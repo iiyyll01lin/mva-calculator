@@ -1,0 +1,7377 @@
+{
+  "syntax_library": [
+    {
+      "id": "syn-001",
+      "action_verb": "GET",
+      "code_most": "A",
+      "parameter_range": "Distance < 30cm",
+      "tmu_value": 1
+    },
+    {
+      "id": "syn-002",
+      "action_verb": "GET",
+      "code_most": "A",
+      "parameter_range": "Distance 30-60cm",
+      "tmu_value": 3
+    },
+    {
+      "id": "syn-003",
+      "action_verb": "GET",
+      "code_most": "A",
+      "parameter_range": "Distance > 60cm",
+      "tmu_value": 6
+    },
+    {
+      "id": "syn-004",
+      "action_verb": "PUT",
+      "code_most": "P",
+      "parameter_range": "Loose fit",
+      "tmu_value": 1
+    },
+    {
+      "id": "syn-005",
+      "action_verb": "PUT",
+      "code_most": "P",
+      "parameter_range": "Tight fit",
+      "tmu_value": 3
+    },
+    {
+      "id": "syn-006",
+      "action_verb": "GRASP",
+      "code_most": "G",
+      "parameter_range": "Simple grasp",
+      "tmu_value": 1
+    },
+    {
+      "id": "syn-007",
+      "action_verb": "GRASP",
+      "code_most": "G",
+      "parameter_range": "Complex grasp",
+      "tmu_value": 3
+    },
+    {
+      "id": "syn-008",
+      "action_verb": "MOVE",
+      "code_most": "M",
+      "parameter_range": "Controlled < 30cm",
+      "tmu_value": 3
+    },
+    {
+      "id": "syn-009",
+      "action_verb": "MOVE",
+      "code_most": "M",
+      "parameter_range": "Controlled > 30cm",
+      "tmu_value": 6
+    },
+    {
+      "id": "syn-010",
+      "action_verb": "PROCESS",
+      "code_most": "X",
+      "parameter_range": "Simple process",
+      "tmu_value": 3
+    },
+    {
+      "id": "syn-011",
+      "action_verb": "PROCESS",
+      "code_most": "X",
+      "parameter_range": "Complex process",
+      "tmu_value": 6
+    },
+    {
+      "id": "syn-012",
+      "action_verb": "ALIGN",
+      "code_most": "I",
+      "parameter_range": "Simple alignment",
+      "tmu_value": 1
+    },
+    {
+      "id": "syn-013",
+      "action_verb": "ALIGN",
+      "code_most": "I",
+      "parameter_range": "Precise alignment",
+      "tmu_value": 3
+    },
+    {
+      "id": "syn-4b316ddc",
+      "action_verb": "抓取",
+      "code_most": "G",
+      "parameter_range": "一般作业",
+      "tmu_value": 1
+    },
+    {
+      "id": "syn-39065336",
+      "action_verb": "拿取",
+      "code_most": "G",
+      "parameter_range": "一般作业",
+      "tmu_value": 1
+    },
+    {
+      "id": "syn-d8de7b77",
+      "action_verb": "轻拍",
+      "code_most": "G",
+      "parameter_range": "一般作业",
+      "tmu_value": 1
+    },
+    {
+      "id": "syn-955ecd15",
+      "action_verb": "抓握",
+      "code_most": "G",
+      "parameter_range": "一般作业",
+      "tmu_value": 1
+    },
+    {
+      "id": "syn-e96bcdf5",
+      "action_verb": "按动按钮",
+      "code_most": "M",
+      "parameter_range": "一般作业",
+      "tmu_value": 3
+    },
+    {
+      "id": "syn-b6cffe71",
+      "action_verb": "理",
+      "code_most": "M",
+      "parameter_range": "理線",
+      "tmu_value": 3
+    },
+    {
+      "id": "syn-6ca4299d",
+      "action_verb": "穿",
+      "code_most": "M",
+      "parameter_range": "一般作业",
+      "tmu_value": 3
+    },
+    {
+      "id": "syn-305ac2ac",
+      "action_verb": "滑出螺丝",
+      "code_most": "M",
+      "parameter_range": "锁螺丝",
+      "tmu_value": 3
+    },
+    {
+      "id": "syn-1b8f6f5f",
+      "action_verb": "推",
+      "code_most": "M",
+      "parameter_range": "一般作业",
+      "tmu_value": 3
+    },
+    {
+      "id": "syn-e398d592",
+      "action_verb": "拉",
+      "code_most": "M",
+      "parameter_range": "一般作业",
+      "tmu_value": 3
+    },
+    {
+      "id": "syn-f618d107",
+      "action_verb": "贴附",
+      "code_most": "M",
+      "parameter_range": "貼附",
+      "tmu_value": 3
+    },
+    {
+      "id": "syn-3739ecb8",
+      "action_verb": "去除",
+      "code_most": "M",
+      "parameter_range": "一般作业",
+      "tmu_value": 3
+    },
+    {
+      "id": "syn-c95a727b",
+      "action_verb": "撕除",
+      "code_most": "M",
+      "parameter_range": "一般作业",
+      "tmu_value": 3
+    },
+    {
+      "id": "syn-75e5426e",
+      "action_verb": "撕开",
+      "code_most": "M",
+      "parameter_range": "一般作业",
+      "tmu_value": 3
+    },
+    {
+      "id": "syn-d074ab76",
+      "action_verb": "折",
+      "code_most": "M",
+      "parameter_range": "理線",
+      "tmu_value": 3
+    },
+    {
+      "id": "syn-0896a1a4",
+      "action_verb": "擦拭",
+      "code_most": "M",
+      "parameter_range": "擦拭",
+      "tmu_value": 3
+    },
+    {
+      "id": "syn-0c5e6514",
+      "action_verb": "手度",
+      "code_most": "M",
+      "parameter_range": "一般作业",
+      "tmu_value": 3
+    },
+    {
+      "id": "syn-e1ef7213",
+      "action_verb": "脚步",
+      "code_most": "M",
+      "parameter_range": "一般作业",
+      "tmu_value": 6
+    },
+    {
+      "id": "syn-b503b851",
+      "action_verb": "旋转",
+      "code_most": "M",
+      "parameter_range": "一般作业",
+      "tmu_value": 3
+    },
+    {
+      "id": "syn-ec538c51",
+      "action_verb": "丢",
+      "code_most": "P",
+      "parameter_range": "一般作业",
+      "tmu_value": 1
+    },
+    {
+      "id": "syn-c90e8141",
+      "action_verb": "保持住",
+      "code_most": "P",
+      "parameter_range": "一般作业",
+      "tmu_value": 1
+    },
+    {
+      "id": "syn-8ee793f1",
+      "action_verb": "放",
+      "code_most": "P",
+      "parameter_range": "一般作业",
+      "tmu_value": 1
+    },
+    {
+      "id": "syn-da05b1c2",
+      "action_verb": "组",
+      "code_most": "P",
+      "parameter_range": "裝配",
+      "tmu_value": 3
+    },
+    {
+      "id": "syn-164869b8",
+      "action_verb": "复选",
+      "code_most": "P",
+      "parameter_range": "一般作业",
+      "tmu_value": 1
+    },
+    {
+      "id": "syn-dcf08149",
+      "action_verb": "对准",
+      "code_most": "P",
+      "parameter_range": "插金手指",
+      "tmu_value": 3
+    },
+    {
+      "id": "syn-3c41f85f",
+      "action_verb": "插入",
+      "code_most": "P",
+      "parameter_range": "插線",
+      "tmu_value": 3
+    },
+    {
+      "id": "syn-d3b04af9",
+      "action_verb": "卡合",
+      "code_most": "P",
+      "parameter_range": "卡合",
+      "tmu_value": 3
+    },
+    {
+      "id": "syn-ca39b293",
+      "action_verb": "施加壓力",
+      "code_most": "P",
+      "parameter_range": "一般作业",
+      "tmu_value": 3
+    },
+    {
+      "id": "syn-f4e24222",
+      "action_verb": "压合",
+      "code_most": "X",
+      "parameter_range": "壓合&熱熔",
+      "tmu_value": 6
+    },
+    {
+      "id": "syn-a143fdd9",
+      "action_verb": "热熔",
+      "code_most": "X",
+      "parameter_range": "壓合&熱熔",
+      "tmu_value": 6
+    },
+    {
+      "id": "syn-9d7226b2",
+      "action_verb": "点胶",
+      "code_most": "X",
+      "parameter_range": "點膠&Bonding",
+      "tmu_value": 6
+    },
+    {
+      "id": "syn-a59cd2a3",
+      "action_verb": "锁附固定",
+      "code_most": "X",
+      "parameter_range": "鎖螺絲",
+      "tmu_value": 6
+    },
+    {
+      "id": "syn-35a37721",
+      "action_verb": "镭雕",
+      "code_most": "X",
+      "parameter_range": "半自動/自動化設備操作",
+      "tmu_value": 6
+    },
+    {
+      "id": "syn-3500cb20",
+      "action_verb": "扫描",
+      "code_most": "X",
+      "parameter_range": "刷槍",
+      "tmu_value": 3
+    },
+    {
+      "id": "syn-7e5f0fe7",
+      "action_verb": "刷PPID",
+      "code_most": "X",
+      "parameter_range": "刷槍",
+      "tmu_value": 3
+    },
+    {
+      "id": "syn-eb765650",
+      "action_verb": "刷工单二维码",
+      "code_most": "X",
+      "parameter_range": "刷槍",
+      "tmu_value": 3
+    },
+    {
+      "id": "syn-6ab703c0",
+      "action_verb": "刷条形码",
+      "code_most": "X",
+      "parameter_range": "刷槍",
+      "tmu_value": 3
+    },
+    {
+      "id": "syn-285339fd",
+      "action_verb": "打印",
+      "code_most": "X",
+      "parameter_range": "半自動/自動化設備操作",
+      "tmu_value": 0
+    },
+    {
+      "id": "syn-a2174493",
+      "action_verb": "并检查",
+      "code_most": "I",
+      "parameter_range": "目視",
+      "tmu_value": 1
+    },
+    {
+      "id": "syn-0ceb05c6",
+      "action_verb": "并确认",
+      "code_most": "I",
+      "parameter_range": "目視",
+      "tmu_value": 1
+    },
+    {
+      "id": "syn-31073125",
+      "action_verb": "并对准",
+      "code_most": "I",
+      "parameter_range": "目視",
+      "tmu_value": 1
+    },
+    {
+      "id": "syn-a02db25d",
+      "action_verb": "并对齐",
+      "code_most": "I",
+      "parameter_range": "目視",
+      "tmu_value": 1
+    }
+  ],
+  "component_library": [
+    {
+      "id": "comp-5a01e9b86b",
+      "name_cn": "导电布",
+      "name_en": "导电布",
+      "category": "元件"
+    },
+    {
+      "id": "comp-345672a491",
+      "name_cn": "醋酸胶布",
+      "name_en": "醋酸胶布",
+      "category": "元件"
+    },
+    {
+      "id": "comp-e1fc9308e0",
+      "name_cn": "背胶离型纸",
+      "name_en": "背胶离型纸",
+      "category": "元件"
+    },
+    {
+      "id": "comp-1b9d9dde1a",
+      "name_cn": "保护袋",
+      "name_en": "保护袋",
+      "category": "元件"
+    },
+    {
+      "id": "comp-86244d48cb",
+      "name_cn": "保护套",
+      "name_en": "保护套",
+      "category": "元件"
+    },
+    {
+      "id": "comp-50c0060d80",
+      "name_cn": "保护膜",
+      "name_en": "保护膜",
+      "category": "元件"
+    },
+    {
+      "id": "comp-ba0e271e34",
+      "name_cn": "铝箔",
+      "name_en": "铝箔",
+      "category": "元件"
+    },
+    {
+      "id": "comp-a0e552d200",
+      "name_cn": "小板",
+      "name_en": "小板",
+      "category": "元件"
+    },
+    {
+      "id": "comp-a15349ac73",
+      "name_cn": "离型纸",
+      "name_en": "离型纸",
+      "category": "元件"
+    },
+    {
+      "id": "comp-96efeb3995",
+      "name_cn": "二維碼",
+      "name_en": "二維碼",
+      "category": "元件"
+    },
+    {
+      "id": "comp-1c7c1eebcd",
+      "name_cn": "mylar",
+      "name_en": "mylar",
+      "category": "元件"
+    },
+    {
+      "id": "comp-42858fc9fa",
+      "name_cn": "金手指",
+      "name_en": "金手指",
+      "category": "元件"
+    },
+    {
+      "id": "comp-46608d4bfc",
+      "name_cn": "MB端",
+      "name_en": "MB端",
+      "category": "元件"
+    },
+    {
+      "id": "comp-52fa42c7f3",
+      "name_cn": "IO端",
+      "name_en": "IO端",
+      "category": "元件"
+    },
+    {
+      "id": "comp-b7c58d155c",
+      "name_cn": "TP端",
+      "name_en": "TP端",
+      "category": "元件"
+    },
+    {
+      "id": "comp-522ab86641",
+      "name_cn": "扣环",
+      "name_en": "扣环",
+      "category": "元件"
+    },
+    {
+      "id": "comp-159946aa11",
+      "name_cn": "小板背胶",
+      "name_en": "小板背胶",
+      "category": "元件"
+    },
+    {
+      "id": "comp-9c0d0a2672",
+      "name_cn": "排线插头",
+      "name_en": "排线插头",
+      "category": "元件"
+    },
+    {
+      "id": "comp-e9d38453ff",
+      "name_cn": "上侧",
+      "name_en": "上侧",
+      "category": "元件"
+    },
+    {
+      "id": "comp-4c61fcce48",
+      "name_cn": "下侧",
+      "name_en": "下侧",
+      "category": "元件"
+    },
+    {
+      "id": "comp-2acda7f9a0",
+      "name_cn": "左上角",
+      "name_en": "左上角",
+      "category": "元件"
+    },
+    {
+      "id": "comp-2ce9bcda2d",
+      "name_cn": "左下角",
+      "name_en": "左下角",
+      "category": "元件"
+    },
+    {
+      "id": "comp-88f9a10c5f",
+      "name_cn": "右上角",
+      "name_en": "右上角",
+      "category": "元件"
+    },
+    {
+      "id": "comp-0f1904a7d8",
+      "name_cn": "右下角",
+      "name_en": "右下角",
+      "category": "元件"
+    },
+    {
+      "id": "comp-c8251b59a8",
+      "name_cn": "刷枪",
+      "name_en": "刷枪",
+      "category": "元件"
+    },
+    {
+      "id": "comp-a62bdc11fc",
+      "name_cn": "铝箔背胶离型纸",
+      "name_en": "铝箔背胶离型纸",
+      "category": "元件"
+    },
+    {
+      "id": "comp-d9d79feb93",
+      "name_cn": "pin口",
+      "name_en": "pin口",
+      "category": "元件"
+    },
+    {
+      "id": "comp-8566923239",
+      "name_cn": "左边",
+      "name_en": "左边",
+      "category": "元件"
+    },
+    {
+      "id": "comp-b3ceb938fb",
+      "name_cn": "右边",
+      "name_en": "右边",
+      "category": "元件"
+    },
+    {
+      "id": "comp-6dfce6238b",
+      "name_cn": "两边",
+      "name_en": "两边",
+      "category": "元件"
+    },
+    {
+      "id": "comp-2d426cc53b",
+      "name_cn": "固定位置处",
+      "name_en": "固定位置处",
+      "category": "元件"
+    },
+    {
+      "id": "comp-9e59329a16",
+      "name_cn": "上方边缘位置",
+      "name_en": "上方边缘位置",
+      "category": "元件"
+    },
+    {
+      "id": "comp-319c4cc15f",
+      "name_cn": "下方边缘位置",
+      "name_en": "下方边缘位置",
+      "category": "元件"
+    },
+    {
+      "id": "comp-bddad8702f",
+      "name_cn": "自带透明背胶纸",
+      "name_en": "自带透明背胶纸",
+      "category": "元件"
+    },
+    {
+      "id": "comp-38eb53507a",
+      "name_cn": "保护膜右下角",
+      "name_en": "保护膜右下角",
+      "category": "元件"
+    }
+  ],
+  "tool_library": [
+    {
+      "id": "tool-001",
+      "name": "電動起子",
+      "spec": "3±0.2 lbf.in",
+      "bit": "δ,05,2#"
+    },
+    {
+      "id": "tool-002",
+      "name": "手套",
+      "spec": "ESD",
+      "bit": null
+    },
+    {
+      "id": "tool-003",
+      "name": "靜電氣槍",
+      "spec": "Anti-static",
+      "bit": null
+    },
+    {
+      "id": "tool-004",
+      "name": "吸塵器",
+      "spec": "Clean room",
+      "bit": null
+    }
+  ],
+  "location_library": [
+    {
+      "id": "loc-ba3583069d",
+      "name": "Connector"
+    },
+    {
+      "id": "loc-8b656a5dd9",
+      "name": "Cover"
+    },
+    {
+      "id": "loc-6b45264da1",
+      "name": "Cover(上盖)下方卡勾内"
+    },
+    {
+      "id": "loc-1c58fe8427",
+      "name": "Cover右上方"
+    },
+    {
+      "id": "loc-aed89c69bd",
+      "name": "Cover右上角"
+    },
+    {
+      "id": "loc-97ed83c28b",
+      "name": "Cover右下角"
+    },
+    {
+      "id": "loc-3c73703a2b",
+      "name": "Cover左上方"
+    },
+    {
+      "id": "loc-52ad4d2934",
+      "name": "Cover左上角"
+    },
+    {
+      "id": "loc-760befa924",
+      "name": "Cover左下角"
+    },
+    {
+      "id": "loc-995731a131",
+      "name": "Cover背面"
+    },
+    {
+      "id": "loc-70704c6c48",
+      "name": "LCD"
+    },
+    {
+      "id": "loc-e324c950ba",
+      "name": "LCD（显示屏）"
+    },
+    {
+      "id": "loc-d13fa27769",
+      "name": "Label剥离机"
+    },
+    {
+      "id": "loc-b91eed4b7a",
+      "name": "Lower"
+    },
+    {
+      "id": "loc-6e979f426b",
+      "name": "MB"
+    },
+    {
+      "id": "loc-dddf07ce02",
+      "name": "MES电脑"
+    },
+    {
+      "id": "loc-e5cb10980f",
+      "name": "PIN口"
+    },
+    {
+      "id": "loc-a6d1ae1ad8",
+      "name": "PPID"
+    },
+    {
+      "id": "loc-4c7cfb2e92",
+      "name": "Rubber"
+    },
+    {
+      "id": "loc-2eb2d4fa16",
+      "name": "TP 小板"
+    },
+    {
+      "id": "loc-11a66854c0",
+      "name": "UP"
+    },
+    {
+      "id": "loc-51590b6a04",
+      "name": "mark线"
+    },
+    {
+      "id": "loc-0cf2d2a227",
+      "name": "二维码位置"
+    },
+    {
+      "id": "loc-6978cdfe14",
+      "name": "卡勾"
+    },
+    {
+      "id": "loc-13d481c3c8",
+      "name": "卡槽"
+    },
+    {
+      "id": "loc-d48bd83f38",
+      "name": "台车"
+    },
+    {
+      "id": "loc-f9934d4902",
+      "name": "右支架"
+    },
+    {
+      "id": "loc-ce6001263c",
+      "name": "回流线"
+    },
+    {
+      "id": "loc-a94d82e09f",
+      "name": "垃圾是否残留"
+    },
+    {
+      "id": "loc-cf0bed4739",
+      "name": "垃圾桶"
+    },
+    {
+      "id": "loc-370285653d",
+      "name": "定位框"
+    },
+    {
+      "id": "loc-81ba2d14b8",
+      "name": "工单二维码"
+    },
+    {
+      "id": "loc-bea3c80bda",
+      "name": "工单位置处"
+    },
+    {
+      "id": "loc-1ff826e6f8",
+      "name": "左侧Rubber"
+    },
+    {
+      "id": "loc-c24542053c",
+      "name": "左支架"
+    },
+    {
+      "id": "loc-98b649aeeb",
+      "name": "平行接口"
+    },
+    {
+      "id": "loc-491f7e6d04",
+      "name": "打印机"
+    },
+    {
+      "id": "loc-a014dcaffd",
+      "name": "托盘"
+    },
+    {
+      "id": "loc-522ab86641",
+      "name": "扣环"
+    },
+    {
+      "id": "loc-0496caf1d7",
+      "name": "捡料架"
+    },
+    {
+      "id": "loc-067b91a2f9",
+      "name": "捡料架亮灯位置处"
+    },
+    {
+      "id": "loc-6f141de6bf",
+      "name": "排线"
+    },
+    {
+      "id": "loc-6e4fd28ff8",
+      "name": "排线接口出"
+    },
+    {
+      "id": "loc-0565e43054",
+      "name": "材料来料料盘"
+    },
+    {
+      "id": "loc-eb3b2dac73",
+      "name": "材料盒"
+    },
+    {
+      "id": "loc-a35d72018c",
+      "name": "条形码"
+    },
+    {
+      "id": "loc-d67da0032d",
+      "name": "栈板"
+    },
+    {
+      "id": "loc-960f6b65e1",
+      "name": "治具"
+    },
+    {
+      "id": "loc-2d6a1a23f5",
+      "name": "流水线"
+    },
+    {
+      "id": "loc-e451aef5a0",
+      "name": "百宝箱"
+    },
+    {
+      "id": "loc-e97049b19a",
+      "name": "百宝箱固定位置"
+    },
+    {
+      "id": "loc-15e08cd85f",
+      "name": "线槽"
+    },
+    {
+      "id": "loc-80dacf2833",
+      "name": "线边桌"
+    },
+    {
+      "id": "loc-789fd010d3",
+      "name": "胶台"
+    },
+    {
+      "id": "loc-3ce426e9b7",
+      "name": "螺丝供料器"
+    },
+    {
+      "id": "loc-aa7feda51e",
+      "name": "螺丝孔"
+    },
+    {
+      "id": "loc-cbb49957e5",
+      "name": "螺丝柱"
+    },
+    {
+      "id": "loc-ebd72460a5",
+      "name": "转轴支架处"
+    },
+    {
+      "id": "loc-709a2828a9",
+      "name": "限位槽"
+    },
+    {
+      "id": "loc-a63b5cb04a",
+      "name": "限位点"
+    },
+    {
+      "id": "loc-4e091b8248",
+      "name": "限位线"
+    },
+    {
+      "id": "loc-276b93ce9c",
+      "name": "预定位置处"
+    }
+  ],
+  "object_library": [
+    {
+      "id": "obj-lcd",
+      "category": "高單價物料",
+      "sub_category": "LCD",
+      "name": "LCD顯示器",
+      "glove_type": "兩只半指手套",
+      "ctq": true
+    },
+    {
+      "id": "obj-mb",
+      "category": "主板/MLB",
+      "sub_category": "MLB",
+      "name": "MLB主板",
+      "glove_type": "兩只半指手套",
+      "ctq": true
+    },
+    {
+      "id": "obj-dimm",
+      "category": "記憶體",
+      "sub_category": "DIMM",
+      "name": "DIMM模組",
+      "glove_type": "兩只半指手套",
+      "ctq": true
+    },
+    {
+      "id": "obj-hdd",
+      "category": "儲存裝置",
+      "sub_category": "HDD",
+      "name": "HDD硬碟",
+      "glove_type": "兩只無塵手套",
+      "ctq": true
+    },
+    {
+      "id": "obj-vrm",
+      "category": "子零件",
+      "sub_category": "VRM",
+      "name": "VRM模組",
+      "glove_type": "兩只半指手套",
+      "ctq": false
+    },
+    {
+      "id": "obj-pcie",
+      "category": "介面卡",
+      "sub_category": "PCIE",
+      "name": "PCIE擴充卡",
+      "glove_type": "兩只半指手套",
+      "ctq": true
+    },
+    {
+      "id": "obj-cable",
+      "category": "線材",
+      "sub_category": "Cable",
+      "name": "訊號線束",
+      "glove_type": "左手半指+右手指套",
+      "ctq": false
+    },
+    {
+      "id": "obj-carton",
+      "category": "包材",
+      "sub_category": "Carton",
+      "name": "包裝外箱",
+      "glove_type": "一般作業手套",
+      "ctq": false
+    },
+    {
+      "id": "obj-fastener",
+      "category": "標準件",
+      "sub_category": "Screw",
+      "name": "拇指螺絲",
+      "glove_type": "兩只半指手套",
+      "ctq": true
+    }
+  ],
+  "from_locations": [
+    {
+      "id": "from-0496caf1d7",
+      "name": "捡料架"
+    },
+    {
+      "id": "from-067b91a2f9",
+      "name": "捡料架亮灯位置处"
+    },
+    {
+      "id": "from-e451aef5a0",
+      "name": "百宝箱"
+    },
+    {
+      "id": "from-a014dcaffd",
+      "name": "托盘"
+    },
+    {
+      "id": "from-eb3b2dac73",
+      "name": "材料盒"
+    },
+    {
+      "id": "from-0565e43054",
+      "name": "材料来料料盘"
+    },
+    {
+      "id": "from-3ce426e9b7",
+      "name": "螺丝供料器"
+    },
+    {
+      "id": "from-789fd010d3",
+      "name": "胶台"
+    },
+    {
+      "id": "from-d13fa27769",
+      "name": "Label剥离机"
+    },
+    {
+      "id": "from-d67da0032d",
+      "name": "栈板"
+    },
+    {
+      "id": "from-491f7e6d04",
+      "name": "打印机"
+    },
+    {
+      "id": "from-80dacf2833",
+      "name": "线边桌"
+    },
+    {
+      "id": "from-d48bd83f38",
+      "name": "台车"
+    },
+    {
+      "id": "from-ce6001263c",
+      "name": "回流线"
+    },
+    {
+      "id": "from-960f6b65e1",
+      "name": "治具"
+    },
+    {
+      "id": "from-3c73703a2b",
+      "name": "Cover左上方"
+    },
+    {
+      "id": "from-1c58fe8427",
+      "name": "Cover右上方"
+    },
+    {
+      "id": "from-760befa924",
+      "name": "Cover左下角"
+    },
+    {
+      "id": "from-97ed83c28b",
+      "name": "Cover右下角"
+    },
+    {
+      "id": "from-52ad4d2934",
+      "name": "Cover左上角"
+    },
+    {
+      "id": "from-aed89c69bd",
+      "name": "Cover右上角"
+    },
+    {
+      "id": "from-2d6a1a23f5",
+      "name": "流水线"
+    },
+    {
+      "id": "from-e324c950ba",
+      "name": "LCD（显示屏）"
+    }
+  ],
+  "to_locations": [
+    {
+      "id": "to-6e979f426b",
+      "name": "MB"
+    },
+    {
+      "id": "to-70704c6c48",
+      "name": "LCD"
+    },
+    {
+      "id": "to-11a66854c0",
+      "name": "UP"
+    },
+    {
+      "id": "to-b91eed4b7a",
+      "name": "Lower"
+    },
+    {
+      "id": "to-8b656a5dd9",
+      "name": "Cover"
+    },
+    {
+      "id": "to-e5cb10980f",
+      "name": "PIN口"
+    },
+    {
+      "id": "to-2eb2d4fa16",
+      "name": "TP 小板"
+    },
+    {
+      "id": "to-a014dcaffd",
+      "name": "托盘"
+    },
+    {
+      "id": "to-960f6b65e1",
+      "name": "治具"
+    },
+    {
+      "id": "to-6f141de6bf",
+      "name": "排线"
+    },
+    {
+      "id": "to-2d6a1a23f5",
+      "name": "流水线"
+    },
+    {
+      "id": "to-0cf2d2a227",
+      "name": "二维码位置"
+    },
+    {
+      "id": "to-e97049b19a",
+      "name": "百宝箱固定位置"
+    },
+    {
+      "id": "to-bea3c80bda",
+      "name": "工单位置处"
+    },
+    {
+      "id": "to-cf0bed4739",
+      "name": "垃圾桶"
+    },
+    {
+      "id": "to-3c73703a2b",
+      "name": "Cover左上方"
+    },
+    {
+      "id": "to-1c58fe8427",
+      "name": "Cover右上方"
+    },
+    {
+      "id": "to-760befa924",
+      "name": "Cover左下角"
+    },
+    {
+      "id": "to-97ed83c28b",
+      "name": "Cover右下角"
+    },
+    {
+      "id": "to-52ad4d2934",
+      "name": "Cover左上角"
+    },
+    {
+      "id": "to-aed89c69bd",
+      "name": "Cover右上角"
+    },
+    {
+      "id": "to-13d481c3c8",
+      "name": "卡槽"
+    },
+    {
+      "id": "to-6978cdfe14",
+      "name": "卡勾"
+    },
+    {
+      "id": "to-995731a131",
+      "name": "Cover背面"
+    },
+    {
+      "id": "to-ba3583069d",
+      "name": "Connector"
+    },
+    {
+      "id": "to-276b93ce9c",
+      "name": "预定位置处"
+    },
+    {
+      "id": "to-c24542053c",
+      "name": "左支架"
+    },
+    {
+      "id": "to-f9934d4902",
+      "name": "右支架"
+    },
+    {
+      "id": "to-6e4fd28ff8",
+      "name": "排线接口出"
+    },
+    {
+      "id": "to-4c7cfb2e92",
+      "name": "Rubber"
+    },
+    {
+      "id": "to-3ce426e9b7",
+      "name": "螺丝供料器"
+    },
+    {
+      "id": "to-6b45264da1",
+      "name": "Cover(上盖)下方卡勾内"
+    }
+  ],
+  "reference_points": [
+    {
+      "id": "ref-dddf07ce02",
+      "name": "MES电脑"
+    },
+    {
+      "id": "ref-15e08cd85f",
+      "name": "线槽"
+    },
+    {
+      "id": "ref-51590b6a04",
+      "name": "mark线"
+    },
+    {
+      "id": "ref-98b649aeeb",
+      "name": "平行接口"
+    },
+    {
+      "id": "ref-aa7feda51e",
+      "name": "螺丝孔"
+    },
+    {
+      "id": "ref-a94d82e09f",
+      "name": "垃圾是否残留"
+    },
+    {
+      "id": "ref-a6d1ae1ad8",
+      "name": "PPID"
+    },
+    {
+      "id": "ref-370285653d",
+      "name": "定位框"
+    },
+    {
+      "id": "ref-6978cdfe14",
+      "name": "卡勾"
+    },
+    {
+      "id": "ref-a63b5cb04a",
+      "name": "限位点"
+    },
+    {
+      "id": "ref-4e091b8248",
+      "name": "限位线"
+    },
+    {
+      "id": "ref-cbb49957e5",
+      "name": "螺丝柱"
+    },
+    {
+      "id": "ref-709a2828a9",
+      "name": "限位槽"
+    },
+    {
+      "id": "ref-522ab86641",
+      "name": "扣环"
+    },
+    {
+      "id": "ref-ebd72460a5",
+      "name": "转轴支架处"
+    },
+    {
+      "id": "ref-81ba2d14b8",
+      "name": "工单二维码"
+    },
+    {
+      "id": "ref-a35d72018c",
+      "name": "条形码"
+    },
+    {
+      "id": "ref-1ff826e6f8",
+      "name": "左侧Rubber"
+    }
+  ],
+  "precautions": [
+    {
+      "id": "prec-c1677cb0dd",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "注意事项少于3个",
+      "index_condition2": "",
+      "note_type": "一般注意事项",
+      "note_code": "1",
+      "description": "所有作业人员必须按照MI标准作业，不可随意更改动作，及涂改MI"
+    },
+    {
+      "id": "prec-df53af9796",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "注意事项少于3个",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "2",
+      "description": "作业过程中需将垃圾及时丢进垃圾盒或垃圾桶，不可随意丢到流水线或地面上"
+    },
+    {
+      "id": "prec-f39b7f5360",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "注意事项少于3个",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "3",
+      "description": "手套每班次更换，特殊情况发现脏污破损及时更换"
+    },
+    {
+      "id": "prec-04ebc50a85",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "电动起子",
+      "index_condition2": "",
+      "note_type": "锁螺丝注意事项",
+      "note_code": "1",
+      "description": "禁止OP在螺丝未接触螺丝孔时就旋转状态去锁附螺丝"
+    },
+    {
+      "id": "prec-47f67f8b83",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "电动起子",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "2",
+      "description": "锁完螺丝后检查是否锁到位,确认OK后再进行下一动作"
+    },
+    {
+      "id": "prec-cd79051f7a",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "电动起子",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "3",
+      "description": "电动起子,电动起子高度需距离机台 22~35cm,逆流水线锁螺丝"
+    },
+    {
+      "id": "prec-aabcd7ce15",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "电动起子",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "4",
+      "description": "开线前需检查起子是否有磁环（双磁环），没有及时通知线外人员"
+    },
+    {
+      "id": "prec-934ddc816a",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "电动起子",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "5",
+      "description": "要确保螺丝锁附到底,锁附完螺丝后听到\"嗒\"的一声响后再去完成下个动作"
+    },
+    {
+      "id": "prec-4c8d42df8d",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "电动起子",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "6",
+      "description": "一次只能拿取1颗螺丝,锁完螺丝在等待的时候,电动起子头上不能悬挂螺丝"
+    },
+    {
+      "id": "prec-5ad46a34b0",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "电动起子",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "7",
+      "description": "起子头规格 Φ??? Φ???    ?#(???)"
+    },
+    {
+      "id": "prec-c8683adb3b",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "电动起子",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "8",
+      "description": "电动起子需有套筒,防止人员私自调节扭力"
+    },
+    {
+      "id": "prec-44c5217667",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "电动起子",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "9",
+      "description": "核对实物/供料器/MI上料号是否一致，机台内掉落螺丝需要及时清理"
+    },
+    {
+      "id": "prec-645744181e",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "手套",
+      "index_condition2": "",
+      "note_type": "手套注意事项",
+      "note_code": "1",
+      "description": "此站别需戴全指手套和静电手环"
+    },
+    {
+      "id": "prec-d1e9cd0dfd",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "手套",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "2",
+      "description": "此站别需戴一隻全指手套&一隻半指手套(手握起子)和静电手环"
+    },
+    {
+      "id": "prec-c5ce9cef6d",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "手套",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "3",
+      "description": "此站别需戴半指手套和静电手环"
+    },
+    {
+      "id": "prec-b750952b38",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "手套",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "4",
+      "description": "手套2H 更换一次，特殊情况发现脏污破损及时更换 (ASSY)"
+    },
+    {
+      "id": "prec-91641c36a8",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "治具",
+      "index_condition2": "热熔治具list",
+      "note_type": "热熔治具注意事项",
+      "note_code": "1",
+      "description": "热熔屏显治具温度范围：?????℃(铜板温度)；热熔治具铜柱温度范围—?????℃"
+    },
+    {
+      "id": "prec-33f1536710",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "治具",
+      "index_condition2": "热熔治具list",
+      "note_type": "",
+      "note_code": "2",
+      "description": "气压值：????? Mpa   热熔压合时间:????? S"
+    },
+    {
+      "id": "prec-3aed375ac8",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "治具",
+      "index_condition2": "热熔治具list",
+      "note_type": "",
+      "note_code": "3",
+      "description": "压强值/压强值范围：????? Kgf/cm² & ????? N/cm²"
+    },
+    {
+      "id": "prec-4aeab657ce",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "治具",
+      "index_condition2": "热熔治具list",
+      "note_type": "",
+      "note_code": "4",
+      "description": "K/B(键盘)热熔站作業員自检-热熔头是否OK"
+    },
+    {
+      "id": "prec-e8a59decc8",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "治具",
+      "index_condition2": "热熔治具list",
+      "note_type": "",
+      "note_code": "5",
+      "description": "热熔治具下模内不可有異物,防止upper(掌托)外观面热熔时导致外观不良"
+    },
+    {
+      "id": "prec-a72c0c9a4d",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "治具",
+      "index_condition2": "热熔治具list",
+      "note_type": "",
+      "note_code": "6",
+      "description": "注意KB排线不能靠近热熔点"
+    },
+    {
+      "id": "prec-555df139b3",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "治具",
+      "index_condition2": "压合治具list",
+      "note_type": "压合治具注意事项",
+      "note_code": "1",
+      "description": "设备工作压强值范围：????? Kgf/cm²或????? N/cm²  ，设备工作气压值：:????? Mpa（电动治具无气压值）  压合时间:????? S"
+    },
+    {
+      "id": "prec-f810ea5076",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "离子风扇",
+      "index_condition2": "",
+      "note_type": "离子风扇注意事项",
+      "note_code": "1",
+      "description": "离子风扇需开至最大档位，吹拂角度需正对作业区域，(距離：???????公分)"
+    },
+    {
+      "id": "prec-4263e60304",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "电脑/刷枪",
+      "index_condition2": "",
+      "note_type": "kitting注意事项",
+      "note_code": "1",
+      "description": "当站人员检料时若发现明显的材料不良,请将材料放至不良品暂放区,由线外人员统一处理"
+    },
+    {
+      "id": "prec-8b02090b66",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "电脑/刷枪",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "2",
+      "description": "撿料人员不可以私自更换料架上材料的位置"
+    },
+    {
+      "id": "prec-eebbc75ee4",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "电脑/刷枪",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "3",
+      "description": "如有缺料的情况,检料人员需停线,并告知线外上料人员,切记不可以取其他架位上的材料替代"
+    },
+    {
+      "id": "prec-ee4683b181",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "电脑/刷枪",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "4",
+      "description": "材料要轻拿轻放,不能一只手同时捡两颗料"
+    },
+    {
+      "id": "prec-6adcf626f4",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "电脑/刷枪",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "5",
+      "description": "依KITTING料架的指示灯拣料(灯亮则需检料,不亮则无需检料)"
+    },
+    {
+      "id": "prec-ed10826422",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "电脑/刷枪",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "6",
+      "description": "材料必须背靠背摆放，避免撞刮伤"
+    },
+    {
+      "id": "prec-a0778ce7a3",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "电脑/刷枪",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "7",
+      "description": "拿取键盘需拿取中间部分，禁止单手拿取一边"
+    },
+    {
+      "id": "prec-99782bfa32",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "电脑/刷枪",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "8",
+      "description": "拿取LCD无PCB板端中间位置或两侧边中间位置，拿取寬度不得低於30mm"
+    },
+    {
+      "id": "prec-22e87abd3e",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "电脑/刷枪",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "9",
+      "description": "百宝箱一格不可放多个材料"
+    },
+    {
+      "id": "prec-424f5461b3",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "打印机",
+      "index_condition2": "",
+      "note_type": "打印Label注意事项",
+      "note_code": "1",
+      "description": "检查label是否有打印不良，如有不良需通知线外及相关人员处理"
+    },
+    {
+      "id": "prec-2415d14394",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "打印机",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "2",
+      "description": "如有不能正常过站及不能打印label出来需通知线外及相关人员处理"
+    },
+    {
+      "id": "prec-008fcdaae0",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "治具",
+      "index_condition2": "TP麦拉 CCD治具",
+      "note_type": "TP麦拉 CCD治具注意事项",
+      "note_code": "1",
+      "description": "气压值：????? Mpa  压强值/压强值范围 ????? Kgf/cm² & ?????   N/cm²   压合时间：????? S"
+    },
+    {
+      "id": "prec-958c05f3b0",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "治具",
+      "index_condition2": "TP麦拉 CCD治具",
+      "note_type": "",
+      "note_code": "2",
+      "description": "压合完 TP Mylar 后需自检，确保压合OK(若有明显偏移现象，需叫当线线外处理)"
+    },
+    {
+      "id": "prec-8a3aaaf35b",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "治具",
+      "index_condition2": "开机键锁附治具",
+      "note_type": "开机键锁附治具注意事项",
+      "note_code": "1",
+      "description": "气压值：????? Mpa  ，压强值：????? N/cm²"
+    },
+    {
+      "id": "prec-b3a02b3b71",
+      "process": "ASSY",
+      "category": "治工具设备/XX料",
+      "index_condition1": "治具",
+      "index_condition2": "双工位治具list",
+      "note_type": "一人一机双工位作业",
+      "note_code": "1",
+      "description": "UP放回原泡棉时不可放错，UP、工单、百宝箱要一一对应。"
+    },
+    {
+      "id": "prec-fa3bda4063",
+      "process": "ASSY",
+      "category": "材料目标物",
+      "index_condition1": "背胶",
+      "index_condition2": "",
+      "note_type": "裸露背胶材料注意事项",
+      "note_code": "1",
+      "description": "手指不可接触材料背胶胶面"
+    },
+    {
+      "id": "prec-07fd633e66",
+      "process": "ASSY",
+      "category": "材料目标物",
+      "index_condition1": "背胶",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "2",
+      "description": "休息或吃饭时间不得提前撕除背胶离型纸，如若撕除后必须进行下一工站的操作"
+    },
+    {
+      "id": "prec-1b2a00281e",
+      "process": "ASSY",
+      "category": "材料目标物",
+      "index_condition1": "排线",
+      "index_condition2": "",
+      "note_type": "排线注意事项",
+      "note_code": "1",
+      "description": "排线需自检是否插理到位"
+    },
+    {
+      "id": "prec-2e595ee93b",
+      "process": "ASSY",
+      "category": "材料目标物",
+      "index_condition1": "排线",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "2",
+      "description": "注意自检排线接口是否有破损缺失，若有及时交由线外处理"
+    },
+    {
+      "id": "prec-3be48df02f",
+      "process": "ASSY",
+      "category": "材料目标物",
+      "index_condition1": "bezel",
+      "index_condition2": "卡合",
+      "note_type": "卡合注意事项",
+      "note_code": "1",
+      "description": "卡完bezel/KB后需自检是否完全卡合到位"
+    },
+    {
+      "id": "prec-f147e724a6",
+      "process": "ASSY",
+      "category": "材料目标物",
+      "index_condition1": "bezel",
+      "index_condition2": "卡合",
+      "note_type": "",
+      "note_code": "2",
+      "description": "卡合bezel时需一处一处的按压卡合，不可滑动卡合"
+    },
+    {
+      "id": "prec-d151763362",
+      "process": "ASSY",
+      "category": "材料目标物",
+      "index_condition1": "WLAN Label",
+      "index_condition2": "",
+      "note_type": "WLAN Label贴附注意事项",
+      "note_code": "1",
+      "description": "检查label有无破损或损坏，如有损坏或破损交由线外处理"
+    },
+    {
+      "id": "prec-a439d6983a",
+      "process": "ASSY",
+      "category": "材料目标物",
+      "index_condition1": "WLAN Label",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "2",
+      "description": "label贴附不可有脏污、破损、贴歪、位置颠倒、褶皱、气泡等不良"
+    },
+    {
+      "id": "prec-2c92bfee8c",
+      "process": "ASSY",
+      "category": "材料目标物",
+      "index_condition1": "散热泥",
+      "index_condition2": "",
+      "note_type": "散热泥注意",
+      "note_code": "1",
+      "description": "有散热泥一面需朝上，手不可直接触碰散热泥"
+    },
+    {
+      "id": "prec-42c5580f92",
+      "process": "ASSY",
+      "category": "材料目标物",
+      "index_condition1": "散热泥",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "2",
+      "description": "铁件散热泥不可超出铁件边缘，脱落重新贴附时不可贴偏，贴斜"
+    },
+    {
+      "id": "prec-0b11bba3d2",
+      "process": "ASSY",
+      "category": "材料目标物",
+      "index_condition1": "铜箔",
+      "index_condition2": "",
+      "note_type": "铜箔注意",
+      "note_code": "1",
+      "description": "需貼附平整、不可漏贴、贴歪"
+    },
+    {
+      "id": "prec-dafd6d0a35",
+      "process": "ASSY",
+      "category": "材料目标物",
+      "index_condition1": "RAM",
+      "index_condition2": "",
+      "note_type": "RAM注意",
+      "note_code": "1",
+      "description": "RAM（内存条）需45°插入，摇晃三下"
+    },
+    {
+      "id": "prec-5c6cde9275",
+      "process": "ASSY",
+      "category": "材料目标物",
+      "index_condition1": "RAM",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "2",
+      "description": "单RAM优先插????槽"
+    },
+    {
+      "id": "prec-5755c2391b",
+      "process": "ASSY",
+      "category": "材料目标物",
+      "index_condition1": "插金手指",
+      "index_condition2": "",
+      "note_type": "插金手指注意事项",
+      "note_code": "1",
+      "description": "黑色天线对应黑色三角，白色天线对应白色三角"
+    },
+    {
+      "id": "prec-5b4a28fe07",
+      "process": "ASSY",
+      "category": "材料目标物",
+      "index_condition1": "插金手指",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "2",
+      "description": "插理排线时，需确保排线完全插入，不可插歪及未插到位"
+    },
+    {
+      "id": "prec-4dda46de91",
+      "process": "ASSY",
+      "category": "材料目标物",
+      "index_condition1": "拉拉胶",
+      "index_condition2": "",
+      "note_type": "拉拉胶注意事项",
+      "note_code": "1",
+      "description": "撕除表面离型纸后禁止触摸拉垃胶"
+    },
+    {
+      "id": "prec-1532c1397e",
+      "process": "ASSY",
+      "category": "材料目标物",
+      "index_condition1": "拉拉胶",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "2",
+      "description": "粘贴拉拉胶需贴附平整，不能有褶皱"
+    },
+    {
+      "id": "prec-e7d0dd8f13",
+      "process": "ASSY",
+      "category": "材料目标物",
+      "index_condition1": "拉拉胶",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "3",
+      "description": "撕拉拉胶离型纸时用一只手按住拉带头，另一只手撕离型纸"
+    },
+    {
+      "id": "prec-630a4c76ab",
+      "process": "ASSY",
+      "category": "材料目标物",
+      "index_condition1": "喇叭",
+      "index_condition2": "",
+      "note_type": "喇叭",
+      "note_code": "1",
+      "description": "组装喇叭时喇叭胶圈必须平整，胶圈不可掉落"
+    },
+    {
+      "id": "prec-7594f5c0cd",
+      "process": "ASSY",
+      "category": "材料目标物",
+      "index_condition1": "排线",
+      "index_condition2": "",
+      "note_type": "理线",
+      "note_code": "1",
+      "description": "排线需自检是否进入卡槽，不得跳线及爬墙"
+    },
+    {
+      "id": "prec-41bed36271",
+      "process": "ASSY",
+      "category": "材料目标物",
+      "index_condition1": "排线",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "2",
+      "description": "不能使用有破损、尖锐或严重磨损的理线棒进行作业，如若发现需要告知线外人员及时更换"
+    },
+    {
+      "id": "prec-32adcfd3cb",
+      "process": "ASSY",
+      "category": "材料目标物",
+      "index_condition1": "Thermal&MB",
+      "index_condition2": "",
+      "note_type": "组装Thermal 及MB 模组",
+      "note_code": "1",
+      "description": "拿取导热管&MB模组时需要拿模组中间位置，不能触碰风扇区域，包含扇叶"
+    },
+    {
+      "id": "prec-db8c562f84",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "Label",
+      "index_condition2": "",
+      "note_type": "包装贴label站别",
+      "note_code": "1",
+      "description": "贴UP面label，如果基准线label不存在，则旁边label贴于基准线label位置，后续label依次平移"
+    },
+    {
+      "id": "prec-c6f1431ae0",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "Label",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "2",
+      "description": "label贴附不可有脏污、破损、贴歪、位置颠倒、褶皱、气泡等不良"
+    },
+    {
+      "id": "prec-40882526e3",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "托盘",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "清理泡棉，确保泡棉干净，不可有残胶/胶带，不可在泡棉上乱涂乱画"
+    },
+    {
+      "id": "prec-b4e566e884",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "垃圾盒/垃圾桶",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "作业过程中需将垃圾及时丢进垃圾盒或垃圾桶，不可随意丢到流水在线或地面"
+    },
+    {
+      "id": "prec-ab403d949b",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "手套",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "此站需佩戴全指手套，更换频率1h/次"
+    },
+    {
+      "id": "prec-1855b05c8e",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "手套",
+      "index_condition2": "label剥离机",
+      "note_type": "",
+      "note_code": "",
+      "description": "有label剥离机此站需佩戴一只半指手套一只全指手套，更换频率1h/次"
+    },
+    {
+      "id": "prec-2b5bfc9805",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "手套",
+      "index_condition2": "label剥离机",
+      "note_type": "",
+      "note_code": "",
+      "description": "无label剥离机此站需佩戴两只半指手套，更换频率1h/次"
+    },
+    {
+      "id": "prec-f918dd0228",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "治具",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "使用治具前，需确认治具名称正确，并无脏污、破损等不良"
+    },
+    {
+      "id": "prec-5cefc28141",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "Label",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "根据泡棉内刷的label贴附，没有则不用贴"
+    },
+    {
+      "id": "prec-4e72a5f4ac",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "治具",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "选择治具必须根据机种名称选择，不可用错"
+    },
+    {
+      "id": "prec-cc444a4059",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "Label",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "发现label贴歪或与定义位置不符时.撕下后不可以留有残胶"
+    },
+    {
+      "id": "prec-842222b581",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "打印机",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "检视是否有打印不良，如有打印不良需重新打印"
+    },
+    {
+      "id": "prec-68c3ffb65b",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "Label",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "Label贴付以Lower上倒角定位，不可贴歪"
+    },
+    {
+      "id": "prec-e2627f6219",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "Label",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "Label贴附后需检查Label不可有丝毫褶皱，贴附不可歪斜"
+    },
+    {
+      "id": "prec-2178a117c2",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "无尘布",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "注意无尘布擦拭约1小时需更换一次，和无尘布太脏需随时更换"
+    },
+    {
+      "id": "prec-89443cca81",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "无尘布",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "擦拭LCD面需要从左往右,从上往下擦,不可胡乱擦拭"
+    },
+    {
+      "id": "prec-5360c12602",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "无尘布",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "禁止用任何液体直接倒在LCD Panel上 进行清洁"
+    },
+    {
+      "id": "prec-44c86e6c5c",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "无尘布",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "擦拭LCD时,禁止将LCD打开180°"
+    },
+    {
+      "id": "prec-7eec9e9c21",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "手套",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "此站需佩戴全指手套，更换频率1h/次，如脏污,立即更换"
+    },
+    {
+      "id": "prec-e88c2c8700",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "无尘布",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "擦拭LCD时需用手扶着LCD"
+    },
+    {
+      "id": "prec-bfb2168c33",
+      "process": "PACK",
+      "category": "材料目标物",
+      "index_condition1": "纸箱",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "折纸箱前需检查DELL  Logo 、条码以及纸箱有无破损，或打印不良.如遇上述问题则交由线外处理"
+    },
+    {
+      "id": "prec-519beeeb61",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "Label",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "检查Label有无破损或损坏，如有损坏或破损交由线外处理"
+    },
+    {
+      "id": "prec-79c92ad889",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "Label",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "依泡棉内的Label贴附,没有则不用贴"
+    },
+    {
+      "id": "prec-7d17fff239",
+      "process": "PACK",
+      "category": "材料目标物",
+      "index_condition1": "机台",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "产品需轻拿轻放，不可划伤、撞伤机台"
+    },
+    {
+      "id": "prec-7eec9e9c21",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "手套",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "此站需佩戴全指手套，更换频率1h/次，如脏污,立即更换"
+    },
+    {
+      "id": "prec-03bb277630",
+      "process": "PACK",
+      "category": "材料目标物",
+      "index_condition1": "PE袋",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "套PE袋人员在把机器装进袋子之前检查机器上是否有毛屑等其它不该有的东西，若有需清理完毕才可打包"
+    },
+    {
+      "id": "prec-bfc490eb5a",
+      "process": "PACK",
+      "category": "材料目标物",
+      "index_condition1": "PE袋",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "在装PE袋时应检查PE袋有无破损，印刷不良，如遇上述情况，交由线外处理"
+    },
+    {
+      "id": "prec-983244b9c7",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "手套",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "此站拿取机台全指手套，粘胶带用半指手套，更换频率1h/次"
+    },
+    {
+      "id": "prec-402a8ed217",
+      "process": "PACK",
+      "category": "材料目标物",
+      "index_condition1": "机台",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "机台放进外箱内时须检查包装袋完好无损且包装完整"
+    },
+    {
+      "id": "prec-fd12957091",
+      "process": "PACK",
+      "category": "材料目标物",
+      "index_condition1": "说明书",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "捡说明书等文件时需自检没有褶皱和破损"
+    },
+    {
+      "id": "prec-988c1cc622",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "刷枪",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "不带料，只需刷枪过站"
+    },
+    {
+      "id": "prec-d56432c655",
+      "process": "PACK",
+      "category": "材料目标物",
+      "index_condition1": "包材/配件",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "捡出的材料必须放在泡棉上,掉落在地上的材料必须由线外人员去处理"
+    },
+    {
+      "id": "prec-200bcbb0a0",
+      "process": "PACK",
+      "category": "材料目标物",
+      "index_condition1": "包材/配件",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "捡料人员不可以私自更换料架上材料的位置"
+    },
+    {
+      "id": "prec-15a046c9ce",
+      "process": "PACK",
+      "category": "材料目标物",
+      "index_condition1": "包材/配件",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "装夹页/说明书于Carton时不可折叠放置"
+    },
+    {
+      "id": "prec-e54a74a065",
+      "process": "PACK",
+      "category": "材料目标物",
+      "index_condition1": "包材/配件",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "在装夹页时，要正面放置，不可乱放"
+    },
+    {
+      "id": "prec-846138d6f3",
+      "process": "PACK",
+      "category": "材料目标物",
+      "index_condition1": "包材/配件",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "检查材料有无破损、脏污，若有，则交由线外处理"
+    },
+    {
+      "id": "prec-397a198e82",
+      "process": "PACK",
+      "category": "材料目标物",
+      "index_condition1": "包材/配件",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "放配件时需检查外箱内是否有Pizza Box（隔板）"
+    },
+    {
+      "id": "prec-2f44218963",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "Label",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "打印Label后，要看是否为良品，Label不可贴歪，不可有破损如遇上述情况交由线外处理"
+    },
+    {
+      "id": "prec-277dc5aa2f",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "Service tag",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "比对打印出来的Service tag与外箱上的Service tag值是否一致"
+    },
+    {
+      "id": "prec-2e8127ed98",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "Label",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "Label贴附要对正,如果贴上去后发现不良，需交给线外处理"
+    },
+    {
+      "id": "prec-514c4a6bd5",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "胶带",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "胶带长度为：15CM~17CM"
+    },
+    {
+      "id": "prec-04e38b1d84",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "胶带",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "检查胶带是否有打皱或没有封口，胶带长度是否不在固定尺寸内﹐如有需请线外人员重封"
+    },
+    {
+      "id": "prec-0369449cbb",
+      "process": "PACK",
+      "category": "材料目标物",
+      "index_condition1": "机台",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "产品不可摆放于地面上"
+    },
+    {
+      "id": "prec-b8a6c3cff7",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "电子秤",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "秤重如有不符,需将机台交由线外处理"
+    },
+    {
+      "id": "prec-a5a34d1e60",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "电子秤",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "称重范围依照QA系统维护的重量范围(+/50g)"
+    },
+    {
+      "id": "prec-aa18adcf6b",
+      "process": "PACK",
+      "category": "材料目标物",
+      "index_condition1": "机台",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "",
+      "description": "机台需轻拿轻放，堆放整齐"
+    },
+    {
+      "id": "prec-736661530d",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "无尘布",
+      "index_condition2": "",
+      "note_type": "擦拭LCD",
+      "note_code": "1",
+      "description": "擦拭LCD时需用手扶住Cover左上角"
+    },
+    {
+      "id": "prec-ee1ef713d9",
+      "process": "PACK",
+      "category": "治工具设备/XX料",
+      "index_condition1": "手套",
+      "index_condition2": "",
+      "note_type": "",
+      "note_code": "5",
+      "description": "手套1H 更换一次，特殊情况发现脏污破损及时更换 (PACK)"
+    }
+  ],
+  "glove_rules": [
+    {
+      "id": "glove-6e77b2acfb",
+      "object_category": "高单价",
+      "object_name": "3D摄像头",
+      "action": "拿取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-6288d771fa",
+      "object_category": "高单价",
+      "object_name": "3D摄像头",
+      "action": "抓取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-4714d04e10",
+      "object_category": "高单价",
+      "object_name": "3D摄像头",
+      "action": "組",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-89fcbb3817",
+      "object_category": "高单价",
+      "object_name": "LCD(显示屏)",
+      "action": "拿取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-f5a896f101",
+      "object_category": "高单价",
+      "object_name": "LCD(显示屏)",
+      "action": "抓取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-8a85e70819",
+      "object_category": "高单价",
+      "object_name": "LCD(显示屏)",
+      "action": "組",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-2cb1e05a66",
+      "object_category": "高单价",
+      "object_name": "RAM(内存条)",
+      "action": "插入",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-cde18a0afd",
+      "object_category": "高单价",
+      "object_name": "SIM卡",
+      "action": "拿取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-a348078703",
+      "object_category": "高单价",
+      "object_name": "SIM卡",
+      "action": "抓取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-cbf0083bcf",
+      "object_category": "高单价",
+      "object_name": "SIM卡",
+      "action": "組",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-e40fc5ed75",
+      "object_category": "高单价",
+      "object_name": "SSD(固态硬盘)",
+      "action": "插入",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-9c7f0a1ac6",
+      "object_category": "高单价",
+      "object_name": "WLAN(网卡)",
+      "action": "插入",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-3156819b43",
+      "object_category": "高单价",
+      "object_name": "WWAN卡",
+      "action": "插入",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-44be4f4660",
+      "object_category": "高单价",
+      "object_name": "摄像头",
+      "action": "拿取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-0b4bfddd7c",
+      "object_category": "高单价",
+      "object_name": "摄像头",
+      "action": "抓取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-dfbd876a3c",
+      "object_category": "高单价",
+      "object_name": "摄像头",
+      "action": "組",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-7c69a037b3",
+      "object_category": "板",
+      "object_name": "Audio小板",
+      "action": "拿取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-c5f375acb8",
+      "object_category": "板",
+      "object_name": "Audio小板",
+      "action": "抓取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-a20b2e4e6c",
+      "object_category": "板",
+      "object_name": "Function（功能）小板",
+      "action": "拿取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-1976e8f4bf",
+      "object_category": "板",
+      "object_name": "Function（功能）小板",
+      "action": "抓取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-be2278c253",
+      "object_category": "板",
+      "object_name": "IO小板",
+      "action": "拿取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-76513f1f24",
+      "object_category": "板",
+      "object_name": "IO小板",
+      "action": "抓取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-670181e96e",
+      "object_category": "板",
+      "object_name": "M/B(主板)",
+      "action": "拿取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-c12b10de78",
+      "object_category": "板",
+      "object_name": "M/B(主板)",
+      "action": "抓取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-2c1de11543",
+      "object_category": "板",
+      "object_name": "MCU小板",
+      "action": "拿取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-9abe25f1ef",
+      "object_category": "板",
+      "object_name": "MCU小板",
+      "action": "抓取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-9611973bf3",
+      "object_category": "板",
+      "object_name": "Sensor（感应）小板",
+      "action": "拿取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-e05c8546c2",
+      "object_category": "板",
+      "object_name": "Sensor（感应）小板",
+      "action": "抓取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-e9c3243d53",
+      "object_category": "板",
+      "object_name": "TP 小板",
+      "action": "拿取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-d540c939f8",
+      "object_category": "板",
+      "object_name": "TP 小板",
+      "action": "抓取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-f8379802e9",
+      "object_category": "板",
+      "object_name": "导光小板",
+      "action": "拿取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-3477f15be6",
+      "object_category": "板",
+      "object_name": "导光小板",
+      "action": "抓取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-76babe5e87",
+      "object_category": "板",
+      "object_name": "开机小板",
+      "action": "拿取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-f8e64c9518",
+      "object_category": "板",
+      "object_name": "开机小板",
+      "action": "抓取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-6df30f9de4",
+      "object_category": "板",
+      "object_name": "指纹小板",
+      "action": "拿取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-12f7aa797d",
+      "object_category": "板",
+      "object_name": "指纹小板",
+      "action": "抓取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-614081f859",
+      "object_category": "板",
+      "object_name": "Audio小板",
+      "action": "刷PPID",
+      "glove_type": "一只半指手套；一只全指手套"
+    },
+    {
+      "id": "glove-27d70cf3ec",
+      "object_category": "板",
+      "object_name": "Function（功能）小板",
+      "action": "刷PPID",
+      "glove_type": "一只半指手套；一只全指手套"
+    },
+    {
+      "id": "glove-1a371d2479",
+      "object_category": "板",
+      "object_name": "IO小板",
+      "action": "刷PPID",
+      "glove_type": "一只半指手套；一只全指手套"
+    },
+    {
+      "id": "glove-9eddd45d2a",
+      "object_category": "板",
+      "object_name": "M/B(主板)",
+      "action": "刷PPID",
+      "glove_type": "一只半指手套；一只全指手套"
+    },
+    {
+      "id": "glove-c932894718",
+      "object_category": "板",
+      "object_name": "MCU小板",
+      "action": "刷PPID",
+      "glove_type": "一只半指手套；一只全指手套"
+    },
+    {
+      "id": "glove-5265313e24",
+      "object_category": "板",
+      "object_name": "Sensor（感应）小板",
+      "action": "刷PPID",
+      "glove_type": "一只半指手套；一只全指手套"
+    },
+    {
+      "id": "glove-ea084fbba5",
+      "object_category": "板",
+      "object_name": "TP 小板",
+      "action": "刷PPID",
+      "glove_type": "一只半指手套；一只全指手套"
+    },
+    {
+      "id": "glove-f719c14891",
+      "object_category": "板",
+      "object_name": "导光小板",
+      "action": "刷PPID",
+      "glove_type": "一只半指手套；一只全指手套"
+    },
+    {
+      "id": "glove-97040290cf",
+      "object_category": "板",
+      "object_name": "开机小板",
+      "action": "刷PPID",
+      "glove_type": "一只半指手套；一只全指手套"
+    },
+    {
+      "id": "glove-e0cdccecf2",
+      "object_category": "板",
+      "object_name": "指纹小板",
+      "action": "刷PPID",
+      "glove_type": "一只半指手套；一只全指手套"
+    },
+    {
+      "id": "glove-8cf4653ece",
+      "object_category": "排线",
+      "object_name": "KB排线",
+      "action": "插入",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-2599bbe640",
+      "object_category": "排线",
+      "object_name": "KB排线",
+      "action": "理",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-41eecde82c",
+      "object_category": "排线",
+      "object_name": "MCU 排线",
+      "action": "插入",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-62baf183c7",
+      "object_category": "排线",
+      "object_name": "MCU 排线",
+      "action": "理",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-81d35980e0",
+      "object_category": "排线",
+      "object_name": "Sensor排线",
+      "action": "插入",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-084e4f7a3a",
+      "object_category": "排线",
+      "object_name": "Sensor排线",
+      "action": "理",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-7681063149",
+      "object_category": "排线",
+      "object_name": "TP排线",
+      "action": "插入",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-d58e300a63",
+      "object_category": "排线",
+      "object_name": "TP排线",
+      "action": "理",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-1486d56856",
+      "object_category": "排线",
+      "object_name": "导光排线",
+      "action": "插入",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-185f000638",
+      "object_category": "排线",
+      "object_name": "导光排线",
+      "action": "理",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-5828e38b49",
+      "object_category": "排线",
+      "object_name": "指纹排线",
+      "action": "插入",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-aae4c29655",
+      "object_category": "排线",
+      "object_name": "指纹排线",
+      "action": "理",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-be9e178a5b",
+      "object_category": "排线",
+      "object_name": "摄像头排线",
+      "action": "插入",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-d1d620a3c5",
+      "object_category": "排线",
+      "object_name": "摄像头排线",
+      "action": "理",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-d10443d367",
+      "object_category": "排线",
+      "object_name": "电池排线",
+      "action": "插入",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-48eb94499f",
+      "object_category": "排线",
+      "object_name": "电池排线",
+      "action": "理",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-3aea0d6e89",
+      "object_category": "未分類",
+      "object_name": "mylar",
+      "action": "去除",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-6f37bdbfd0",
+      "object_category": "未分類",
+      "object_name": "mylar",
+      "action": "撕開",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-42e9d2995d",
+      "object_category": "未分類",
+      "object_name": "mylar",
+      "action": "撕除",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-9f3775b275",
+      "object_category": "未分類",
+      "object_name": "离型纸",
+      "action": "去除",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-d886cb2487",
+      "object_category": "未分類",
+      "object_name": "离型纸",
+      "action": "撕開",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-5d73aebd9d",
+      "object_category": "未分類",
+      "object_name": "离型纸",
+      "action": "撕除",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-abc9ee64b6",
+      "object_category": "未分類",
+      "object_name": "醋酸胶布",
+      "action": "去除",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-d6a5519f68",
+      "object_category": "未分類",
+      "object_name": "醋酸胶布",
+      "action": "撕開",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-d1135b59c1",
+      "object_category": "未分類",
+      "object_name": "醋酸胶布",
+      "action": "撕除",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-090215dd9f",
+      "object_category": "未分類",
+      "object_name": "保护膜",
+      "action": "去除",
+      "glove_type": "一只半指手套；一只全指手套"
+    },
+    {
+      "id": "glove-8ced6febae",
+      "object_category": "未分類",
+      "object_name": "保护膜",
+      "action": "撕開",
+      "glove_type": "一只半指手套；一只全指手套"
+    },
+    {
+      "id": "glove-868a030bdd",
+      "object_category": "未分類",
+      "object_name": "保护膜",
+      "action": "撕除",
+      "glove_type": "一只半指手套；一只全指手套"
+    },
+    {
+      "id": "glove-a2a58f76bb",
+      "object_category": "未分類",
+      "object_name": "",
+      "action": "滑出螺絲",
+      "glove_type": "一只半指手套；一只全指手套"
+    },
+    {
+      "id": "glove-dd368644ab",
+      "object_category": "未分類",
+      "object_name": "",
+      "action": "鎖附固定",
+      "glove_type": "一只半指手套；一只全指手套"
+    },
+    {
+      "id": "glove-81d1a03ea6",
+      "object_category": "Rubber",
+      "object_name": "MB Rubber",
+      "action": "拿取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-9cd39a5e25",
+      "object_category": "Rubber",
+      "object_name": "MB Rubber",
+      "action": "抓取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-bccdfcab76",
+      "object_category": "Rubber",
+      "object_name": "TP Rubber",
+      "action": "拿取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-f127ac470e",
+      "object_category": "Rubber",
+      "object_name": "TP Rubber",
+      "action": "抓取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-3003f9eb63",
+      "object_category": "Rubber",
+      "object_name": "hinge rubber",
+      "action": "拿取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-4955f2e6f8",
+      "object_category": "Rubber",
+      "object_name": "hinge rubber",
+      "action": "抓取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-d28afb51fa",
+      "object_category": "Rubber",
+      "object_name": "摄像头Rubber",
+      "action": "拿取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-647383eaf6",
+      "object_category": "Rubber",
+      "object_name": "摄像头Rubber",
+      "action": "抓取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-b2b244c3bf",
+      "object_category": "Rubber",
+      "object_name": "蓝色Rubber",
+      "action": "拿取",
+      "glove_type": "兩只半指手套"
+    },
+    {
+      "id": "glove-27c4472096",
+      "object_category": "Rubber",
+      "object_name": "蓝色Rubber",
+      "action": "抓取",
+      "glove_type": "兩只半指手套"
+    }
+  ],
+  "level_system_templates": [
+    {
+      "id": "lvl-001",
+      "name": "LCD安裝-主流程",
+      "sequence": [
+        "main:1",
+        "main:2",
+        "sub1:2.1",
+        "sub1:2.2",
+        "cub1:2.2.1"
+      ],
+      "notes": "LCD屬CTQ，sub層需要nb限制不超過2個元素"
+    },
+    {
+      "id": "lvl-002",
+      "name": "線材整理-雙手動作",
+      "sequence": [
+        "main:1",
+        "sub1:1.1",
+        "sub1:1.2",
+        "nb:hand=2"
+      ],
+      "notes": "線材整理需限制為雙手同步，以nb元素約束手數"
+    }
+  ],
+  "ion_fan_bindings": [
+    {
+      "id": "ionfan-6e04e86f1b",
+      "object_category": "高单价",
+      "object_name": "3D摄像头",
+      "note": ""
+    },
+    {
+      "id": "ionfan-10945a6e3e",
+      "object_category": "高单价",
+      "object_name": "HDD(机械硬盘)",
+      "note": ""
+    },
+    {
+      "id": "ionfan-3dbd5bf611",
+      "object_category": "高单价",
+      "object_name": "LCD(显示屏)",
+      "note": ""
+    },
+    {
+      "id": "ionfan-2935a335cc",
+      "object_category": "高单价",
+      "object_name": "RAM(内存条)",
+      "note": ""
+    },
+    {
+      "id": "ionfan-5e662a14f2",
+      "object_category": "高单价",
+      "object_name": "SIM卡",
+      "note": ""
+    },
+    {
+      "id": "ionfan-879c742b04",
+      "object_category": "高单价",
+      "object_name": "SSD(固态硬盘)",
+      "note": ""
+    },
+    {
+      "id": "ionfan-625726e52b",
+      "object_category": "高单价",
+      "object_name": "WLAN(网卡)",
+      "note": ""
+    },
+    {
+      "id": "ionfan-63801dfece",
+      "object_category": "高单价",
+      "object_name": "WWAN卡",
+      "note": ""
+    },
+    {
+      "id": "ionfan-3f8590ad9a",
+      "object_category": "高单价",
+      "object_name": "摄像头",
+      "note": ""
+    },
+    {
+      "id": "ionfan-d446cf989e",
+      "object_category": "高单价",
+      "object_name": "电池",
+      "note": ""
+    },
+    {
+      "id": "ionfan-790dbf45b3",
+      "object_category": "板",
+      "object_name": "Audio小板",
+      "note": ""
+    },
+    {
+      "id": "ionfan-24efb6cf1c",
+      "object_category": "板",
+      "object_name": "Function（功能）小板",
+      "note": ""
+    },
+    {
+      "id": "ionfan-ee1917ae0e",
+      "object_category": "板",
+      "object_name": "IO小板",
+      "note": ""
+    },
+    {
+      "id": "ionfan-c123cf83b7",
+      "object_category": "板",
+      "object_name": "M/B(主板)",
+      "note": ""
+    },
+    {
+      "id": "ionfan-2ce53d8fb8",
+      "object_category": "板",
+      "object_name": "MCU小板",
+      "note": ""
+    },
+    {
+      "id": "ionfan-9bad775df6",
+      "object_category": "板",
+      "object_name": "Sensor（感应）小板",
+      "note": ""
+    },
+    {
+      "id": "ionfan-73dd9ab6bf",
+      "object_category": "板",
+      "object_name": "TP 小板",
+      "note": ""
+    },
+    {
+      "id": "ionfan-b3b9a81d94",
+      "object_category": "板",
+      "object_name": "导光小板",
+      "note": ""
+    },
+    {
+      "id": "ionfan-6b8b3019c7",
+      "object_category": "板",
+      "object_name": "开机小板",
+      "note": ""
+    },
+    {
+      "id": "ionfan-8755131fd8",
+      "object_category": "板",
+      "object_name": "指纹小板",
+      "note": ""
+    }
+  ],
+  "mi_naming_rules": [
+    {
+      "id": "mi-9ffc980da7",
+      "field_label": "MOST區分",
+      "slug": "most",
+      "position": 1,
+      "description": "機種五碼\n(手填)\n必填\nNote: 自動化需另外加一個設備 list，以便區分MI\nMI命名原則",
+      "options": [
+        "未填則顯示 \"All model\""
+      ],
+      "example": "MI 標準文件名稱--- HDL50_鋁版_集中捡料_ASSY_自動_16",
+      "required": true
+    },
+    {
+      "id": "mi-d12278a24b",
+      "field_label": "Line Balance",
+      "slug": "line_balance",
+      "position": 8,
+      "description": "秒數 (CT)\n依照Line balance產出",
+      "options": [
+        "可選擇是否顯示在MI名稱"
+      ],
+      "example": "",
+      "required": false
+    }
+  ],
+  "level_guidelines": [
+    {
+      "id": "lvl-guide-4b82de0af9",
+      "title": "Level System 教學檔案",
+      "body": "Level System 教學檔案"
+    },
+    {
+      "id": "lvl-guide-8ab19dd15b",
+      "title": "甚麼是Level System?",
+      "body": "甚麼是Level System?"
+    },
+    {
+      "id": "lvl-guide-a60478618a",
+      "title": "Level System 說明",
+      "body": "Level System是一種數位化組裝邏輯的表達方式，目的是為了解決組裝過程中所遇到的順序問題，而在過程中不會是單純的順序排列，要考慮當時組裝的機型的結構不同，或是自動化設備的操作、治具操作等等情況。而將這些邏輯利用數位化的方式表達後，系統才能夠對於此數據進行學習，並且找到最佳的組裝流程。"
+    },
+    {
+      "id": "lvl-guide-597bc9dcd4",
+      "title": "Level System的表達方式?",
+      "body": "Level System的表達方式?"
+    },
+    {
+      "id": "lvl-guide-c6648e88a3",
+      "title": "Level System 說明",
+      "body": "裡面主要的參數有七點："
+    },
+    {
+      "id": "lvl-guide-453d73c856",
+      "title": "Level System 說明",
+      "body": "1.動作描述：對於該動作的標準描述，此段描述要經過IE審核後，認定為標準描述即可使用。"
+    },
+    {
+      "id": "lvl-guide-796e0c1e37",
+      "title": "Level System 說明",
+      "body": "2.動作時長：對於此動作所花費的時間，計算公式為標準時間*寬放係數。"
+    },
+    {
+      "id": "lvl-guide-cf6661cc90",
+      "title": "Level System 說明",
+      "body": "3.分割限制名稱：限制有著相同名稱的動作在同一個站別的標籤，命名方式為”nb”+”數字”，ex: nb1、nb2。"
+    },
+    {
+      "id": "lvl-guide-4193b54fac",
+      "title": "Level System 說明",
+      "body": "4.分割限制數量：設定標籤的限制數量，輸入須為正整數。"
+    },
+    {
+      "id": "lvl-guide-646d3edbf0",
+      "title": "Level System 說明",
+      "body": "5.歸屬名稱：與從屬名稱相同的限制，需要輸入功能字符，不同的字符表達的邏輯關係也不同，名稱不可重複，命名方式為” 功能字符”+”數字”，main不包含在裡面。ex: sub1、cub1。"
+    },
+    {
+      "id": "lvl-guide-7d67a6ae97",
+      "title": "Level System 說明",
+      "body": "6.歸屬層級：在此所限制的層級，該項目只能為正整數"
+    },
+    {
+      "id": "lvl-guide-a8490e70ea",
+      "title": "Level System 說明",
+      "body": "7.從屬名稱：與歸屬名稱相同的限制，需要輸入功能字符，不同的字符表達的邏輯關係也不同，名稱不可重複，命名方式為” 功能字符”+”數字”， main不包含在裡面。ex: sub1、cub1。"
+    },
+    {
+      "id": "lvl-guide-8251c7ba53",
+      "title": "何謂功能字符?",
+      "body": "何謂功能字符?"
+    },
+    {
+      "id": "lvl-guide-6b8c4c09f1",
+      "title": "Level System 說明",
+      "body": "字符的功能為表達不同種類的動作群組，目前現有main、sub、cub、nb這四種。"
+    },
+    {
+      "id": "lvl-guide-4f11bb5393",
+      "title": "Level System 說明",
+      "body": "1.main: 主要順序分層。在編輯層級中的主要層級，所有層級文件的最初分層必須使用main."
+    },
+    {
+      "id": "lvl-guide-020147be8d",
+      "title": "Level System 說明",
+      "body": "2.sub: 次要順序分層。層級深度到2以後所使用的順序編制."
+    },
+    {
+      "id": "lvl-guide-5dd8f00450",
+      "title": "Level System 說明",
+      "body": "3.cub: 次要固化分層。將動作固化成系統無法分割的動作區塊."
+    },
+    {
+      "id": "lvl-guide-a831f9d677",
+      "title": "Level System 說明",
+      "body": "4.nb:  分割限制元素。可以限制擁有相同元素標籤的層級數量."
+    },
+    {
+      "id": "lvl-guide-b0c54fc0ca",
+      "title": "以下利用幾個簡單的例子來幫助理解Level System的描述方式：",
+      "body": "以下利用幾個簡單的例子來幫助理解Level System的描述方式："
+    },
+    {
+      "id": "lvl-guide-e5cc78cd64",
+      "title": "1.我們今天有10個動作A~J，這10個動作需要依順序完成，動作之間沒有互相綁定的關係，意旨可以拆分到不同站別來完成，此時我們要怎麼表達。",
+      "body": "1.我們今天有10個動作A~J，這10個動作需要依順序完成，動作之間沒有互相綁定的關係，意旨可以拆分到不同站別來完成，此時我們要怎麼表達。"
+    },
+    {
+      "id": "lvl-guide-a9b17fc2ed",
+      "title": "Ans：首先我們會有一張空白的層級表，在確定過我們的需求後填入項對應的字符。",
+      "body": "Ans：首先我們會有一張空白的層級表，在確定過我們的需求後填入項對應的字符。"
+    },
+    {
+      "id": "lvl-guide-8c6afe9a74",
+      "title": "內容",
+      "body": "原始秒數"
+    },
+    {
+      "id": "lvl-guide-581dbdbac4",
+      "title": "A",
+      "body": "1"
+    },
+    {
+      "id": "lvl-guide-e85d6c943c",
+      "title": "B",
+      "body": "1"
+    },
+    {
+      "id": "lvl-guide-c9623d53b5",
+      "title": "C",
+      "body": "1"
+    },
+    {
+      "id": "lvl-guide-0f0a84c140",
+      "title": "D",
+      "body": "1"
+    },
+    {
+      "id": "lvl-guide-c53d8b4573",
+      "title": "E",
+      "body": "1"
+    },
+    {
+      "id": "lvl-guide-825becc50a",
+      "title": "F",
+      "body": "1"
+    },
+    {
+      "id": "lvl-guide-47741efb57",
+      "title": "G",
+      "body": "1"
+    },
+    {
+      "id": "lvl-guide-596610d558",
+      "title": "H",
+      "body": "1"
+    },
+    {
+      "id": "lvl-guide-db45b8a94d",
+      "title": "I",
+      "body": "1"
+    },
+    {
+      "id": "lvl-guide-ef7e3135e3",
+      "title": "J",
+      "body": "1"
+    },
+    {
+      "id": "lvl-guide-d6c068d8d2",
+      "title": "完成後的層級表格如下。",
+      "body": "完成後的層級表格如下。"
+    },
+    {
+      "id": "lvl-guide-a5810e4b4a",
+      "title": "main為主要的層級分層字符，而動作的排列順序會依照所編列的數字1~10進行排序，而A~J的動作歸屬都是main，以下是我們的示意圖。",
+      "body": "main為主要的層級分層字符，而動作的排列順序會依照所編列的數字1~10進行排序，而A~J的動作歸屬都是main，以下是我們的示意圖。"
+    },
+    {
+      "id": "lvl-guide-6005325e54",
+      "title": "2.承接上題，這次A、B、C三個動作可以在前三步驟交換，剩下七個動作必須在這三個動作完成後再進行順序完成。",
+      "body": "2.承接上題，這次A、B、C三個動作可以在前三步驟交換，剩下七個動作必須在這三個動作完成後再進行順序完成。"
+    },
+    {
+      "id": "lvl-guide-3a0c93ab98",
+      "title": "Ans：這時我們只需要將前三個層級的數字設為1即可達成此目的。",
+      "body": "Ans：這時我們只需要將前三個層級的數字設為1即可達成此目的。"
+    },
+    {
+      "id": "lvl-guide-5d36628082",
+      "title": "3.承接上題，此時D、E、F三個動作為獨立的順序動作，一旦開始做D，就必須將E、F做完才能進行其他動作，D、E、F群組動作可以和A、B、C三個動作做互換順序。",
+      "body": "3.承接上題，此時D、E、F三個動作為獨立的順序動作，一旦開始做D，就必須將E、F做完才能進行其他動作，D、E、F群組動作可以和A、B、C三個動作做互換順序。"
+    },
+    {
+      "id": "lvl-guide-12c296bec7",
+      "title": "Ans：為了要讓D、E、F擁有獨立順序，必須要將此三個動作用sub功能標籤給另外設置。我們將這三個動作向後延伸一個深度，讓原先的main的層級1 後新增了一個附屬標籤sub1，再讓D、E、F三個動作的從屬變成sub1即可。",
+      "body": "Ans：為了要讓D、E、F擁有獨立順序，必須要將此三個動作用sub功能標籤給另外設置。我們將這三個動作向後延伸一個深度，讓原先的main的層級1 後新增了一個附屬標籤sub1，再讓D、E、F三個動作的從屬變成sub1即可。"
+    },
+    {
+      "id": "lvl-guide-e85dc4a63c",
+      "title": "4.現在要將D、E、F三個連續動作設置程不可分站的動作，其餘條件不變。",
+      "body": "4.現在要將D、E、F三個連續動作設置程不可分站的動作，其餘條件不變。"
+    },
+    {
+      "id": "lvl-guide-e1548e720b",
+      "title": "Ans：這時只需要將功能標籤sub1改成cub1即可。",
+      "body": "Ans：這時只需要將功能標籤sub1改成cub1即可。"
+    },
+    {
+      "id": "lvl-guide-e2c26bcad8",
+      "title": "5.現在B、C動作需要設置成不可分割，D、E、F是獨立的連續動作，B、C動作結束後才可以接D的動作。A動作可以在B、C動作的前後皆可，亦可在D、E、F動作前後。G、H、I、J動作需要在A~F都做完後才可接續完成。",
+      "body": "5.現在B、C動作需要設置成不可分割，D、E、F是獨立的連續動作，B、C動作結束後才可以接D的動作。A動作可以在B、C動作的前後皆可，亦可在D、E、F動作前後。G、H、I、J動作需要在A~F都做完後才可接續完成。"
+    },
+    {
+      "id": "lvl-guide-ef1caefe33",
+      "title": "Ans：這時我們可以先完成B~F的動作層級，B、C的動作需要使用cub功能組合，並且將main的層級設置成1，接下來將D、E、F的動作用sub功能組合，並將main設置成2。然後依據動作要求A可以在此兩組動作間跳躍，因此我們這邊將用到變動層級符號“ ~ ”，將A動作的歸屬main層級設置成1~2即可，後續動作要在A~F動作都完成，所以將後續main層級從3開始依序遞增。",
+      "body": "Ans：這時我們可以先完成B~F的動作層級，B、C的動作需要使用cub功能組合，並且將main的層級設置成1，接下來將D、E、F的動作用sub功能組合，並將main設置成2。然後依據動作要求A可以在此兩組動作間跳躍，因此我們這邊將用到變動層級符號“ ~ ”，將A動作的歸屬main層級設置成1~2即可，後續動作要在A~F動作都完成，所以將後續main層級從3開始依序遞增。"
+    },
+    {
+      "id": "lvl-guide-4ae2e1c933",
+      "title": "6.承接上題，動作G、H無法在同一站別。",
+      "body": "6.承接上題，動作G、H無法在同一站別。"
+    },
+    {
+      "id": "lvl-guide-ccb686139b",
+      "title": "Ans：這時需要用到nb功能標籤，需要在G、H的Number欄位設置一個nb標籤(nb1)，之後在Number_Count設定限制次數，而為了要將兩個動作設置在不同站別，此時需要將次數設置成1，意旨同一個站別內只能有一個擁有這種標籤的動作。",
+      "body": "Ans：這時需要用到nb功能標籤，需要在G、H的Number欄位設置一個nb標籤(nb1)，之後在Number_Count設定限制次數，而為了要將兩個動作設置在不同站別，此時需要將次數設置成1，意旨同一個站別內只能有一個擁有這種標籤的動作。"
+    },
+    {
+      "id": "lvl-guide-8439d2dc86",
+      "title": "7.當開始動作A就必須將B、C、D、E也做完，而開始動作F就必須將G、H、I、J給做完，A群組和F群組可以互調，動作B->C和D->E不可拆分，且兩組動作不能在同一站，但兩組動作可以互相對調。動作G->H不可拆分，動作I->J需要等動作H做完以後才可以。",
+      "body": "7.當開始動作A就必須將B、C、D、E也做完，而開始動作F就必須將G、H、I、J給做完，A群組和F群組可以互調，動作B->C和D->E不可拆分，且兩組動作不能在同一站，但兩組動作可以互相對調。動作G->H不可拆分，動作I->J需要等動作H做完以後才可以。"
+    },
+    {
+      "id": "lvl-guide-eb4e9eb4c5",
+      "title": "Ans：由動作要求可知A群組和B群組是同一層級，先將兩個開頭動作都設置成main歸屬的1。再來看動作B->C和D->E是要在A動作完成後才可進行互換的，所以我們將深度2的群組A新增sub1，將動作A層級設成1，B、D設成2。而B->C不可分割，深度3設置cub1。D->E也不可分割，深度3設置cub2。而群組B和D不可以在同一站要在Number標籤上設置nb1且限制數量設置1。依照動作需求，群組F的順序為F->G->H->I->J，將深度2設置sub2，而G、H動作不可分割，將動作G的深度3設置cub讓G->H組合。",
+      "body": "Ans：由動作要求可知A群組和B群組是同一層級，先將兩個開頭動作都設置成main歸屬的1。再來看動作B->C和D->E是要在A動作完成後才可進行互換的，所以我們將深度2的群組A新增sub1，將動作A層級設成1，B、D設成2。而B->C不可分割，深度3設置cub1。D->E也不可分割，深度3設置cub2。而群組B和D不可以在同一站要在Number標籤上設置nb1且限制數量設置1。依照動作需求，群組F的順序為F->G->H->I->J，將深度2設置sub2，而G、H動作不可分割，將動作G的深度3設置cub讓G->H組合。"
+    },
+    {
+      "id": "lvl-guide-35f356ad24",
+      "title": "常見錯誤",
+      "body": "常見錯誤"
+    },
+    {
+      "id": "lvl-guide-65cd2dfbc7",
+      "title": "Level System 說明",
+      "body": "1. 都一定產出一個LB+限制線"
+    },
+    {
+      "id": "lvl-guide-5d7207d1ed",
+      "title": "Level System 說明",
+      "body": "2.需要指出超過限制的列數"
+    },
+    {
+      "id": "lvl-guide-a4e561e129",
+      "title": "Level System 說明",
+      "body": "3. \"或\" For main  1/3  動作可以在1或3被執行"
+    },
+    {
+      "id": "lvl-guide-55ba625a3b",
+      "title": "Level System 說明",
+      "body": "4. Level system 希望可以跳號填寫 (follow單機版則無問題)"
+    },
+    {
+      "id": "lvl-guide-06a9cdb0b0",
+      "title": "Level System 說明",
+      "body": "5. Level system 前面加一欄行號，方便操作"
+    },
+    {
+      "id": "lvl-guide-3b32e8f4bf",
+      "title": "Level System 說明",
+      "body": "6. most system 語句更動時，level system 不要清空 (需要區分上傳跟暫存)"
+    },
+    {
+      "id": "lvl-guide-dde6a62ea7",
+      "title": "Level System 說明",
+      "body": "7.某些限制邏輯需要教學"
+    }
+  ],
+  "employees": [
+    {
+      "id": "emp-001",
+      "name": "張組長",
+      "station_type": "Assembly",
+      "skill_level": "Expert",
+      "efficiency_factor": 1.2
+    },
+    {
+      "id": "emp-002",
+      "name": "李技術員",
+      "station_type": "Assembly",
+      "skill_level": "Proficient",
+      "efficiency_factor": 1.0
+    },
+    {
+      "id": "emp-003",
+      "name": "王工程師",
+      "station_type": "Assembly",
+      "skill_level": "Expert",
+      "efficiency_factor": 1.1
+    },
+    {
+      "id": "emp-004",
+      "name": "陳小美",
+      "station_type": "Assembly",
+      "skill_level": "Novice",
+      "efficiency_factor": 0.85
+    },
+    {
+      "id": "emp-005",
+      "name": "林大華",
+      "station_type": "Assembly",
+      "skill_level": "Proficient",
+      "efficiency_factor": 0.95
+    }
+  ],
+  "projects": [
+    {
+      "id": "proj-001",
+      "name": "K860G6-BASY",
+      "family": "K860G6",
+      "process_type": "BASY",
+      "sku": "W*3558",
+      "version": "1.3",
+      "effective_date": "2025/8/7",
+      "compliance": "RoHS2",
+      "factory": "SQT"
+    }
+  ],
+  "sop_versions": [
+    {
+      "id": "sop-001",
+      "project_id": "proj-001",
+      "version_no": "V1.0",
+      "status": "Published",
+      "actions": [
+        {
+          "id": "act-001",
+          "seq_type": "GENERAL",
+          "description": "將過完MVS站的主板放置在潔淨柵內的工作台上",
+          "tmu": 80,
+          "seconds": 2.88,
+          "params": {
+            "A1": 6,
+            "B1": 0,
+            "G": 1,
+            "A2": 3,
+            "B2": 0,
+            "P": 1,
+            "A3": 0
+          },
+          "station_id": "ST-4-1",
+          "component": "主板",
+          "tool": "無",
+          "is_ctq": false,
+          "primary_action": "放",
+          "hand": "双手",
+          "object_category": "主板/MLB",
+          "glove_type": "兩只半指手套",
+          "level_tag": "main:1"
+        },
+        {
+          "id": "act-002",
+          "seq_type": "CONTROLLED",
+          "description": "掰開主板上DIMM槽，將過完MVS的DIMM按照配置要求放在DIMM槽內",
+          "tmu": 150,
+          "seconds": 5.4,
+          "params": {
+            "A1": 3,
+            "B1": 0,
+            "G": 3,
+            "M": 6,
+            "X": 3,
+            "I": 3,
+            "A3": 0
+          },
+          "station_id": "ST-3-1a",
+          "component": "DIMM",
+          "tool": "DIMM壓合治具",
+          "is_ctq": true,
+          "primary_action": "插入",
+          "hand": "双手",
+          "object_category": "記憶體",
+          "glove_type": "兩只半指手套",
+          "level_tag": "main:2|sub1:2.1"
+        },
+        {
+          "id": "act-003",
+          "seq_type": "CONTROLLED",
+          "description": "將假DIMM按照配置需求數量裝入主板DIMM槽內",
+          "tmu": 120,
+          "seconds": 4.32,
+          "params": {
+            "A1": 3,
+            "B1": 0,
+            "G": 1,
+            "M": 6,
+            "X": 3,
+            "I": 1,
+            "A3": 0
+          },
+          "station_id": "ST-6",
+          "component": "假DIMM",
+          "tool": "DIMM壓合治具",
+          "is_ctq": false,
+          "primary_action": "卡合",
+          "hand": "双手",
+          "object_category": "記憶體",
+          "glove_type": "兩只半指手套",
+          "level_tag": "main:3|sub1:3.1"
+        },
+        {
+          "id": "act-004",
+          "seq_type": "CONTROLLED",
+          "description": "將兩顆拇指螺絲鎖緊，電動起子: 3±0.2 lbf.in，起子頭: δ,05,2#",
+          "tmu": 100,
+          "seconds": 3.6,
+          "params": {
+            "A1": 1,
+            "B1": 0,
+            "G": 1,
+            "M": 3,
+            "X": 6,
+            "I": 1,
+            "A3": 0
+          },
+          "station_id": "ST-5",
+          "component": "拇指螺絲",
+          "tool": "電動起子",
+          "is_ctq": true,
+          "primary_action": "锁附固定",
+          "hand": "右手",
+          "object_category": "標準件",
+          "glove_type": "兩只半指手套",
+          "level_tag": "main:4|sub1:4.1|nb:fasten"
+        }
+      ],
+      "created_by": "user-002",
+      "created_at": "2025-12-04T11:53:03.378479",
+      "reviewed_by": "user-001",
+      "reviewed_at": "2025-12-04T11:53:03.378499",
+      "published_by": "user-001",
+      "published_at": "2025-12-04T11:53:03.378505"
+    },
+    {
+      "id": "sop-d609da19",
+      "project_id": "proj-001",
+      "version_no": "V1.1",
+      "status": "Reviewed",
+      "actions": [
+        {
+          "id": "step-1765424620052",
+          "seq_type": "GENERAL",
+          "description": "双手 從捡料架 拿取 LCD顯示器，GET 到MB",
+          "tmu": 110,
+          "seconds": 0.0,
+          "params": {
+            "A1": 1,
+            "A1_cm": 5,
+            "B1": 0,
+            "G": 3,
+            "A2": 1,
+            "A2_cm": 5,
+            "B2": 0,
+            "P": 6,
+            "M": 0,
+            "X": 0,
+            "I": 0
+          },
+          "station_id": "ST-3-1a",
+          "component": "LCD顯示器",
+          "tool": "無",
+          "image_url": null,
+          "is_ctq": false,
+          "primary_action": "GET",
+          "hand": "双手",
+          "object_category": "高單價物料",
+          "glove_type": "兩只半指手套",
+          "frequency": 1,
+          "level_tag": ""
+        },
+        {
+          "id": "step-1765424620220",
+          "seq_type": "GENERAL",
+          "description": "双手 從捡料架 拿取 LCD顯示器，GET 到MB",
+          "tmu": 110,
+          "seconds": 0.0,
+          "params": {
+            "A1": 1,
+            "A1_cm": 5,
+            "B1": 0,
+            "G": 3,
+            "A2": 1,
+            "A2_cm": 5,
+            "B2": 0,
+            "P": 6,
+            "M": 0,
+            "X": 0,
+            "I": 0
+          },
+          "station_id": "ST-4-1",
+          "component": "LCD顯示器",
+          "tool": "無",
+          "image_url": null,
+          "is_ctq": false,
+          "primary_action": "GET",
+          "hand": "双手",
+          "object_category": "高單價物料",
+          "glove_type": "兩只半指手套",
+          "frequency": 1,
+          "level_tag": ""
+        },
+        {
+          "id": "step-1765424620372",
+          "seq_type": "GENERAL",
+          "description": "双手 從捡料架 拿取 LCD顯示器，GET 到MB",
+          "tmu": 110,
+          "seconds": 0.0,
+          "params": {
+            "A1": 1,
+            "A1_cm": 5,
+            "B1": 0,
+            "G": 3,
+            "A2": 1,
+            "A2_cm": 5,
+            "B2": 0,
+            "P": 6,
+            "M": 0,
+            "X": 0,
+            "I": 0
+          },
+          "station_id": "ST-3-1b",
+          "component": "LCD顯示器",
+          "tool": "無",
+          "image_url": null,
+          "is_ctq": false,
+          "primary_action": "GET",
+          "hand": "双手",
+          "object_category": "高單價物料",
+          "glove_type": "兩只半指手套",
+          "frequency": 1,
+          "level_tag": ""
+        }
+      ],
+      "created_by": "user-002",
+      "created_at": "2025-12-08T18:15:51.933079",
+      "reviewed_by": "user-002",
+      "reviewed_at": "2025-12-11T03:44:14.346391",
+      "published_by": null,
+      "published_at": null
+    },
+    {
+      "id": "sop-902bdf33",
+      "project_id": "proj-001",
+      "version_no": "V1.2",
+      "status": "Draft",
+      "actions": [
+        {
+          "id": "step-1765424677313",
+          "seq_type": "CONTROLLED",
+          "description": "右手 從捡料架 拿取 LCD顯示器，GET 到MB",
+          "tmu": 110,
+          "seconds": 0.0,
+          "params": {
+            "A1": 1,
+            "A1_cm": 5,
+            "B1": 0,
+            "G": 3,
+            "A2": 1,
+            "A2_cm": 5,
+            "B2": 0,
+            "P": 6,
+            "M": 0,
+            "X": 0,
+            "I": 0
+          },
+          "station_id": "ST-3-1a",
+          "component": "LCD顯示器",
+          "tool": "無",
+          "image_url": null,
+          "is_ctq": false,
+          "primary_action": "GET",
+          "hand": "右手",
+          "object_category": "高單價物料",
+          "glove_type": "兩只半指手套",
+          "frequency": 1,
+          "level_tag": ""
+        },
+        {
+          "id": "step-1765424620052",
+          "seq_type": "GENERAL",
+          "description": "双手 從捡料架 拿取 LCD顯示器，GET 到MB",
+          "tmu": 110,
+          "seconds": 0.0,
+          "params": {
+            "A1": 1,
+            "A1_cm": 5,
+            "B1": 0,
+            "G": 3,
+            "A2": 1,
+            "A2_cm": 5,
+            "B2": 0,
+            "P": 6,
+            "M": 0,
+            "X": 0,
+            "I": 0
+          },
+          "station_id": "ST-3-1a",
+          "component": "LCD顯示器",
+          "tool": "無",
+          "image_url": null,
+          "is_ctq": false,
+          "primary_action": "GET",
+          "hand": "双手",
+          "object_category": "高單價物料",
+          "glove_type": "兩只半指手套",
+          "frequency": 1,
+          "level_tag": ""
+        },
+        {
+          "id": "step-1765424620220",
+          "seq_type": "GENERAL",
+          "description": "双手 從捡料架 拿取 LCD顯示器，GET 到MB",
+          "tmu": 110,
+          "seconds": 0.0,
+          "params": {
+            "A1": 1,
+            "A1_cm": 5,
+            "B1": 0,
+            "G": 3,
+            "A2": 1,
+            "A2_cm": 5,
+            "B2": 0,
+            "P": 6,
+            "M": 0,
+            "X": 0,
+            "I": 0
+          },
+          "station_id": "ST-3-1a",
+          "component": "LCD顯示器",
+          "tool": "無",
+          "image_url": null,
+          "is_ctq": false,
+          "primary_action": "GET",
+          "hand": "双手",
+          "object_category": "高單價物料",
+          "glove_type": "兩只半指手套",
+          "frequency": 1,
+          "level_tag": ""
+        },
+        {
+          "id": "step-1765424620372",
+          "seq_type": "GENERAL",
+          "description": "双手 從捡料架 拿取 LCD顯示器，GET 到MB",
+          "tmu": 110,
+          "seconds": 0.0,
+          "params": {
+            "A1": 1,
+            "A1_cm": 5,
+            "B1": 0,
+            "G": 3,
+            "A2": 1,
+            "A2_cm": 5,
+            "B2": 0,
+            "P": 6,
+            "M": 0,
+            "X": 0,
+            "I": 0
+          },
+          "station_id": "ST-3-1a",
+          "component": "LCD顯示器",
+          "tool": "無",
+          "image_url": null,
+          "is_ctq": false,
+          "primary_action": "GET",
+          "hand": "双手",
+          "object_category": "高單價物料",
+          "glove_type": "兩只半指手套",
+          "frequency": 1,
+          "level_tag": ""
+        },
+        {
+          "id": "step-1765424677482",
+          "seq_type": "CONTROLLED",
+          "description": "右手 從捡料架 拿取 LCD顯示器，GET 到MB",
+          "tmu": 110,
+          "seconds": 0.0,
+          "params": {
+            "A1": 1,
+            "A1_cm": 5,
+            "B1": 0,
+            "G": 3,
+            "A2": 1,
+            "A2_cm": 5,
+            "B2": 0,
+            "P": 6,
+            "M": 0,
+            "X": 0,
+            "I": 0
+          },
+          "station_id": "ST-4-1",
+          "component": "LCD顯示器",
+          "tool": "無",
+          "image_url": null,
+          "is_ctq": false,
+          "primary_action": "GET",
+          "hand": "右手",
+          "object_category": "高單價物料",
+          "glove_type": "兩只半指手套",
+          "frequency": 1,
+          "level_tag": ""
+        },
+        {
+          "id": "step-1765424677637",
+          "seq_type": "CONTROLLED",
+          "description": "右手 從捡料架 拿取 LCD顯示器，GET 到MB",
+          "tmu": 110,
+          "seconds": 0.0,
+          "params": {
+            "A1": 1,
+            "A1_cm": 5,
+            "B1": 0,
+            "G": 3,
+            "A2": 1,
+            "A2_cm": 5,
+            "B2": 0,
+            "P": 6,
+            "M": 0,
+            "X": 0,
+            "I": 0
+          },
+          "station_id": "ST-3-1b",
+          "component": "LCD顯示器",
+          "tool": "無",
+          "image_url": null,
+          "is_ctq": false,
+          "primary_action": "GET",
+          "hand": "右手",
+          "object_category": "高單價物料",
+          "glove_type": "兩只半指手套",
+          "frequency": 1,
+          "level_tag": ""
+        },
+        {
+          "id": "step-1765424677780",
+          "seq_type": "CONTROLLED",
+          "description": "右手 從捡料架 拿取 LCD顯示器，GET 到MB",
+          "tmu": 110,
+          "seconds": 0.0,
+          "params": {
+            "A1": 1,
+            "A1_cm": 5,
+            "B1": 0,
+            "G": 3,
+            "A2": 1,
+            "A2_cm": 5,
+            "B2": 0,
+            "P": 6,
+            "M": 0,
+            "X": 0,
+            "I": 0
+          },
+          "station_id": "ST-3-1b",
+          "component": "LCD顯示器",
+          "tool": "無",
+          "image_url": null,
+          "is_ctq": false,
+          "primary_action": "GET",
+          "hand": "右手",
+          "object_category": "高單價物料",
+          "glove_type": "兩只半指手套",
+          "frequency": 1,
+          "level_tag": ""
+        }
+      ],
+      "created_by": "user-002",
+      "created_at": "2025-12-11T03:44:42.034838",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "published_by": null,
+      "published_at": null
+    }
+  ],
+  "actions": [],
+  "stations": [
+    {
+      "id": "ST-3-1a",
+      "name": "第3-1站 (組裝DIMM站)",
+      "operator": "EMP-001 (張組長)",
+      "skill_level": 1.0
+    },
+    {
+      "id": "ST-3-1b",
+      "name": "第3-1站 (組裝假DIMM站)",
+      "operator": "EMP-002 (李技術員)",
+      "skill_level": 0.9
+    },
+    {
+      "id": "ST-4-1",
+      "name": "第4-1站 (組裝主板站)",
+      "operator": "EMP-003 (王工程師)",
+      "skill_level": 1.1
+    },
+    {
+      "id": "ST-4",
+      "name": "第4站",
+      "operator": "emp-001 (張組長)",
+      "skill_level": 1.2
+    },
+    {
+      "id": "ST-5",
+      "name": "第5站",
+      "operator": "emp-001 (張組長)",
+      "skill_level": 1.2
+    },
+    {
+      "id": "ST-6",
+      "name": "第6站",
+      "operator": "emp-001 (張組長)",
+      "skill_level": 1.2
+    },
+    {
+      "id": "ST-3",
+      "name": "第3站",
+      "operator": "emp-001 (張組長)",
+      "skill_level": 1.2
+    }
+  ],
+  "audit_logs": [
+    {
+      "id": "audit-9e1ef9ff",
+      "timestamp": "2025-12-04T12:53:21.725270",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "act-004",
+      "old_value": {
+        "station_id": "ST-4-1"
+      },
+      "new_value": {
+        "station_id": "ST-3-1b"
+      },
+      "description": "Reassigned action from ST-4-1 to ST-3-1b"
+    },
+    {
+      "id": "audit-a60f806e",
+      "timestamp": "2025-12-04T12:53:23.728719",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "act-003",
+      "old_value": {
+        "station_id": "ST-3-1b"
+      },
+      "new_value": {
+        "station_id": "ST-4-1"
+      },
+      "description": "Reassigned action from ST-3-1b to ST-4-1"
+    },
+    {
+      "id": "audit-e9fff3c5",
+      "timestamp": "2025-12-05T02:08:42.943582",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "CREATE",
+      "entity_type": "Station",
+      "entity_id": "ST-05",
+      "old_value": null,
+      "new_value": {
+        "id": "ST-05",
+        "name": "第5站 (包裝)",
+        "operator": "emp-002 (李技術員)",
+        "skill_level": 1.0
+      },
+      "description": "Created station: 第5站 (測試)"
+    },
+    {
+      "id": "audit-5e58491d",
+      "timestamp": "2025-12-05T02:09:23.180826",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "Station",
+      "entity_id": "ST-05",
+      "old_value": {
+        "id": "ST-05",
+        "name": "第5站 (測試)",
+        "operator": "emp-001 (張組長)",
+        "skill_level": 1.2
+      },
+      "new_value": {
+        "id": "ST-05",
+        "name": "第5站 (包裝)",
+        "operator": "emp-002 (李技術員)",
+        "skill_level": 1.0
+      },
+      "description": "Updated station: 第5站 (包裝)"
+    },
+    {
+      "id": "audit-4960c640",
+      "timestamp": "2025-12-05T05:29:44.430183",
+      "user_id": "user-001",
+      "user_name": "Admin Manager",
+      "action": "DELETE",
+      "entity_type": "Station",
+      "entity_id": "ST-05",
+      "old_value": {
+        "id": "ST-05",
+        "name": "第5站 (包裝)",
+        "operator": "emp-002 (李技術員)",
+        "skill_level": 1.0
+      },
+      "new_value": null,
+      "description": "Deleted station: 第5站 (包裝)"
+    },
+    {
+      "id": "audit-a57783de",
+      "timestamp": "2025-12-05T06:37:26.525389",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "act-001",
+      "old_value": {
+        "station_id": "ST-3-1a"
+      },
+      "new_value": {
+        "station_id": "ST-3-1b"
+      },
+      "description": "Reassigned action from ST-3-1a to ST-3-1b"
+    },
+    {
+      "id": "audit-c27cb0b6",
+      "timestamp": "2025-12-05T07:36:51.911243",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "CREATE",
+      "entity_type": "Station",
+      "entity_id": "ST-4",
+      "old_value": null,
+      "new_value": {
+        "id": "ST-4",
+        "name": "第4站",
+        "operator": "emp-001 (張組長)",
+        "skill_level": 1.2
+      },
+      "description": "Created station: 第4站"
+    },
+    {
+      "id": "audit-afaaa03f",
+      "timestamp": "2025-12-05T07:36:54.527259",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "CREATE",
+      "entity_type": "Station",
+      "entity_id": "ST-5",
+      "old_value": null,
+      "new_value": {
+        "id": "ST-5",
+        "name": "第5站",
+        "operator": "emp-001 (張組長)",
+        "skill_level": 1.2
+      },
+      "description": "Created station: 第5站"
+    },
+    {
+      "id": "audit-3c649207",
+      "timestamp": "2025-12-05T07:36:56.881716",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "CREATE",
+      "entity_type": "Station",
+      "entity_id": "ST-6",
+      "old_value": null,
+      "new_value": {
+        "id": "ST-6",
+        "name": "第6站",
+        "operator": "emp-001 (張組長)",
+        "skill_level": 1.2
+      },
+      "description": "Created station: 第6站"
+    },
+    {
+      "id": "audit-6dbb3b8a",
+      "timestamp": "2025-12-05T07:36:59.156829",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "act-004",
+      "old_value": {
+        "station_id": "ST-3-1b"
+      },
+      "new_value": {
+        "station_id": "ST-5"
+      },
+      "description": "Reassigned action from ST-3-1b to ST-5"
+    },
+    {
+      "id": "audit-bd74fe18",
+      "timestamp": "2025-12-05T07:37:02.288573",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "act-003",
+      "old_value": {
+        "station_id": "ST-4-1"
+      },
+      "new_value": {
+        "station_id": "ST-6"
+      },
+      "description": "Reassigned action from ST-4-1 to ST-6"
+    },
+    {
+      "id": "audit-bf673117",
+      "timestamp": "2025-12-08T17:54:35.029969",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "LevelSystem",
+      "entity_id": "proj-001",
+      "old_value": null,
+      "new_value": null,
+      "description": "Saved 4 updated, 0 created level entries"
+    },
+    {
+      "id": "audit-68719861",
+      "timestamp": "2025-12-08T17:54:39.081999",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "LevelSystem",
+      "entity_id": "proj-001",
+      "old_value": null,
+      "new_value": null,
+      "description": "Saved 4 updated, 0 created level entries"
+    },
+    {
+      "id": "audit-4154517a",
+      "timestamp": "2025-12-08T18:15:51.933172",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "CREATE",
+      "entity_type": "SOPVersion",
+      "entity_id": "sop-d609da19",
+      "old_value": null,
+      "new_value": {
+        "id": "sop-d609da19",
+        "project_id": "proj-001",
+        "version_no": "V1.1",
+        "status": "Draft",
+        "actions": [
+          {
+            "id": "step-1765217748806",
+            "seq_type": "GENERAL",
+            "description": "双手 從捡料架 拿取 LCD顯示器，GET 到MB",
+            "tmu": 110,
+            "seconds": 0.0,
+            "params": {
+              "A1": 1,
+              "A1_cm": 5,
+              "B1": 0,
+              "G": 3,
+              "A2": 1,
+              "A2_cm": 5,
+              "B2": 0,
+              "P": 6,
+              "M": 0,
+              "X": 0,
+              "I": 0
+            },
+            "station_id": "ST-3-1b",
+            "component": "LCD顯示器",
+            "tool": "無",
+            "image_url": null,
+            "is_ctq": false,
+            "primary_action": "GET",
+            "hand": "双手",
+            "object_category": "高單價物料",
+            "glove_type": "兩只半指手套",
+            "level_tag": ""
+          },
+          {
+            "id": "step-1765217748978",
+            "seq_type": "GENERAL",
+            "description": "双手 從捡料架 拿取 LCD顯示器，GET 到MB",
+            "tmu": 110,
+            "seconds": 0.0,
+            "params": {
+              "A1": 1,
+              "A1_cm": 5,
+              "B1": 0,
+              "G": 3,
+              "A2": 1,
+              "A2_cm": 5,
+              "B2": 0,
+              "P": 6,
+              "M": 0,
+              "X": 0,
+              "I": 0
+            },
+            "station_id": "ST-3-1a",
+            "component": "LCD顯示器",
+            "tool": "無",
+            "image_url": null,
+            "is_ctq": false,
+            "primary_action": "GET",
+            "hand": "双手",
+            "object_category": "高單價物料",
+            "glove_type": "兩只半指手套",
+            "level_tag": ""
+          },
+          {
+            "id": "step-1765217749143",
+            "seq_type": "GENERAL",
+            "description": "双手 從捡料架 拿取 LCD顯示器，GET 到MB",
+            "tmu": 110,
+            "seconds": 0.0,
+            "params": {
+              "A1": 1,
+              "A1_cm": 5,
+              "B1": 0,
+              "G": 3,
+              "A2": 1,
+              "A2_cm": 5,
+              "B2": 0,
+              "P": 6,
+              "M": 0,
+              "X": 0,
+              "I": 0
+            },
+            "station_id": "ST-4-1",
+            "component": "LCD顯示器",
+            "tool": "無",
+            "image_url": null,
+            "is_ctq": false,
+            "primary_action": "GET",
+            "hand": "双手",
+            "object_category": "高單價物料",
+            "glove_type": "兩只半指手套",
+            "level_tag": ""
+          },
+          {
+            "id": "step-1765217749316",
+            "seq_type": "GENERAL",
+            "description": "双手 從捡料架 拿取 LCD顯示器，GET 到MB",
+            "tmu": 110,
+            "seconds": 0.0,
+            "params": {
+              "A1": 1,
+              "A1_cm": 5,
+              "B1": 0,
+              "G": 3,
+              "A2": 1,
+              "A2_cm": 5,
+              "B2": 0,
+              "P": 6,
+              "M": 0,
+              "X": 0,
+              "I": 0
+            },
+            "station_id": "ST-3-1a",
+            "component": "LCD顯示器",
+            "tool": "無",
+            "image_url": null,
+            "is_ctq": false,
+            "primary_action": "GET",
+            "hand": "双手",
+            "object_category": "高單價物料",
+            "glove_type": "兩只半指手套",
+            "level_tag": ""
+          },
+          {
+            "id": "step-1765217749467",
+            "seq_type": "GENERAL",
+            "description": "双手 從捡料架 拿取 LCD顯示器，GET 到MB",
+            "tmu": 110,
+            "seconds": 0.0,
+            "params": {
+              "A1": 1,
+              "A1_cm": 5,
+              "B1": 0,
+              "G": 3,
+              "A2": 1,
+              "A2_cm": 5,
+              "B2": 0,
+              "P": 6,
+              "M": 0,
+              "X": 0,
+              "I": 0
+            },
+            "station_id": "ST-3-1b",
+            "component": "LCD顯示器",
+            "tool": "無",
+            "image_url": null,
+            "is_ctq": false,
+            "primary_action": "GET",
+            "hand": "双手",
+            "object_category": "高單價物料",
+            "glove_type": "兩只半指手套",
+            "level_tag": ""
+          },
+          {
+            "id": "step-1765217805991",
+            "seq_type": "CONTROLLED",
+            "description": "双手 從捡料架 拿取 LCD顯示器，GET 到MB",
+            "tmu": 110,
+            "seconds": 0.0,
+            "params": {
+              "A1": 1,
+              "A1_cm": 5,
+              "B1": 0,
+              "G": 3,
+              "A2": 1,
+              "A2_cm": 5,
+              "B2": 0,
+              "P": 6,
+              "M": 0,
+              "X": 0,
+              "I": 0
+            },
+            "station_id": "ST-3-1a",
+            "component": "LCD顯示器",
+            "tool": "無",
+            "image_url": null,
+            "is_ctq": false,
+            "primary_action": "GET",
+            "hand": "双手",
+            "object_category": "高單價物料",
+            "glove_type": "兩只半指手套",
+            "level_tag": ""
+          },
+          {
+            "id": "step-1765217806139",
+            "seq_type": "CONTROLLED",
+            "description": "双手 從捡料架 拿取 LCD顯示器，GET 到MB",
+            "tmu": 110,
+            "seconds": 0.0,
+            "params": {
+              "A1": 1,
+              "A1_cm": 5,
+              "B1": 0,
+              "G": 3,
+              "A2": 1,
+              "A2_cm": 5,
+              "B2": 0,
+              "P": 6,
+              "M": 0,
+              "X": 0,
+              "I": 0
+            },
+            "station_id": "ST-4-1",
+            "component": "LCD顯示器",
+            "tool": "無",
+            "image_url": null,
+            "is_ctq": false,
+            "primary_action": "GET",
+            "hand": "双手",
+            "object_category": "高單價物料",
+            "glove_type": "兩只半指手套",
+            "level_tag": ""
+          },
+          {
+            "id": "step-1765217806295",
+            "seq_type": "CONTROLLED",
+            "description": "双手 從捡料架 拿取 LCD顯示器，GET 到MB",
+            "tmu": 110,
+            "seconds": 0.0,
+            "params": {
+              "A1": 1,
+              "A1_cm": 5,
+              "B1": 0,
+              "G": 3,
+              "A2": 1,
+              "A2_cm": 5,
+              "B2": 0,
+              "P": 6,
+              "M": 0,
+              "X": 0,
+              "I": 0
+            },
+            "station_id": "ST-4-1",
+            "component": "LCD顯示器",
+            "tool": "無",
+            "image_url": null,
+            "is_ctq": false,
+            "primary_action": "GET",
+            "hand": "双手",
+            "object_category": "高單價物料",
+            "glove_type": "兩只半指手套",
+            "level_tag": ""
+          },
+          {
+            "id": "step-1765217806449",
+            "seq_type": "CONTROLLED",
+            "description": "双手 從捡料架 拿取 LCD顯示器，GET 到MB",
+            "tmu": 110,
+            "seconds": 0.0,
+            "params": {
+              "A1": 1,
+              "A1_cm": 5,
+              "B1": 0,
+              "G": 3,
+              "A2": 1,
+              "A2_cm": 5,
+              "B2": 0,
+              "P": 6,
+              "M": 0,
+              "X": 0,
+              "I": 0
+            },
+            "station_id": "ST-3-1a",
+            "component": "LCD顯示器",
+            "tool": "無",
+            "image_url": null,
+            "is_ctq": false,
+            "primary_action": "GET",
+            "hand": "双手",
+            "object_category": "高單價物料",
+            "glove_type": "兩只半指手套",
+            "level_tag": ""
+          },
+          {
+            "id": "step-1765217806601",
+            "seq_type": "CONTROLLED",
+            "description": "双手 從捡料架 拿取 LCD顯示器，GET 到MB",
+            "tmu": 110,
+            "seconds": 0.0,
+            "params": {
+              "A1": 1,
+              "A1_cm": 5,
+              "B1": 0,
+              "G": 3,
+              "A2": 1,
+              "A2_cm": 5,
+              "B2": 0,
+              "P": 6,
+              "M": 0,
+              "X": 0,
+              "I": 0
+            },
+            "station_id": "ST-3-1b",
+            "component": "LCD顯示器",
+            "tool": "無",
+            "image_url": null,
+            "is_ctq": false,
+            "primary_action": "GET",
+            "hand": "双手",
+            "object_category": "高單價物料",
+            "glove_type": "兩只半指手套",
+            "level_tag": ""
+          }
+        ],
+        "created_by": "user-002",
+        "created_at": "2025-12-08T18:15:51.933079",
+        "reviewed_by": null,
+        "reviewed_at": null,
+        "published_by": null,
+        "published_at": null
+      },
+      "description": "Created SOP version: V1.1 for project proj-001"
+    },
+    {
+      "id": "audit-18376498",
+      "timestamp": "2025-12-08T18:15:52.042754",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "SOPVersion",
+      "entity_id": "sop-d609da19",
+      "old_value": {
+        "action_count": 0
+      },
+      "new_value": {
+        "action_count": 5
+      },
+      "description": "Updated SOP actions (count: 5)"
+    },
+    {
+      "id": "audit-843c7bce",
+      "timestamp": "2025-12-08T18:16:48.045806",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "SOPVersion",
+      "entity_id": "sop-d609da19",
+      "old_value": {
+        "action_count": 5
+      },
+      "new_value": {
+        "action_count": 10
+      },
+      "description": "Updated SOP actions (count: 10)"
+    },
+    {
+      "id": "audit-35a18165",
+      "timestamp": "2025-12-08T18:17:26.816164",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "step-1765217748806",
+      "old_value": {
+        "station_id": "ST-3-1a"
+      },
+      "new_value": {
+        "station_id": "ST-3-1b"
+      },
+      "description": "Reassigned action from ST-3-1a to ST-3-1b"
+    },
+    {
+      "id": "audit-42e6f911",
+      "timestamp": "2025-12-08T18:17:27.787739",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "step-1765217749143",
+      "old_value": {
+        "station_id": "ST-3-1a"
+      },
+      "new_value": {
+        "station_id": "ST-4-1"
+      },
+      "description": "Reassigned action from ST-3-1a to ST-4-1"
+    },
+    {
+      "id": "audit-5c356366",
+      "timestamp": "2025-12-08T18:17:29.338631",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "step-1765217806601",
+      "old_value": {
+        "station_id": "ST-3-1a"
+      },
+      "new_value": {
+        "station_id": "ST-3-1b"
+      },
+      "description": "Reassigned action from ST-3-1a to ST-3-1b"
+    },
+    {
+      "id": "audit-b9224de0",
+      "timestamp": "2025-12-08T18:17:30.393336",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "step-1765217806295",
+      "old_value": {
+        "station_id": "ST-3-1a"
+      },
+      "new_value": {
+        "station_id": "ST-4-1"
+      },
+      "description": "Reassigned action from ST-3-1a to ST-4-1"
+    },
+    {
+      "id": "audit-1a25bbf0",
+      "timestamp": "2025-12-08T18:17:32.406753",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "step-1765217749467",
+      "old_value": {
+        "station_id": "ST-3-1a"
+      },
+      "new_value": {
+        "station_id": "ST-3-1b"
+      },
+      "description": "Reassigned action from ST-3-1a to ST-3-1b"
+    },
+    {
+      "id": "audit-ebcb5335",
+      "timestamp": "2025-12-08T18:17:33.449107",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "step-1765217806139",
+      "old_value": {
+        "station_id": "ST-3-1a"
+      },
+      "new_value": {
+        "station_id": "ST-4-1"
+      },
+      "description": "Reassigned action from ST-3-1a to ST-4-1"
+    },
+    {
+      "id": "audit-00862ce0",
+      "timestamp": "2025-12-09T02:39:11.837103",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "SOPVersion",
+      "entity_id": "sop-d609da19",
+      "old_value": {
+        "action_count": 10
+      },
+      "new_value": {
+        "action_count": 4
+      },
+      "description": "Updated SOP actions (count: 4)"
+    },
+    {
+      "id": "audit-616364b2",
+      "timestamp": "2025-12-09T02:57:33.905877",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "SOPVersion",
+      "entity_id": "sop-d609da19",
+      "old_value": {
+        "action_count": 4
+      },
+      "new_value": {
+        "action_count": 3
+      },
+      "description": "Updated SOP actions (count: 3)"
+    },
+    {
+      "id": "audit-b2f591be",
+      "timestamp": "2025-12-09T02:58:08.626088",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "SOPVersion",
+      "entity_id": "sop-d609da19",
+      "old_value": {
+        "action_count": 3
+      },
+      "new_value": {
+        "action_count": 6
+      },
+      "description": "Updated SOP actions (count: 6)"
+    },
+    {
+      "id": "audit-4e844065",
+      "timestamp": "2025-12-09T02:58:35.536983",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "LevelSystem",
+      "entity_id": "proj-001",
+      "old_value": null,
+      "new_value": null,
+      "description": "Saved 6 updated, 0 created level entries"
+    },
+    {
+      "id": "audit-6dcdf358",
+      "timestamp": "2025-12-09T02:58:37.081624",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "LevelSystem",
+      "entity_id": "proj-001",
+      "old_value": null,
+      "new_value": null,
+      "description": "Saved 6 updated, 0 created level entries"
+    },
+    {
+      "id": "audit-2e6032c9",
+      "timestamp": "2025-12-09T02:58:47.759005",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "step-1765249086343",
+      "old_value": {
+        "station_id": "ST-3-1a"
+      },
+      "new_value": {
+        "station_id": "ST-3-1b"
+      },
+      "description": "Reassigned action from ST-3-1a to ST-3-1b"
+    },
+    {
+      "id": "audit-dde434fa",
+      "timestamp": "2025-12-09T02:58:50.198166",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "step-1765249052555",
+      "old_value": {
+        "station_id": "ST-3-1a"
+      },
+      "new_value": {
+        "station_id": "ST-4-1"
+      },
+      "description": "Reassigned action from ST-3-1a to ST-4-1"
+    },
+    {
+      "id": "audit-ca312728",
+      "timestamp": "2025-12-09T02:58:51.149440",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "step-1765249086668",
+      "old_value": {
+        "station_id": "ST-3-1a"
+      },
+      "new_value": {
+        "station_id": "ST-3-1b"
+      },
+      "description": "Reassigned action from ST-3-1a to ST-3-1b"
+    },
+    {
+      "id": "audit-1d23de9d",
+      "timestamp": "2025-12-09T02:58:52.039026",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "step-1765249086509",
+      "old_value": {
+        "station_id": "ST-3-1a"
+      },
+      "new_value": {
+        "station_id": "ST-4-1"
+      },
+      "description": "Reassigned action from ST-3-1a to ST-4-1"
+    },
+    {
+      "id": "audit-3569793a",
+      "timestamp": "2025-12-09T02:58:59.766350",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "step-1765249052397",
+      "old_value": {
+        "station_id": "ST-3-1a"
+      },
+      "new_value": {
+        "station_id": "ST-4-1"
+      },
+      "description": "Reassigned action from ST-3-1a to ST-4-1"
+    },
+    {
+      "id": "audit-e832b6b8",
+      "timestamp": "2025-12-09T02:59:19.805360",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "CREATE",
+      "entity_type": "Station",
+      "entity_id": "ST-3",
+      "old_value": null,
+      "new_value": {
+        "id": "ST-3",
+        "name": "第3站",
+        "operator": "emp-001 (張組長)",
+        "skill_level": 1.2
+      },
+      "description": "Created station: 第3站"
+    },
+    {
+      "id": "audit-73ed384b",
+      "timestamp": "2025-12-09T02:59:24.370070",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "step-1765249052397",
+      "old_value": {
+        "station_id": "ST-4-1"
+      },
+      "new_value": {
+        "station_id": "ST-3"
+      },
+      "description": "Reassigned action from ST-4-1 to ST-3"
+    },
+    {
+      "id": "audit-d72144e5",
+      "timestamp": "2025-12-09T03:21:21.378132",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "SOPVersion",
+      "entity_id": "sop-d609da19",
+      "old_value": {
+        "action_count": 6
+      },
+      "new_value": {
+        "action_count": 9
+      },
+      "description": "Updated SOP actions (count: 9)"
+    },
+    {
+      "id": "audit-77333deb",
+      "timestamp": "2025-12-09T04:44:59.394281",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "SOPVersion",
+      "entity_id": "sop-d609da19",
+      "old_value": {
+        "action_count": 9
+      },
+      "new_value": {
+        "action_count": 4
+      },
+      "description": "Updated SOP actions (count: 4)"
+    },
+    {
+      "id": "audit-1132f929",
+      "timestamp": "2025-12-09T04:45:16.921321",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "SOPVersion",
+      "entity_id": "sop-d609da19",
+      "old_value": {
+        "action_count": 4
+      },
+      "new_value": {
+        "action_count": 4
+      },
+      "description": "Updated SOP actions (count: 4)"
+    },
+    {
+      "id": "audit-cec463e9",
+      "timestamp": "2025-12-09T04:45:37.917944",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "SOPVersion",
+      "entity_id": "sop-d609da19",
+      "old_value": {
+        "action_count": 4
+      },
+      "new_value": {
+        "action_count": 7
+      },
+      "description": "Updated SOP actions (count: 7)"
+    },
+    {
+      "id": "audit-96533a75",
+      "timestamp": "2025-12-09T04:51:41.913791",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "SOPVersion",
+      "entity_id": "sop-d609da19",
+      "old_value": {
+        "action_count": 7
+      },
+      "new_value": {
+        "action_count": 3
+      },
+      "description": "Updated SOP actions (count: 3)"
+    },
+    {
+      "id": "audit-a34c534a",
+      "timestamp": "2025-12-09T04:51:55.234085",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "SOPVersion",
+      "entity_id": "sop-d609da19",
+      "old_value": {
+        "action_count": 3
+      },
+      "new_value": {
+        "action_count": 3
+      },
+      "description": "Updated SOP actions (count: 3)"
+    },
+    {
+      "id": "audit-81ee9337",
+      "timestamp": "2025-12-09T04:52:10.186381",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "SOPVersion",
+      "entity_id": "sop-d609da19",
+      "old_value": {
+        "action_count": 3
+      },
+      "new_value": {
+        "action_count": 4
+      },
+      "description": "Updated SOP actions (count: 4)"
+    },
+    {
+      "id": "audit-d5081d3e",
+      "timestamp": "2025-12-09T05:00:30.874081",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "SOPVersion",
+      "entity_id": "sop-d609da19",
+      "old_value": {
+        "action_count": 4
+      },
+      "new_value": {
+        "action_count": 3
+      },
+      "description": "Updated SOP actions (count: 3)"
+    },
+    {
+      "id": "audit-d6fb6e48",
+      "timestamp": "2025-12-09T05:54:23.337957",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "SOPVersion",
+      "entity_id": "sop-d609da19",
+      "old_value": {
+        "action_count": 3
+      },
+      "new_value": {
+        "action_count": 6
+      },
+      "description": "Updated SOP actions (count: 6)"
+    },
+    {
+      "id": "audit-e1f1588e",
+      "timestamp": "2025-12-09T05:54:53.437716",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "LevelSystem",
+      "entity_id": "proj-001",
+      "old_value": null,
+      "new_value": null,
+      "description": "Saved 6 updated, 0 created level entries"
+    },
+    {
+      "id": "audit-b087063f",
+      "timestamp": "2025-12-09T05:55:09.104086",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "LevelSystem",
+      "entity_id": "proj-001",
+      "old_value": null,
+      "new_value": null,
+      "description": "Saved 6 updated, 0 created level entries"
+    },
+    {
+      "id": "audit-bc8b71e8",
+      "timestamp": "2025-12-10T02:25:31.104831",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "step-1765259650983",
+      "old_value": {
+        "station_id": "ST-3-1a"
+      },
+      "new_value": {
+        "station_id": "ST-3-1b"
+      },
+      "description": "Reassigned action from ST-3-1a to ST-3-1b"
+    },
+    {
+      "id": "audit-d164005c",
+      "timestamp": "2025-12-10T02:25:32.375165",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "step-1765259656125",
+      "old_value": {
+        "station_id": "ST-3-1a"
+      },
+      "new_value": {
+        "station_id": "ST-4-1"
+      },
+      "description": "Reassigned action from ST-3-1a to ST-4-1"
+    },
+    {
+      "id": "audit-49a5ae3a",
+      "timestamp": "2025-12-10T02:25:33.249782",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "step-1765259655965",
+      "old_value": {
+        "station_id": "ST-3-1a"
+      },
+      "new_value": {
+        "station_id": "ST-3-1b"
+      },
+      "description": "Reassigned action from ST-3-1a to ST-3-1b"
+    },
+    {
+      "id": "audit-5185f88d",
+      "timestamp": "2025-12-10T02:25:40.546682",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "act-002",
+      "old_value": {
+        "station_id": "ST-3-1a"
+      },
+      "new_value": {
+        "station_id": "ST-4-1"
+      },
+      "description": "Reassigned action from ST-3-1a to ST-4-1"
+    },
+    {
+      "id": "audit-19bfbd37",
+      "timestamp": "2025-12-10T02:25:43.366356",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "act-002",
+      "old_value": {
+        "station_id": "ST-4-1"
+      },
+      "new_value": {
+        "station_id": "ST-3-1a"
+      },
+      "description": "Reassigned action from ST-4-1 to ST-3-1a"
+    },
+    {
+      "id": "audit-64562fc7",
+      "timestamp": "2025-12-10T02:25:50.328898",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "step-1765259651148",
+      "old_value": {
+        "station_id": "ST-3-1a"
+      },
+      "new_value": {
+        "station_id": "ST-4-1"
+      },
+      "description": "Reassigned action from ST-3-1a to ST-4-1"
+    },
+    {
+      "id": "audit-c8110023",
+      "timestamp": "2025-12-10T02:25:53.056570",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "step-1765259650812",
+      "old_value": {
+        "station_id": "ST-3-1a"
+      },
+      "new_value": {
+        "station_id": "ST-4-1"
+      },
+      "description": "Reassigned action from ST-3-1a to ST-4-1"
+    },
+    {
+      "id": "audit-07dd51d8",
+      "timestamp": "2025-12-10T02:25:54.214978",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "step-1765259651148",
+      "old_value": {
+        "station_id": "ST-4-1"
+      },
+      "new_value": {
+        "station_id": "ST-3-1a"
+      },
+      "description": "Reassigned action from ST-4-1 to ST-3-1a"
+    },
+    {
+      "id": "audit-23b640d7",
+      "timestamp": "2025-12-10T02:26:01.292318",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "step-1765259651148",
+      "old_value": {
+        "station_id": "ST-3-1a"
+      },
+      "new_value": {
+        "station_id": "ST-4"
+      },
+      "description": "Reassigned action from ST-3-1a to ST-4"
+    },
+    {
+      "id": "audit-ccdc3278",
+      "timestamp": "2025-12-10T02:26:11.936613",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "step-1765259650812",
+      "old_value": {
+        "station_id": "ST-4-1"
+      },
+      "new_value": {
+        "station_id": "ST-4"
+      },
+      "description": "Reassigned action from ST-4-1 to ST-4"
+    },
+    {
+      "id": "audit-527aa756",
+      "timestamp": "2025-12-10T02:26:16.274812",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "step-1765259651148",
+      "old_value": {
+        "station_id": "ST-4"
+      },
+      "new_value": {
+        "station_id": "ST-4-1"
+      },
+      "description": "Reassigned action from ST-4 to ST-4-1"
+    },
+    {
+      "id": "audit-574821c0",
+      "timestamp": "2025-12-10T02:26:24.707553",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "act-002",
+      "old_value": {
+        "station_id": "ST-3-1a"
+      },
+      "new_value": {
+        "station_id": "ST-4-1"
+      },
+      "description": "Reassigned action from ST-3-1a to ST-4-1"
+    },
+    {
+      "id": "audit-b1c45787",
+      "timestamp": "2025-12-10T02:26:28.776951",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "act-002",
+      "old_value": {
+        "station_id": "ST-4-1"
+      },
+      "new_value": {
+        "station_id": "ST-4"
+      },
+      "description": "Reassigned action from ST-4-1 to ST-4"
+    },
+    {
+      "id": "audit-9f53cbcd",
+      "timestamp": "2025-12-10T02:26:41.215632",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "act-002",
+      "old_value": {
+        "station_id": "ST-4"
+      },
+      "new_value": {
+        "station_id": "ST-3-1a"
+      },
+      "description": "Reassigned action from ST-4 to ST-3-1a"
+    },
+    {
+      "id": "audit-05b4ccca",
+      "timestamp": "2025-12-10T02:26:42.600151",
+      "user_id": "user-002",
+      "user_name": "張工程師",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "act-001",
+      "old_value": {
+        "station_id": "ST-3-1b"
+      },
+      "new_value": {
+        "station_id": "ST-3-1a"
+      },
+      "description": "Reassigned action from ST-3-1b to ST-3-1a"
+    },
+    {
+      "id": "audit-8ae9d431",
+      "timestamp": "2025-12-11T03:43:51.330256",
+      "user_id": "user-002",
+      "user_name": "Avery Yeh",
+      "action": "UPDATE",
+      "entity_type": "SOPVersion",
+      "entity_id": "sop-d609da19",
+      "old_value": {
+        "action_count": 6
+      },
+      "new_value": {
+        "action_count": 3
+      },
+      "description": "Updated SOP actions (count: 3)"
+    },
+    {
+      "id": "audit-5a929375",
+      "timestamp": "2025-12-11T03:44:14.346451",
+      "user_id": "user-002",
+      "user_name": "Avery Yeh",
+      "action": "APPROVE",
+      "entity_type": "SOPVersion",
+      "entity_id": "sop-d609da19",
+      "old_value": {
+        "status": "Draft"
+      },
+      "new_value": {
+        "status": "Reviewed"
+      },
+      "description": "Changed SOP status: Draft -> Reviewed"
+    },
+    {
+      "id": "audit-81ca5a32",
+      "timestamp": "2025-12-11T03:44:42.034861",
+      "user_id": "user-002",
+      "user_name": "Avery Yeh",
+      "action": "CREATE",
+      "entity_type": "SOPVersion",
+      "entity_id": "sop-902bdf33",
+      "old_value": null,
+      "new_value": {
+        "id": "sop-902bdf33",
+        "project_id": "proj-001",
+        "version_no": "V1.2",
+        "status": "Draft",
+        "actions": [
+          {
+            "id": "step-1765424677313",
+            "seq_type": "CONTROLLED",
+            "description": "右手 從捡料架 拿取 LCD顯示器，GET 到MB",
+            "tmu": 110,
+            "seconds": 0.0,
+            "params": {
+              "A1": 1,
+              "A1_cm": 5,
+              "B1": 0,
+              "G": 3,
+              "A2": 1,
+              "A2_cm": 5,
+              "B2": 0,
+              "P": 6,
+              "M": 0,
+              "X": 0,
+              "I": 0
+            },
+            "station_id": "ST-3-1a",
+            "component": "LCD顯示器",
+            "tool": "無",
+            "image_url": null,
+            "is_ctq": false,
+            "primary_action": "GET",
+            "hand": "右手",
+            "object_category": "高單價物料",
+            "glove_type": "兩只半指手套",
+            "frequency": 1,
+            "level_tag": ""
+          },
+          {
+            "id": "step-1765424620052",
+            "seq_type": "GENERAL",
+            "description": "双手 從捡料架 拿取 LCD顯示器，GET 到MB",
+            "tmu": 110,
+            "seconds": 0.0,
+            "params": {
+              "A1": 1,
+              "A1_cm": 5,
+              "B1": 0,
+              "G": 3,
+              "A2": 1,
+              "A2_cm": 5,
+              "B2": 0,
+              "P": 6,
+              "M": 0,
+              "X": 0,
+              "I": 0
+            },
+            "station_id": "ST-3-1a",
+            "component": "LCD顯示器",
+            "tool": "無",
+            "image_url": null,
+            "is_ctq": false,
+            "primary_action": "GET",
+            "hand": "双手",
+            "object_category": "高單價物料",
+            "glove_type": "兩只半指手套",
+            "frequency": 1,
+            "level_tag": ""
+          },
+          {
+            "id": "step-1765424620220",
+            "seq_type": "GENERAL",
+            "description": "双手 從捡料架 拿取 LCD顯示器，GET 到MB",
+            "tmu": 110,
+            "seconds": 0.0,
+            "params": {
+              "A1": 1,
+              "A1_cm": 5,
+              "B1": 0,
+              "G": 3,
+              "A2": 1,
+              "A2_cm": 5,
+              "B2": 0,
+              "P": 6,
+              "M": 0,
+              "X": 0,
+              "I": 0
+            },
+            "station_id": "ST-3-1a",
+            "component": "LCD顯示器",
+            "tool": "無",
+            "image_url": null,
+            "is_ctq": false,
+            "primary_action": "GET",
+            "hand": "双手",
+            "object_category": "高單價物料",
+            "glove_type": "兩只半指手套",
+            "frequency": 1,
+            "level_tag": ""
+          },
+          {
+            "id": "step-1765424620372",
+            "seq_type": "GENERAL",
+            "description": "双手 從捡料架 拿取 LCD顯示器，GET 到MB",
+            "tmu": 110,
+            "seconds": 0.0,
+            "params": {
+              "A1": 1,
+              "A1_cm": 5,
+              "B1": 0,
+              "G": 3,
+              "A2": 1,
+              "A2_cm": 5,
+              "B2": 0,
+              "P": 6,
+              "M": 0,
+              "X": 0,
+              "I": 0
+            },
+            "station_id": "ST-3-1a",
+            "component": "LCD顯示器",
+            "tool": "無",
+            "image_url": null,
+            "is_ctq": false,
+            "primary_action": "GET",
+            "hand": "双手",
+            "object_category": "高單價物料",
+            "glove_type": "兩只半指手套",
+            "frequency": 1,
+            "level_tag": ""
+          },
+          {
+            "id": "step-1765424677482",
+            "seq_type": "CONTROLLED",
+            "description": "右手 從捡料架 拿取 LCD顯示器，GET 到MB",
+            "tmu": 110,
+            "seconds": 0.0,
+            "params": {
+              "A1": 1,
+              "A1_cm": 5,
+              "B1": 0,
+              "G": 3,
+              "A2": 1,
+              "A2_cm": 5,
+              "B2": 0,
+              "P": 6,
+              "M": 0,
+              "X": 0,
+              "I": 0
+            },
+            "station_id": "ST-4-1",
+            "component": "LCD顯示器",
+            "tool": "無",
+            "image_url": null,
+            "is_ctq": false,
+            "primary_action": "GET",
+            "hand": "右手",
+            "object_category": "高單價物料",
+            "glove_type": "兩只半指手套",
+            "frequency": 1,
+            "level_tag": ""
+          },
+          {
+            "id": "step-1765424677637",
+            "seq_type": "CONTROLLED",
+            "description": "右手 從捡料架 拿取 LCD顯示器，GET 到MB",
+            "tmu": 110,
+            "seconds": 0.0,
+            "params": {
+              "A1": 1,
+              "A1_cm": 5,
+              "B1": 0,
+              "G": 3,
+              "A2": 1,
+              "A2_cm": 5,
+              "B2": 0,
+              "P": 6,
+              "M": 0,
+              "X": 0,
+              "I": 0
+            },
+            "station_id": "ST-3-1b",
+            "component": "LCD顯示器",
+            "tool": "無",
+            "image_url": null,
+            "is_ctq": false,
+            "primary_action": "GET",
+            "hand": "右手",
+            "object_category": "高單價物料",
+            "glove_type": "兩只半指手套",
+            "frequency": 1,
+            "level_tag": ""
+          },
+          {
+            "id": "step-1765424677780",
+            "seq_type": "CONTROLLED",
+            "description": "右手 從捡料架 拿取 LCD顯示器，GET 到MB",
+            "tmu": 110,
+            "seconds": 0.0,
+            "params": {
+              "A1": 1,
+              "A1_cm": 5,
+              "B1": 0,
+              "G": 3,
+              "A2": 1,
+              "A2_cm": 5,
+              "B2": 0,
+              "P": 6,
+              "M": 0,
+              "X": 0,
+              "I": 0
+            },
+            "station_id": "ST-3-1b",
+            "component": "LCD顯示器",
+            "tool": "無",
+            "image_url": null,
+            "is_ctq": false,
+            "primary_action": "GET",
+            "hand": "右手",
+            "object_category": "高單價物料",
+            "glove_type": "兩只半指手套",
+            "frequency": 1,
+            "level_tag": ""
+          }
+        ],
+        "created_by": "user-002",
+        "created_at": "2025-12-11T03:44:42.034838",
+        "reviewed_by": null,
+        "reviewed_at": null,
+        "published_by": null,
+        "published_at": null
+      },
+      "description": "Created SOP version: V1.2 for project proj-001"
+    },
+    {
+      "id": "audit-008ec2fd",
+      "timestamp": "2025-12-11T03:44:42.132952",
+      "user_id": "user-002",
+      "user_name": "Avery Yeh",
+      "action": "UPDATE",
+      "entity_type": "SOPVersion",
+      "entity_id": "sop-902bdf33",
+      "old_value": {
+        "action_count": 0
+      },
+      "new_value": {
+        "action_count": 7
+      },
+      "description": "Updated SOP actions (count: 7)"
+    },
+    {
+      "id": "audit-16d741e0",
+      "timestamp": "2025-12-11T03:44:57.502841",
+      "user_id": "user-002",
+      "user_name": "Avery Yeh",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "step-1765424620372",
+      "old_value": {
+        "station_id": "ST-3-1a"
+      },
+      "new_value": {
+        "station_id": "ST-3-1b"
+      },
+      "description": "Reassigned action from ST-3-1a to ST-3-1b"
+    },
+    {
+      "id": "audit-19d260cd",
+      "timestamp": "2025-12-11T03:44:58.678290",
+      "user_id": "user-002",
+      "user_name": "Avery Yeh",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "step-1765424677482",
+      "old_value": {
+        "station_id": "ST-3-1a"
+      },
+      "new_value": {
+        "station_id": "ST-4-1"
+      },
+      "description": "Reassigned action from ST-3-1a to ST-4-1"
+    },
+    {
+      "id": "audit-d2d4f3f3",
+      "timestamp": "2025-12-11T03:45:03.044035",
+      "user_id": "user-002",
+      "user_name": "Avery Yeh",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "step-1765424677637",
+      "old_value": {
+        "station_id": "ST-3-1a"
+      },
+      "new_value": {
+        "station_id": "ST-3-1b"
+      },
+      "description": "Reassigned action from ST-3-1a to ST-3-1b"
+    },
+    {
+      "id": "audit-b50544ac",
+      "timestamp": "2025-12-11T03:45:07.409573",
+      "user_id": "user-002",
+      "user_name": "Avery Yeh",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "step-1765424677780",
+      "old_value": {
+        "station_id": "ST-3-1a"
+      },
+      "new_value": {
+        "station_id": "ST-3-1b"
+      },
+      "description": "Reassigned action from ST-3-1a to ST-3-1b"
+    },
+    {
+      "id": "audit-b5a4fad8",
+      "timestamp": "2025-12-11T03:45:16.121178",
+      "user_id": "user-002",
+      "user_name": "Avery Yeh",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "act-001",
+      "old_value": {
+        "station_id": "ST-3-1a"
+      },
+      "new_value": {
+        "station_id": "ST-4-1"
+      },
+      "description": "Reassigned action from ST-3-1a to ST-4-1"
+    },
+    {
+      "id": "audit-14e9244a",
+      "timestamp": "2025-12-11T05:57:31.950274",
+      "user_id": "user-002",
+      "user_name": "Avery Yeh",
+      "action": "UPDATE",
+      "entity_type": "ActionAssignment",
+      "entity_id": "step-1765424620220",
+      "old_value": {
+        "station_id": "ST-3-1a"
+      },
+      "new_value": {
+        "station_id": "ST-4-1"
+      },
+      "description": "Reassigned action from ST-3-1a to ST-4-1"
+    }
+  ],
+  "simulation_results": [
+    {
+      "id": "sim-854229f8",
+      "timestamp": "2025-12-05T06:37:20.640188",
+      "project_id": "proj-001",
+      "takt_time": 5.0,
+      "cycle_time": 6.9,
+      "uph": 521,
+      "balance_rate": 0.7,
+      "num_stations": 3,
+      "bottleneck_station": "ST-3-1a",
+      "total_time": 14.43,
+      "alerts_count": 2,
+      "created_by": "張工程師",
+      "station_summary": [
+        {
+          "id": "ST-3-1a",
+          "operator": "張組長",
+          "actual_time": 6.9,
+          "is_overloaded": true
+        },
+        {
+          "id": "ST-3-1b",
+          "operator": "李技術員",
+          "actual_time": 3.6,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4-1",
+          "operator": "王工程師",
+          "actual_time": 3.93,
+          "is_overloaded": false
+        }
+      ]
+    },
+    {
+      "id": "sim-c34283e8",
+      "timestamp": "2025-12-05T06:37:29.124627",
+      "project_id": "proj-001",
+      "takt_time": 5.0,
+      "cycle_time": 6.48,
+      "uph": 555,
+      "balance_rate": 0.77,
+      "num_stations": 3,
+      "bottleneck_station": "ST-3-1b",
+      "total_time": 14.91,
+      "alerts_count": 2,
+      "created_by": "張工程師",
+      "station_summary": [
+        {
+          "id": "ST-3-1a",
+          "operator": "張組長",
+          "actual_time": 4.5,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-3-1b",
+          "operator": "李技術員",
+          "actual_time": 6.48,
+          "is_overloaded": true
+        },
+        {
+          "id": "ST-4-1",
+          "operator": "王工程師",
+          "actual_time": 3.93,
+          "is_overloaded": false
+        }
+      ]
+    },
+    {
+      "id": "sim-c5b9255a",
+      "timestamp": "2025-12-05T07:37:00.104901",
+      "project_id": "proj-001",
+      "takt_time": 5.0,
+      "cycle_time": 4.5,
+      "uph": 799,
+      "balance_rate": 0.53,
+      "num_stations": 6,
+      "bottleneck_station": "ST-3-1a",
+      "total_time": 14.31,
+      "alerts_count": 1,
+      "created_by": "張工程師",
+      "station_summary": [
+        {
+          "id": "ST-3-1a",
+          "operator": "張組長",
+          "actual_time": 4.5,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-3-1b",
+          "operator": "李技術員",
+          "actual_time": 2.88,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4-1",
+          "operator": "王工程師",
+          "actual_time": 3.93,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4",
+          "operator": "張組長",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-5",
+          "operator": "張組長",
+          "actual_time": 3.0,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-6",
+          "operator": "張組長",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        }
+      ]
+    },
+    {
+      "id": "sim-1a0f5676",
+      "timestamp": "2025-12-05T07:37:03.515988",
+      "project_id": "proj-001",
+      "takt_time": 5.0,
+      "cycle_time": 4.5,
+      "uph": 799,
+      "balance_rate": 0.52,
+      "num_stations": 6,
+      "bottleneck_station": "ST-3-1a",
+      "total_time": 13.98,
+      "alerts_count": 1,
+      "created_by": "張工程師",
+      "station_summary": [
+        {
+          "id": "ST-3-1a",
+          "operator": "張組長",
+          "actual_time": 4.5,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-3-1b",
+          "operator": "李技術員",
+          "actual_time": 2.88,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4-1",
+          "operator": "王工程師",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4",
+          "operator": "張組長",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-5",
+          "operator": "張組長",
+          "actual_time": 3.0,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-6",
+          "operator": "張組長",
+          "actual_time": 3.6,
+          "is_overloaded": false
+        }
+      ]
+    },
+    {
+      "id": "sim-c39f0285",
+      "timestamp": "2025-12-05T11:26:58.538270",
+      "project_id": "proj-001",
+      "takt_time": 5.0,
+      "cycle_time": 4.5,
+      "uph": 799,
+      "balance_rate": 0.55,
+      "num_stations": 3,
+      "bottleneck_station": "ST-3-1a",
+      "total_time": 7.38,
+      "alerts_count": 1,
+      "created_by": "張工程師",
+      "station_summary": [
+        {
+          "id": "ST-3-1a",
+          "operator": "張組長",
+          "actual_time": 4.5,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-3-1b",
+          "operator": "李技術員",
+          "actual_time": 2.88,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4-1",
+          "operator": "王工程師",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        }
+      ]
+    },
+    {
+      "id": "sim-52d013a4",
+      "timestamp": "2025-12-08T15:41:43.503454",
+      "project_id": "proj-001",
+      "takt_time": 5.0,
+      "cycle_time": 4.5,
+      "uph": 799,
+      "balance_rate": 0.55,
+      "num_stations": 3,
+      "bottleneck_station": "ST-3-1a",
+      "total_time": 7.38,
+      "alerts_count": 1,
+      "created_by": "張工程師",
+      "station_summary": [
+        {
+          "id": "ST-3-1a",
+          "operator": "張組長",
+          "actual_time": 4.5,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-3-1b",
+          "operator": "李技術員",
+          "actual_time": 2.88,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4-1",
+          "operator": "王工程師",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        }
+      ]
+    },
+    {
+      "id": "sim-31ba6a96",
+      "timestamp": "2025-12-09T02:58:53.982672",
+      "project_id": "proj-001",
+      "takt_time": 5.0,
+      "cycle_time": 4.5,
+      "uph": 799,
+      "balance_rate": 0.55,
+      "num_stations": 3,
+      "bottleneck_station": "ST-3-1a",
+      "total_time": 7.38,
+      "alerts_count": 1,
+      "created_by": "張工程師",
+      "station_summary": [
+        {
+          "id": "ST-3-1a",
+          "operator": "張組長",
+          "actual_time": 4.5,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-3-1b",
+          "operator": "李技術員",
+          "actual_time": 2.88,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4-1",
+          "operator": "王工程師",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        }
+      ]
+    },
+    {
+      "id": "sim-47cf8e22",
+      "timestamp": "2025-12-09T02:59:02.827711",
+      "project_id": "proj-001",
+      "takt_time": 5.0,
+      "cycle_time": 4.5,
+      "uph": 799,
+      "balance_rate": 0.55,
+      "num_stations": 3,
+      "bottleneck_station": "ST-3-1a",
+      "total_time": 7.38,
+      "alerts_count": 1,
+      "created_by": "張工程師",
+      "station_summary": [
+        {
+          "id": "ST-3-1a",
+          "operator": "張組長",
+          "actual_time": 4.5,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-3-1b",
+          "operator": "李技術員",
+          "actual_time": 2.88,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4-1",
+          "operator": "王工程師",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        }
+      ]
+    },
+    {
+      "id": "sim-aa933dd2",
+      "timestamp": "2025-12-09T02:59:25.368147",
+      "project_id": "proj-001",
+      "takt_time": 5.0,
+      "cycle_time": 2.88,
+      "uph": 1250,
+      "balance_rate": 0.33,
+      "num_stations": 3,
+      "bottleneck_station": "ST-3-1b",
+      "total_time": 2.88,
+      "alerts_count": 1,
+      "created_by": "張工程師",
+      "station_summary": [
+        {
+          "id": "ST-3-1b",
+          "operator": "李技術員",
+          "actual_time": 2.88,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4-1",
+          "operator": "王工程師",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-3",
+          "operator": "張組長",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        }
+      ]
+    },
+    {
+      "id": "sim-0bba95a9",
+      "timestamp": "2025-12-10T02:25:26.101019",
+      "project_id": "proj-001",
+      "takt_time": 5.0,
+      "cycle_time": 4.5,
+      "uph": 799,
+      "balance_rate": 0.55,
+      "num_stations": 3,
+      "bottleneck_station": "ST-3-1a",
+      "total_time": 7.38,
+      "alerts_count": 1,
+      "created_by": "張工程師",
+      "station_summary": [
+        {
+          "id": "ST-3-1a",
+          "operator": "張組長",
+          "actual_time": 4.5,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-3-1b",
+          "operator": "李技術員",
+          "actual_time": 2.88,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4-1",
+          "operator": "王工程師",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        }
+      ]
+    },
+    {
+      "id": "sim-ad9c8e34",
+      "timestamp": "2025-12-10T02:25:37.743825",
+      "project_id": "proj-001",
+      "takt_time": 5.0,
+      "cycle_time": 4.5,
+      "uph": 799,
+      "balance_rate": 0.55,
+      "num_stations": 3,
+      "bottleneck_station": "ST-3-1a",
+      "total_time": 7.38,
+      "alerts_count": 1,
+      "created_by": "張工程師",
+      "station_summary": [
+        {
+          "id": "ST-3-1a",
+          "operator": "張組長",
+          "actual_time": 4.5,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-3-1b",
+          "operator": "李技術員",
+          "actual_time": 2.88,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4-1",
+          "operator": "王工程師",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        }
+      ]
+    },
+    {
+      "id": "sim-cca5f410",
+      "timestamp": "2025-12-10T02:25:41.327892",
+      "project_id": "proj-001",
+      "takt_time": 5.0,
+      "cycle_time": 4.91,
+      "uph": 733,
+      "balance_rate": 0.53,
+      "num_stations": 3,
+      "bottleneck_station": "ST-4-1",
+      "total_time": 7.79,
+      "alerts_count": 1,
+      "created_by": "張工程師",
+      "station_summary": [
+        {
+          "id": "ST-3-1a",
+          "operator": "張組長",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-3-1b",
+          "operator": "李技術員",
+          "actual_time": 2.88,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4-1",
+          "operator": "王工程師",
+          "actual_time": 4.91,
+          "is_overloaded": false
+        }
+      ]
+    },
+    {
+      "id": "sim-c8bc17f1",
+      "timestamp": "2025-12-10T02:25:44.141077",
+      "project_id": "proj-001",
+      "takt_time": 5.0,
+      "cycle_time": 4.5,
+      "uph": 799,
+      "balance_rate": 0.55,
+      "num_stations": 3,
+      "bottleneck_station": "ST-3-1a",
+      "total_time": 7.38,
+      "alerts_count": 1,
+      "created_by": "張工程師",
+      "station_summary": [
+        {
+          "id": "ST-3-1a",
+          "operator": "張組長",
+          "actual_time": 4.5,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-3-1b",
+          "operator": "李技術員",
+          "actual_time": 2.88,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4-1",
+          "operator": "王工程師",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        }
+      ]
+    },
+    {
+      "id": "sim-1d11fe09",
+      "timestamp": "2025-12-10T02:25:51.073287",
+      "project_id": "proj-001",
+      "takt_time": 5.0,
+      "cycle_time": 4.5,
+      "uph": 799,
+      "balance_rate": 0.55,
+      "num_stations": 3,
+      "bottleneck_station": "ST-3-1a",
+      "total_time": 7.38,
+      "alerts_count": 1,
+      "created_by": "張工程師",
+      "station_summary": [
+        {
+          "id": "ST-3-1a",
+          "operator": "張組長",
+          "actual_time": 4.5,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-3-1b",
+          "operator": "李技術員",
+          "actual_time": 2.88,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4-1",
+          "operator": "王工程師",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        }
+      ]
+    },
+    {
+      "id": "sim-64d9c87a",
+      "timestamp": "2025-12-10T02:25:55.085401",
+      "project_id": "proj-001",
+      "takt_time": 5.0,
+      "cycle_time": 4.5,
+      "uph": 799,
+      "balance_rate": 0.55,
+      "num_stations": 3,
+      "bottleneck_station": "ST-3-1a",
+      "total_time": 7.38,
+      "alerts_count": 1,
+      "created_by": "張工程師",
+      "station_summary": [
+        {
+          "id": "ST-3-1a",
+          "operator": "張組長",
+          "actual_time": 4.5,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-3-1b",
+          "operator": "李技術員",
+          "actual_time": 2.88,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4-1",
+          "operator": "王工程師",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        }
+      ]
+    },
+    {
+      "id": "sim-bc5fe342",
+      "timestamp": "2025-12-10T02:26:02.008331",
+      "project_id": "proj-001",
+      "takt_time": 5.0,
+      "cycle_time": 4.5,
+      "uph": 799,
+      "balance_rate": 0.41,
+      "num_stations": 4,
+      "bottleneck_station": "ST-3-1a",
+      "total_time": 7.38,
+      "alerts_count": 1,
+      "created_by": "張工程師",
+      "station_summary": [
+        {
+          "id": "ST-3-1a",
+          "operator": "張組長",
+          "actual_time": 4.5,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-3-1b",
+          "operator": "李技術員",
+          "actual_time": 2.88,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4-1",
+          "operator": "王工程師",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4",
+          "operator": "陳小美",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        }
+      ]
+    },
+    {
+      "id": "sim-00db6175",
+      "timestamp": "2025-12-10T02:26:12.671913",
+      "project_id": "proj-001",
+      "takt_time": 5.0,
+      "cycle_time": 4.5,
+      "uph": 799,
+      "balance_rate": 0.41,
+      "num_stations": 4,
+      "bottleneck_station": "ST-3-1a",
+      "total_time": 7.38,
+      "alerts_count": 1,
+      "created_by": "張工程師",
+      "station_summary": [
+        {
+          "id": "ST-3-1a",
+          "operator": "張組長",
+          "actual_time": 4.5,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-3-1b",
+          "operator": "李技術員",
+          "actual_time": 2.88,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4-1",
+          "operator": "王工程師",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4",
+          "operator": "陳小美",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        }
+      ]
+    },
+    {
+      "id": "sim-5f834481",
+      "timestamp": "2025-12-10T02:26:20.841973",
+      "project_id": "proj-001",
+      "takt_time": 5.0,
+      "cycle_time": 4.5,
+      "uph": 799,
+      "balance_rate": 0.41,
+      "num_stations": 4,
+      "bottleneck_station": "ST-3-1a",
+      "total_time": 7.38,
+      "alerts_count": 1,
+      "created_by": "張工程師",
+      "station_summary": [
+        {
+          "id": "ST-3-1a",
+          "operator": "張組長",
+          "actual_time": 4.5,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-3-1b",
+          "operator": "李技術員",
+          "actual_time": 2.88,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4-1",
+          "operator": "王工程師",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4",
+          "operator": "陳小美",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        }
+      ]
+    },
+    {
+      "id": "sim-6a1d73b5",
+      "timestamp": "2025-12-10T02:26:25.408694",
+      "project_id": "proj-001",
+      "takt_time": 5.0,
+      "cycle_time": 4.91,
+      "uph": 733,
+      "balance_rate": 0.4,
+      "num_stations": 4,
+      "bottleneck_station": "ST-4-1",
+      "total_time": 7.79,
+      "alerts_count": 1,
+      "created_by": "張工程師",
+      "station_summary": [
+        {
+          "id": "ST-3-1a",
+          "operator": "張組長",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-3-1b",
+          "operator": "李技術員",
+          "actual_time": 2.88,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4-1",
+          "operator": "王工程師",
+          "actual_time": 4.91,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4",
+          "operator": "陳小美",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        }
+      ]
+    },
+    {
+      "id": "sim-a7e8f00e",
+      "timestamp": "2025-12-10T02:26:30.504494",
+      "project_id": "proj-001",
+      "takt_time": 5.0,
+      "cycle_time": 6.35,
+      "uph": 566,
+      "balance_rate": 0.36,
+      "num_stations": 4,
+      "bottleneck_station": "ST-4",
+      "total_time": 9.23,
+      "alerts_count": 4,
+      "created_by": "張工程師",
+      "station_summary": [
+        {
+          "id": "ST-3-1a",
+          "operator": "張組長",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-3-1b",
+          "operator": "李技術員",
+          "actual_time": 2.88,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4-1",
+          "operator": "王工程師",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4",
+          "operator": "陳小美",
+          "actual_time": 6.35,
+          "is_overloaded": true
+        }
+      ]
+    },
+    {
+      "id": "sim-634cc4a2",
+      "timestamp": "2025-12-10T02:26:44.043234",
+      "project_id": "proj-001",
+      "takt_time": 5.0,
+      "cycle_time": 6.9,
+      "uph": 521,
+      "balance_rate": 0.25,
+      "num_stations": 4,
+      "bottleneck_station": "ST-3-1a",
+      "total_time": 6.9,
+      "alerts_count": 2,
+      "created_by": "張工程師",
+      "station_summary": [
+        {
+          "id": "ST-3-1a",
+          "operator": "張組長",
+          "actual_time": 6.9,
+          "is_overloaded": true
+        },
+        {
+          "id": "ST-3-1b",
+          "operator": "李技術員",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4-1",
+          "operator": "王工程師",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4",
+          "operator": "陳小美",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        }
+      ]
+    },
+    {
+      "id": "sim-1adf6df1",
+      "timestamp": "2025-12-11T03:45:08.907626",
+      "project_id": "proj-001",
+      "takt_time": 5.0,
+      "cycle_time": 6.9,
+      "uph": 521,
+      "balance_rate": 0.33,
+      "num_stations": 3,
+      "bottleneck_station": "ST-3-1a",
+      "total_time": 6.9,
+      "alerts_count": 2,
+      "created_by": "Avery Yeh",
+      "station_summary": [
+        {
+          "id": "ST-3-1a",
+          "operator": "張組長",
+          "actual_time": 6.9,
+          "is_overloaded": true
+        },
+        {
+          "id": "ST-3-1b",
+          "operator": "李技術員",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4-1",
+          "operator": "王工程師",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        }
+      ]
+    },
+    {
+      "id": "sim-dcbb5404",
+      "timestamp": "2025-12-11T03:45:17.210206",
+      "project_id": "proj-001",
+      "takt_time": 5.0,
+      "cycle_time": 4.5,
+      "uph": 799,
+      "balance_rate": 0.53,
+      "num_stations": 3,
+      "bottleneck_station": "ST-3-1a",
+      "total_time": 7.12,
+      "alerts_count": 1,
+      "created_by": "Avery Yeh",
+      "station_summary": [
+        {
+          "id": "ST-3-1a",
+          "operator": "張組長",
+          "actual_time": 4.5,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-3-1b",
+          "operator": "李技術員",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4-1",
+          "operator": "王工程師",
+          "actual_time": 2.62,
+          "is_overloaded": false
+        }
+      ]
+    },
+    {
+      "id": "sim-031d2b21",
+      "timestamp": "2025-12-11T05:48:58.516371",
+      "project_id": "proj-001",
+      "takt_time": 5.0,
+      "cycle_time": 4.5,
+      "uph": 799,
+      "balance_rate": 0.53,
+      "num_stations": 3,
+      "bottleneck_station": "ST-3-1a",
+      "total_time": 7.12,
+      "alerts_count": 1,
+      "created_by": "Avery Yeh",
+      "station_summary": [
+        {
+          "id": "ST-3-1a",
+          "operator": "張組長",
+          "actual_time": 4.5,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-3-1b",
+          "operator": "李技術員",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4-1",
+          "operator": "王工程師",
+          "actual_time": 2.62,
+          "is_overloaded": false
+        }
+      ]
+    },
+    {
+      "id": "sim-b009a0e1",
+      "timestamp": "2025-12-11T05:49:06.223305",
+      "project_id": "proj-001",
+      "takt_time": 5.0,
+      "cycle_time": 4.5,
+      "uph": 799,
+      "balance_rate": 0.53,
+      "num_stations": 3,
+      "bottleneck_station": "ST-3-1a",
+      "total_time": 7.12,
+      "alerts_count": 1,
+      "created_by": "Avery Yeh",
+      "station_summary": [
+        {
+          "id": "ST-3-1a",
+          "operator": "張組長",
+          "actual_time": 4.5,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-3-1b",
+          "operator": "李技術員",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4-1",
+          "operator": "王工程師",
+          "actual_time": 2.62,
+          "is_overloaded": false
+        }
+      ]
+    },
+    {
+      "id": "sim-23f3a108",
+      "timestamp": "2025-12-11T05:49:09.999731",
+      "project_id": "proj-001",
+      "takt_time": 5.0,
+      "cycle_time": 4.5,
+      "uph": 799,
+      "balance_rate": 0.53,
+      "num_stations": 3,
+      "bottleneck_station": "ST-3-1a",
+      "total_time": 7.12,
+      "alerts_count": 1,
+      "created_by": "Avery Yeh",
+      "station_summary": [
+        {
+          "id": "ST-3-1a",
+          "operator": "張組長",
+          "actual_time": 4.5,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-3-1b",
+          "operator": "李技術員",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4-1",
+          "operator": "王工程師",
+          "actual_time": 2.62,
+          "is_overloaded": false
+        }
+      ]
+    },
+    {
+      "id": "sim-92616baf",
+      "timestamp": "2025-12-11T05:57:34.000523",
+      "project_id": "proj-001",
+      "takt_time": 5.0,
+      "cycle_time": 4.5,
+      "uph": 799,
+      "balance_rate": 0.53,
+      "num_stations": 3,
+      "bottleneck_station": "ST-3-1a",
+      "total_time": 7.12,
+      "alerts_count": 1,
+      "created_by": "Avery Yeh",
+      "station_summary": [
+        {
+          "id": "ST-3-1a",
+          "operator": "張組長",
+          "actual_time": 4.5,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-3-1b",
+          "operator": "李技術員",
+          "actual_time": 0.0,
+          "is_overloaded": false
+        },
+        {
+          "id": "ST-4-1",
+          "operator": "王工程師",
+          "actual_time": 2.62,
+          "is_overloaded": false
+        }
+      ]
+    }
+  ],
+  "level_entries": {
+    "proj-001": [
+      {
+        "id": "lvl-b7fe090b",
+        "action_id": "act-001",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-b1f3aff4",
+        "action_id": "act-002",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-f4182933",
+        "action_id": "act-003",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-8a56ee11",
+        "action_id": "act-004",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-5abc2ab6",
+        "action_id": "step-1765217748806",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-3bb7b5f6",
+        "action_id": "step-1765217748978",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-079d0ff5",
+        "action_id": "step-1765217749143",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-d492c9a5",
+        "action_id": "step-1765217749316",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-ff3cc7d7",
+        "action_id": "step-1765217749467",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-1e2f2ac2",
+        "action_id": "step-1765217805991",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-701c11b6",
+        "action_id": "step-1765217806139",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-c47c3ea6",
+        "action_id": "step-1765217806295",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-96dd3f20",
+        "action_id": "step-1765217806449",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-9b9a1f31",
+        "action_id": "step-1765217806601",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-3e3bcc64",
+        "action_id": "step-1765247950121",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-2dac5fef",
+        "action_id": "step-1765247950283",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-1fe61aff",
+        "action_id": "step-1765247950459",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-f027243c",
+        "action_id": "step-1765247950611",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-dc6d453f",
+        "action_id": "step-1765249052221",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-c0b1d148",
+        "action_id": "step-1765249052397",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-4db50db8",
+        "action_id": "step-1765249052555",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-293956df",
+        "action_id": "step-1765249086343",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-fc761dcd",
+        "action_id": "step-1765249086509",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-ae6bb971",
+        "action_id": "step-1765249086668",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-855bdefc",
+        "action_id": "step-1765250472769",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-3d049d06",
+        "action_id": "step-1765250469614",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-41e81495",
+        "action_id": "step-1765250469784",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-0de75f6b",
+        "action_id": "step-1765250469949",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-7b3e04e5",
+        "action_id": "step-1765250470093",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-6b5fd9fc",
+        "action_id": "step-1765250472926",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-a8a09a0b",
+        "action_id": "step-1765250473080",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-52aad37d",
+        "action_id": "step-1765250473246",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-b7252247",
+        "action_id": "step-1765250473399",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-d3dd1e18",
+        "action_id": "step-1765255491405",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-f3f27a21",
+        "action_id": "step-1765255491565",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-c92d23fd",
+        "action_id": "step-1765255491749",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-793ad7af",
+        "action_id": "step-1765255491910",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-1a2b9e4f",
+        "action_id": "step-1765255536245",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-93330ad4",
+        "action_id": "step-1765255536413",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-0c1dae87",
+        "action_id": "step-1765255536589",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-88622fbe",
+        "action_id": "step-1765255899780",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-29def5ea",
+        "action_id": "step-1765255899964",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-aa3293d4",
+        "action_id": "step-1765255900116",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-0b184d07",
+        "action_id": "step-1765255925741",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-7d0f2d6d",
+        "action_id": "step-1765256426684",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-0430c9a8",
+        "action_id": "step-1765256426860",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-6be7361c",
+        "action_id": "step-1765256427029",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null
+      },
+      {
+        "id": "lvl-456055f4",
+        "action_id": "step-1765259650644",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null,
+        "sort_order": 1
+      },
+      {
+        "id": "lvl-0489be4f",
+        "action_id": "step-1765259650812",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null,
+        "sort_order": 2
+      },
+      {
+        "id": "lvl-528c03cd",
+        "action_id": "step-1765259650983",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null,
+        "sort_order": 3
+      },
+      {
+        "id": "lvl-531b04c7",
+        "action_id": "step-1765259651148",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null,
+        "sort_order": 4
+      },
+      {
+        "id": "lvl-e1f4b9a4",
+        "action_id": "step-1765259655965",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null,
+        "sort_order": 0
+      },
+      {
+        "id": "lvl-6ec7b7d6",
+        "action_id": "step-1765259656125",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null,
+        "sort_order": 5
+      },
+      {
+        "id": "lvl-38f02412",
+        "action_id": "step-1765424620052",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null,
+        "sort_order": 53
+      },
+      {
+        "id": "lvl-9ef2f508",
+        "action_id": "step-1765424620220",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null,
+        "sort_order": 54
+      },
+      {
+        "id": "lvl-1825b998",
+        "action_id": "step-1765424620372",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null,
+        "sort_order": 55
+      },
+      {
+        "id": "lvl-5dfc360b",
+        "action_id": "step-1765424677313",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null,
+        "sort_order": 56
+      },
+      {
+        "id": "lvl-dc148500",
+        "action_id": "step-1765424677482",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null,
+        "sort_order": 57
+      },
+      {
+        "id": "lvl-cf24044e",
+        "action_id": "step-1765424677637",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null,
+        "sort_order": 58
+      },
+      {
+        "id": "lvl-443fa9da",
+        "action_id": "step-1765424677780",
+        "difficulty_factor": 1.0,
+        "number_tag": null,
+        "number_count": null,
+        "main_seq": null,
+        "order_seq": null,
+        "cub_group": null,
+        "machine_count": 1,
+        "operator_count": 1,
+        "status_label": null,
+        "sort_order": 59
+      }
+    ]
+  },
+  "_meta": {
+    "saved_at": "2026-01-11T16:04:06.381867+00:00",
+    "version": "1.0"
+  }
+}

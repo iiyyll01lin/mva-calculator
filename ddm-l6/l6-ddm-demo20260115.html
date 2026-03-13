@@ -1,0 +1,1463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L6 Line Balance Simulation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/prop-types/prop-types.min.js"></script>
+    <script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
+    <!-- Updated to Babel 7 for modern JS support -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="module">
+        try {
+            const [mvaCalc, importers, csv] = await Promise.all([
+                import('./mva/mvaCalc.js'),
+                import('./mva/importers.js'),
+                import('./mva/csv.js'),
+            ]);
+            window.__MVA_MODULES = { mvaCalc, importers, csv };
+        } catch (e) {
+            // Demo remains functional via inline fallbacks; importers/export CSV may be limited.
+            console.warn('Failed to preload MVA modules.', e);
+        }
+    </script>
+
+    <script type="text/babel">
+        const { useState, useMemo } = React;
+
+        // --- Icons (Inline SVGs to avoid external dependency issues) ---
+        
+        const IconWrapper = ({ children, size = 24, className = "" }) => (
+            <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width={size} 
+                height={size} 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                className={className}
+            >
+                {children}
+            </svg>
+        );
+
+        const Icons = {
+            LayoutDashboard: (props) => <IconWrapper {...props}><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></IconWrapper>,
+            Settings: (props) => <IconWrapper {...props}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.35a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></IconWrapper>,
+            Database: (props) => <IconWrapper {...props}><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></IconWrapper>,
+            ListOrdered: (props) => <IconWrapper {...props}><line x1="10" x2="21" y1="6" y2="6"/><line x1="10" x2="21" y1="12" y2="12"/><line x1="10" x2="21" y1="18" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></IconWrapper>,
+            PlayCircle: (props) => <IconWrapper {...props}><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></IconWrapper>,
+            Save: (props) => <IconWrapper {...props}><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></IconWrapper>,
+            ChevronRight: (props) => <IconWrapper {...props}><path d="m9 18 6-6-6-6"/></IconWrapper>,
+            AlertCircle: (props) => <IconWrapper {...props}><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></IconWrapper>,
+            BarChart3: (props) => <IconWrapper {...props}><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></IconWrapper>,
+            CheckCircle2: (props) => <IconWrapper {...props}><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></IconWrapper>,
+        };
+
+        // Recharts
+        const { 
+            BarChart, 
+            Bar, 
+            XAxis, 
+            YAxis, 
+            CartesianGrid, 
+            Tooltip: RechartsTooltip, 
+            Legend, 
+            ResponsiveContainer, 
+            ReferenceLine 
+        } = window.Recharts;
+
+        /**
+         * L6 Line Balance Simulation System
+         * Based on the provided design proposal.
+         */
+
+        // --- MVA helpers (loaded via dynamic import to keep this HTML portable) ---
+        // In Babel-in-browser, we can't use top-level import statements.
+        // We'll lazy-load ESM helpers and fall back to local calculations if load fails.
+        let __mva = null;
+        async function loadMvaHelpers() {
+            if (__mva) return __mva;
+            try {
+                if (window.__MVA_MODULES?.mvaCalc) {
+                    __mva = window.__MVA_MODULES.mvaCalc;
+                    return __mva;
+                }
+                __mva = await import('./mva/mvaCalc.js');
+                return __mva;
+            } catch (e) {
+                console.warn('Failed to load mva helpers, using fallback.', e);
+                __mva = {
+                    laborCostPerUnit: ({ hourlyRate, headcount, lineUph, efficiency }) => {
+                        const rate = Number(hourlyRate) || 0;
+                        const hc = Number(headcount) || 0;
+                        const uph = Number(lineUph) || 0;
+                        const eff = Number(efficiency) || 0;
+                        if (rate < 0 || hc < 0 || uph <= 0 || eff <= 0) return 0;
+                        return (rate * hc) / (uph * eff);
+                    },
+                    monthlyVolumeFromPlan: ({ rfqQtyPerMonth, lineUph, shiftsPerDay, hoursPerShift, workDaysPerMonth, utilization = 1 }) => {
+                        const rfq = Number(rfqQtyPerMonth) || 0;
+                        if (rfq > 0) return rfq;
+                        const uph = Number(lineUph) || 0;
+                        const shifts = Number(shiftsPerDay) || 0;
+                        const hours = Number(hoursPerShift) || 0;
+                        const days = Number(workDaysPerMonth) || 0;
+                        const util = Number(utilization) || 1;
+                        return uph * shifts * hours * days * util;
+                    },
+                    overheadPerUnit: ({ equipmentDepreciationPerMonth, equipmentMaintenanceRatio, spaceMonthlyCost, powerCostPerUnit, monthlyVolume }) => {
+                        const dep = Number(equipmentDepreciationPerMonth) || 0;
+                        const mr = Number(equipmentMaintenanceRatio) || 0;
+                        const space = Number(spaceMonthlyCost) || 0;
+                        const power = Number(powerCostPerUnit) || 0;
+                        const vol = Number(monthlyVolume) || 0;
+                        if (vol <= 0) {
+                            return {
+                                equipmentDepPerUnit: 0,
+                                equipmentMaintPerUnit: 0,
+                                spacePerUnit: 0,
+                                powerPerUnit: power,
+                                totalOverheadPerUnit: power,
+                            };
+                        }
+                        const equipmentDepPerUnit = dep / vol;
+                        const equipmentMaintPerUnit = (dep * mr) / vol;
+                        const spacePerUnit = space / vol;
+                        const powerPerUnit = power;
+                        return {
+                            equipmentDepPerUnit,
+                            equipmentMaintPerUnit,
+                            spacePerUnit,
+                            powerPerUnit,
+                            totalOverheadPerUnit: equipmentDepPerUnit + equipmentMaintPerUnit + spacePerUnit + powerPerUnit,
+                        };
+                    },
+                    computeMvaMvp: ({ directLaborRows, indirectLaborRows, rates, overhead, lineUph, monthlyVolume }) => {
+                        const dlRate = rates?.directLaborHourlyRate ?? 0;
+                        const idlRate = rates?.indirectLaborHourlyRate ?? 0;
+                        const eff = rates?.efficiency ?? 0;
+                        const dlBreakdown = (directLaborRows || []).map((row) => {
+                            const uph = row?.uphSource === 'override' ? row?.overrideUph : lineUph;
+                            return {
+                                id: row?.id,
+                                name: row?.name,
+                                headcount: row?.headcount,
+                                uphUsed: uph,
+                                costPerUnit: __mva.laborCostPerUnit({ hourlyRate: dlRate, headcount: row?.headcount, lineUph: uph, efficiency: eff })
+                            };
+                        });
+                        const idlBreakdown = (indirectLaborRows || []).map((row) => {
+                            const uph = row?.uphSource === 'override' ? row?.overrideUph : lineUph;
+                            return {
+                                id: row?.id,
+                                name: row?.name,
+                                headcount: row?.headcount,
+                                uphUsed: uph,
+                                costPerUnit: __mva.laborCostPerUnit({ hourlyRate: idlRate, headcount: row?.headcount, lineUph: uph, efficiency: eff })
+                            };
+                        });
+                        const dlPerUnit = dlBreakdown.reduce((sum, r) => sum + (Number(r.costPerUnit) || 0), 0);
+                        const idlPerUnit = idlBreakdown.reduce((sum, r) => sum + (Number(r.costPerUnit) || 0), 0);
+                        const overheadComputed = __mva.overheadPerUnit({
+                            equipmentDepreciationPerMonth: overhead?.equipmentDepreciationPerMonth,
+                            equipmentMaintenanceRatio: overhead?.equipmentMaintenanceRatio,
+                            spaceMonthlyCost: overhead?.spaceMonthlyCost,
+                            powerCostPerUnit: overhead?.powerCostPerUnit,
+                            monthlyVolume,
+                        });
+                        const totalPerUnit = dlPerUnit + idlPerUnit + (Number(overheadComputed.totalOverheadPerUnit) || 0);
+                        return { dlBreakdown, idlBreakdown, dlPerUnit, idlPerUnit, overhead: overheadComputed, totalPerUnit };
+                    },
+                };
+                return __mva;
+            }
+        }
+
+        let __mvaImporters = null;
+        async function loadMvaImporters() {
+            if (__mvaImporters) return __mvaImporters;
+            try {
+                if (window.__MVA_MODULES?.importers) {
+                    __mvaImporters = window.__MVA_MODULES.importers;
+                    return __mvaImporters;
+                }
+                __mvaImporters = await import('./mva/importers.js');
+                return __mvaImporters;
+            } catch (e) {
+                console.warn('Failed to load MVA importers.', e);
+                __mvaImporters = null;
+                return null;
+            }
+        }
+
+        let __csv = null;
+        async function loadCsvHelpers() {
+            if (__csv) return __csv;
+            try {
+                if (window.__MVA_MODULES?.csv) {
+                    __csv = window.__MVA_MODULES.csv;
+                    return __csv;
+                }
+                __csv = await import('./mva/csv.js');
+                return __csv;
+            } catch (e) {
+                console.warn('Failed to load CSV helpers.', e);
+                __csv = null;
+                return null;
+            }
+        }
+
+        // --- Default Initial Data (From PPT) ---
+
+        const DEFAULT_BASIC_INFO = {
+            modelName: "1395A3368201",
+            workDays: 26,
+            demandWeekly: 6000,
+            shiftsPerDay: 2,
+            hoursPerShift: 11,
+            breaksPerShiftMin: 150,
+            targetUtilization: 0.9,
+            fpy: 0.96,
+            boardsPerPanel: 1,
+            hasTopSide: true,
+            hasBottomSide: true,
+            lotSize: 1000,
+            setupTimeMin: 60,
+            oeePlacement: 0.7,
+            oeeOthers: 0.8
+        };
+
+        const DEFAULT_MACHINES = [
+            { id: 'm1', group: 'Printer', description: 'Solder paste printer', rate: 120, type: 'fixed' },
+            { id: 'm2', group: 'SPI', description: 'Solder paste inspection', rate: 200, type: 'fixed' },
+            { id: 'm3', group: 'Placement_NXT_Chips', description: 'FUJI NXT M3 - chips', rate: 22000, type: 'placement' },
+            { id: 'm4', group: 'Placement_NXT_IC', description: 'FUJI NXT M6 - IC', rate: 10000, type: 'placement' },
+            { id: 'm5', group: 'Placement_NXT_BGA', description: 'FUJI NXT M6 - BGA/CSP', rate: 3500, type: 'placement' },
+            { id: 'm6', group: 'Placement_NPM_Chips', description: 'Panasonic NPM - chips', rate: 35000, type: 'placement' },
+            { id: 'm7', group: 'Placement_NPM_IC', description: 'Panasonic NPM - IC', rate: 10000, type: 'placement' },
+            { id: 'm8', group: 'Placement_NPM_BGA', description: 'Panasonic NPM - BGA/CSP', rate: 4000, type: 'placement' },
+            { id: 'm9', group: 'AOI', description: 'SMT AOI', rate: 189, type: 'fixed' },
+            { id: 'm10', group: 'Reflow', description: 'Reflow oven', rate: 120, type: 'fixed' },
+            { id: 'm11', group: 'THT/DIP', description: 'Manual insertion', rate: 120, type: 'fixed' },
+            { id: 'm12', group: 'WaveSolder', description: 'Default', rate: 250, type: 'fixed' },
+            { id: 'm13', group: 'ICT', description: 'In-circuit test', rate: 90, type: 'fixed' }, // Adjusted from 9 to 90 assuming typo in PPT or extremely slow test
+            { id: 'm14', group: 'FBT', description: 'Functional test', rate: 60, type: 'fixed' }, // Adjusted from 6 to 60 for realism
+            { id: 'm15', group: 'Visual', description: 'Manual inspection', rate: 144, type: 'fixed' },
+            { id: 'm16', group: 'Assembly', description: 'Final assembly', rate: 100, type: 'fixed' },
+            { id: 'm17', group: 'Packing', description: 'Pack & label', rate: 120, type: 'fixed' },
+            { id: 'm18', group: 'Loader', description: 'AYVL Loader', rate: 1200, type: 'fixed' },
+        ];
+
+        const DEFAULT_BOM_MAP = [
+            { id: 'b1', side: 'Top', bucket: '0402/0603 chips', count: 2385, machineGroup: 'Placement_NXT_Chips' },
+            { id: 'b2', side: 'Top', bucket: 'SOP/QFP/QFN', count: 206, machineGroup: 'Placement_NXT_IC' },
+            { id: 'b3', side: 'Top', bucket: 'BGA/CSP', count: 3, machineGroup: 'Placement_NXT_BGA' },
+            { id: 'b4', side: 'Bottom', bucket: '0402/0603 chips', count: 2130, machineGroup: 'Placement_NXT_Chips' },
+            { id: 'b5', side: 'Bottom', bucket: 'SOP/QFP/QFN', count: 26, machineGroup: 'Placement_NXT_IC' },
+            { id: 'b6', side: 'Bottom', bucket: 'BGA/CSP', count: 0, machineGroup: 'Placement_NXT_BGA' },
+        ];
+
+        const DEFAULT_PROCESS = [
+            { step: 1, process: 'Printer', side: 'Bottom' },
+            { step: 2, process: 'SPI', side: 'Bottom' },
+            { step: 3, process: 'Placement_NXT_Chips', side: 'Bottom' },
+            { step: 4, process: 'Placement_NXT_IC', side: 'Bottom' },
+            { step: 5, process: 'Placement_NXT_BGA', side: 'Bottom' },
+            { step: 6, process: 'AOI', side: 'Bottom' },
+            { step: 7, process: 'Reflow', side: 'Bottom' },
+            { step: 8, process: 'Printer', side: 'Top' },
+            { step: 9, process: 'SPI', side: 'Top' },
+            { step: 10, process: 'Placement_NXT_Chips', side: 'Top' },
+            { step: 11, process: 'Placement_NXT_IC', side: 'Top' },
+            { step: 12, process: 'Placement_NXT_BGA', side: 'Top' },
+            { step: 13, process: 'AOI', side: 'Top' },
+            { step: 14, process: 'Reflow', side: 'Top' },
+            { step: 15, process: 'THT/DIP', side: 'N/A' },
+            { step: 16, process: 'WaveSolder', side: 'N/A' },
+            { step: 17, process: 'ICT', side: 'N/A' },
+            { step: 18, process: 'FBT', side: 'N/A' },
+            { step: 19, process: 'Visual', side: 'N/A' },
+            { step: 20, process: 'Assembly', side: 'N/A' },
+            { step: 21, process: 'Packing', side: 'N/A' },
+        ];
+
+        // --- Components ---
+
+        const SidebarItem = ({ icon: Icon, label, active, onClick, testId }) => (
+            <button
+                data-testid={testId}
+                onClick={onClick}
+                className={`w-full flex items-center space-x-3 px-4 py-3 text-sm font-medium transition-colors ${
+                active 
+                    ? 'bg-blue-600 text-white shadow-md' 
+                    : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+                }`}
+            >
+                {Icon && <Icon size={18} />}
+                <span>{label}</span>
+                {active && <Icons.ChevronRight size={16} className="ml-auto opacity-75" />}
+            </button>
+        );
+
+        const SectionHeader = ({ title, description }) => (
+            <div className="mb-6">
+                <h2 className="text-2xl font-bold text-slate-100">{title}</h2>
+                <p className="text-slate-400 mt-1">{description}</p>
+            </div>
+        );
+
+        const InputField = ({ label, value, onChange, type = "text", suffix, inputProps }) => (
+            <div className="flex flex-col">
+                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                {label}
+                </label>
+                <div className="relative">
+                <input
+                    {...(inputProps || {})}
+                    type={type}
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                    className="w-full p-2.5 bg-slate-800 border border-slate-700 rounded-md text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
+                />
+                {suffix && (
+                    <span className="absolute right-3 top-2.5 text-slate-500 text-sm pointer-events-none">
+                    {suffix}
+                    </span>
+                )}
+                </div>
+            </div>
+        );
+
+        // --- Main Application Component ---
+
+        function L6Simulation() {
+            const [activeTab, setActiveTab] = useState('basic');
+            const [basicInfo, setBasicInfo] = useState(DEFAULT_BASIC_INFO);
+            const [machines, setMachines] = useState(DEFAULT_MACHINES);
+            const [bomMap, setBomMap] = useState(DEFAULT_BOM_MAP);
+            const [processSteps, setProcessSteps] = useState(DEFAULT_PROCESS);
+
+            // --- MVA State (MVP) ---
+            const [mvaRates, setMvaRates] = useState({
+                directLaborHourlyRate: 12.5,
+                indirectLaborHourlyRate: 23.28,
+                efficiency: 0.93,
+            });
+
+            const [mvaVolume, setMvaVolume] = useState({
+                demandMode: 'monthly', // 'monthly' | 'weekly'
+                rfqQtyPerMonth: 10000,
+                weeklyDemand: 0,
+                workDaysPerWeek: 5,
+                workDaysPerMonth: 22,
+            });
+
+            const [mvaOverhead, setMvaOverhead] = useState({
+                equipmentDepreciationPerMonth: 11271.150918914824,
+                equipmentMaintenanceRatio: 0.1,
+                spaceMonthlyCost: 229742.99,
+                powerCostPerUnit: 0.28,
+            });
+
+            const [directLaborRows, setDirectLaborRows] = useState([
+                { id: 'dl-offline', name: 'offline', headcount: 17, uphSource: 'line' },
+                { id: 'dl-assembly', name: 'Assembly', headcount: 15, uphSource: 'line' },
+                { id: 'dl-kitting', name: 'Kitting', headcount: 3, uphSource: 'line' },
+                { id: 'dl-test', name: 'Test', headcount: 4, uphSource: 'line' },
+                { id: 'dl-packing', name: 'Packing', headcount: 10, uphSource: 'line' },
+                { id: 'dl-shipping', name: 'Shipping', headcount: 1, uphSource: 'line' },
+            ]);
+
+            const [indirectLaborRows, setIndirectLaborRows] = useState([
+                { id: 'idl-site-mgr', name: 'Site Mgr.', headcount: 0.22, uphSource: 'line' },
+                { id: 'idl-fis-mes', name: 'FIS/MES', headcount: 1.76, uphSource: 'line' },
+                { id: 'idl-ie-om', name: 'IE/OM/Facility', headcount: 2.376, uphSource: 'line' },
+                { id: 'idl-te', name: 'TE', headcount: 8.36, uphSource: 'line' },
+                { id: 'idl-qai', name: 'QAI', headcount: 0.7128, uphSource: 'line' },
+                { id: 'idl-sqe', name: 'SQE', headcount: 3.8016, uphSource: 'line' },
+                { id: 'idl-hr', name: 'HR', headcount: 5.5836, uphSource: 'line' },
+            ]);
+
+            // --- Calculations ---
+
+            const simulationResults = useMemo(() => {
+                // 1. Calculate Available Time & Demand
+                const availableMinutesPerDay = (basicInfo.shiftsPerDay * basicInfo.hoursPerShift * 60) - (basicInfo.shiftsPerDay * basicInfo.breaksPerShiftMin);
+                const availableSecondsPerWeek = availableMinutesPerDay * 60 * basicInfo.workDays;
+                const taktTime = availableSecondsPerWeek / basicInfo.demandWeekly; // Seconds per board needed to meet demand
+
+                // 2. Calculate Cycle Time per Step
+                const stepResults = processSteps.map(step => {
+                const machine = machines.find(m => m.group === step.process);
+                if (!machine) return { ...step, cycleTime: 0, machineType: 'unknown', rate: 0 };
+
+                let cycleTime = 0;
+                let rawRate = machine.rate; // Units per hour
+                let componentCount = 0;
+                let oee = machine.type === 'placement' ? basicInfo.oeePlacement : basicInfo.oeeOthers;
+
+                if (machine.type === 'placement') {
+                    // Find BOM entries for this machine group and side
+                    const bomEntries = bomMap.filter(b => b.machineGroup === step.process && b.side === step.side);
+                    componentCount = bomEntries.reduce((sum, entry) => sum + Number(entry.count), 0);
+                    
+                    // CT = (Components / RatePH) * 3600 / OEE
+                    // Avoid div by zero
+                    if (rawRate > 0) {
+                    cycleTime = (componentCount / rawRate) * 3600;
+                    }
+                } else {
+                    // Fixed rate machine (e.g., Printer, Reflow)
+                    // Rate is typically Boards (or Panels) per Hour
+                    // CT = (1 / RatePH) * 3600 / OEE
+                    // * Penalization logic: If boardsPerPanel > 1, and machine handles panels, effective rate for board is higher?
+                    // Let's assume Rate is "Operations per Hour".
+                    // If operation is "Print 1 Panel", and panel has 2 boards, we divide CT by 2 for per-board CT.
+                    
+                    // Simplifying assumption based on PPT: "Nominal rate" usually means throughput of the unit being processed.
+                    if (rawRate > 0) {
+                    cycleTime = (1 / rawRate) * 3600;
+                    }
+                }
+
+                // Apply OEE
+                const effectiveCycleTime = cycleTime / (oee || 1); // Avoid NaN
+                
+                // Apply Setup Loss (Amortized per board)
+                const setupLossPerBoard = (basicInfo.setupTimeMin * 60) / basicInfo.lotSize;
+                const finalCycleTime = effectiveCycleTime + setupLossPerBoard;
+
+                return {
+                    ...step,
+                    machineDescription: machine.description,
+                    cycleTime: finalCycleTime,
+                    rawCycleTime: cycleTime,
+                    taktTime: taktTime,
+                    componentCount,
+                    isBottleneck: false 
+                };
+                });
+
+                // 3. Identify Bottleneck
+                const maxCycleTime = Math.max(...stepResults.map(s => s.cycleTime));
+                const finalSteps = stepResults.map(s => ({
+                ...s,
+                isBottleneck: s.cycleTime === maxCycleTime,
+                utilization: (s.cycleTime / maxCycleTime) * 100
+                }));
+
+                // 4. Aggregate Metrics
+                const bottleneckStep = finalSteps.find(s => s.isBottleneck);
+                const uph = maxCycleTime > 0 ? 3600 / maxCycleTime : 0;
+                
+                // Line Balance Efficiency
+                // LBE = Sum(Process Times) / (Longest Process Time * Number of Processes)
+                const sumCycleTime = finalSteps.reduce((acc, curr) => acc + curr.cycleTime, 0);
+                const lineBalanceEfficiency = (sumCycleTime / (maxCycleTime * finalSteps.length)) * 100;
+
+                return {
+                taktTime,
+                steps: finalSteps,
+                uph,
+                bottleneck: bottleneckStep,
+                lineBalanceEfficiency,
+                weeklyOutput: uph * (availableMinutesPerDay / 60) * basicInfo.workDays * basicInfo.targetUtilization
+                };
+            }, [basicInfo, machines, bomMap, processSteps]);
+
+            // --- MVA Calculations ---
+            const mvaResults = useMemo(() => {
+                const lineUph = simulationResults?.uph || 0;
+
+                // Monthly volume: prefer RFQ input; fallback uses plan.
+                const demandMode = mvaVolume?.demandMode || 'monthly';
+                const rfqQtyPerMonth = mvaVolume?.rfqQtyPerMonth;
+                const weeklyDemand = mvaVolume?.weeklyDemand;
+                const workDaysPerWeek = mvaVolume?.workDaysPerWeek;
+                const workDaysPerMonth = mvaVolume?.workDaysPerMonth;
+
+                // Use basicInfo shifts/hours as the default plan calendar.
+                const shiftsPerDay = basicInfo?.shiftsPerDay;
+                const hoursPerShift = basicInfo?.hoursPerShift;
+                const utilization = basicInfo?.targetUtilization ?? 1;
+
+                // We must keep useMemo synchronous; use a small synchronous fallback until helpers are loaded.
+                const rfqMonthly = Number(rfqQtyPerMonth) || 0;
+                const weekly = Number(weeklyDemand) || 0;
+                const wdW = Number(workDaysPerWeek) || 0;
+                const wdM = Number(workDaysPerMonth) || 0;
+
+                const convertedMonthly = (demandMode === 'weekly' && weekly > 0 && wdW > 0 && wdM > 0)
+                    ? (weekly * (wdM / wdW))
+                    : rfqMonthly;
+
+                const inferredVolume = convertedMonthly > 0
+                    ? convertedMonthly
+                    : (Number(lineUph) || 0) * (Number(shiftsPerDay) || 0) * (Number(hoursPerShift) || 0) * (Number(workDaysPerMonth) || 0) * (Number(utilization) || 1);
+
+                // Lightweight calculation inline; full helper is used by tests and by export (async).
+                const eff = Number(mvaRates?.efficiency) || 0;
+                const dlRate = Number(mvaRates?.directLaborHourlyRate) || 0;
+                const idlRate = Number(mvaRates?.indirectLaborHourlyRate) || 0;
+
+                const calcLaborRows = (rows, hourlyRate) => {
+                    return (rows || []).map((r) => {
+                        const uphUsed = (r?.uphSource === 'override' && Number(r?.overrideUph) > 0) ? Number(r.overrideUph) : lineUph;
+                        const hc = Number(r?.headcount) || 0;
+                        const perUnit = (uphUsed > 0 && eff > 0)
+                            ? (hourlyRate * hc) / (uphUsed * eff)
+                            : 0;
+                        return { ...r, uphUsed, costPerUnit: perUnit };
+                    });
+                };
+
+                const dlBreakdown = calcLaborRows(directLaborRows, dlRate);
+                const idlBreakdown = calcLaborRows(indirectLaborRows, idlRate);
+                const dlPerUnit = dlBreakdown.reduce((s, r) => s + (Number(r.costPerUnit) || 0), 0);
+                const idlPerUnit = idlBreakdown.reduce((s, r) => s + (Number(r.costPerUnit) || 0), 0);
+
+                const dep = Number(mvaOverhead?.equipmentDepreciationPerMonth) || 0;
+                const mr = Number(mvaOverhead?.equipmentMaintenanceRatio) || 0;
+                const space = Number(mvaOverhead?.spaceMonthlyCost) || 0;
+                const power = Number(mvaOverhead?.powerCostPerUnit) || 0;
+                const vol = Number(inferredVolume) || 0;
+
+                const equipmentDepPerUnit = vol > 0 ? dep / vol : 0;
+                const equipmentMaintPerUnit = vol > 0 ? (dep * mr) / vol : 0;
+                const spacePerUnit = vol > 0 ? space / vol : 0;
+                const powerPerUnit = power;
+                const overheadPerUnit = equipmentDepPerUnit + equipmentMaintPerUnit + spacePerUnit + powerPerUnit;
+
+                return {
+                    lineUph,
+                    monthlyVolume: inferredVolume,
+                    dlBreakdown,
+                    idlBreakdown,
+                    dlPerUnit,
+                    idlPerUnit,
+                    overhead: {
+                        equipmentDepPerUnit,
+                        equipmentMaintPerUnit,
+                        spacePerUnit,
+                        powerPerUnit,
+                        totalOverheadPerUnit: overheadPerUnit,
+                    },
+                    totalPerUnit: dlPerUnit + idlPerUnit + overheadPerUnit,
+                    warnings: {
+                        missingUph: !(lineUph > 0),
+                        missingEfficiency: !(eff > 0),
+                        missingMonthlyVolume: !(inferredVolume > 0),
+                    },
+                };
+            }, [simulationResults, basicInfo, mvaRates, mvaVolume, mvaOverhead, directLaborRows, indirectLaborRows]);
+
+            // --- Handlers ---
+
+            const handleBasicInfoChange = (key, val) => {
+                setBasicInfo(prev => ({ ...prev, [key]: val }));
+            };
+
+            const updateMachineRate = (id, newRate) => {
+                setMachines(prev => prev.map(m => m.id === id ? { ...m, rate: Number(newRate) } : m));
+            };
+
+            const updateBomCount = (id, newCount) => {
+                setBomMap(prev => prev.map(b => b.id === id ? { ...b, count: Number(newCount) } : b));
+            };
+
+            // --- Render Functions ---
+
+            const renderBasicInfo = () => (
+                <div className="space-y-6 animate-in fade-in duration-500">
+                <SectionHeader 
+                    title="Basic Information" 
+                    description="Configure the fundamental parameters for the simulation model."
+                />
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="bg-slate-800 p-5 rounded-lg border border-slate-700 shadow-sm space-y-4">
+                    <h3 className="font-semibold text-slate-300 border-b border-slate-700 pb-2">Production Planning</h3>
+                    <InputField label="Model Name" value={basicInfo.modelName} onChange={v => handleBasicInfoChange('modelName', v)} />
+                    <InputField label="Work Days (Planning)" value={basicInfo.workDays} onChange={v => handleBasicInfoChange('workDays', Number(v))} type="number" suffix="days" />
+                    <InputField label="Weekly Demand" value={basicInfo.demandWeekly} onChange={v => handleBasicInfoChange('demandWeekly', Number(v))} type="number" suffix="units" />
+                    </div>
+
+                    <div className="bg-slate-800 p-5 rounded-lg border border-slate-700 shadow-sm space-y-4">
+                    <h3 className="font-semibold text-slate-300 border-b border-slate-700 pb-2">Shift Configuration</h3>
+                    <InputField label="Shifts per Day" value={basicInfo.shiftsPerDay} onChange={v => handleBasicInfoChange('shiftsPerDay', Number(v))} type="number" />
+                    <InputField label="Hours per Shift" value={basicInfo.hoursPerShift} onChange={v => handleBasicInfoChange('hoursPerShift', Number(v))} type="number" suffix="hrs" />
+                    <InputField label="Breaks per Shift" value={basicInfo.breaksPerShiftMin} onChange={v => handleBasicInfoChange('breaksPerShiftMin', Number(v))} type="number" suffix="min" />
+                    </div>
+
+                    <div className="bg-slate-800 p-5 rounded-lg border border-slate-700 shadow-sm space-y-4">
+                    <h3 className="font-semibold text-slate-300 border-b border-slate-700 pb-2">Efficiency & Quality</h3>
+                    <InputField label="Target Utilization (0-1)" value={basicInfo.targetUtilization} onChange={v => handleBasicInfoChange('targetUtilization', Number(v))} type="number" />
+                    <InputField label="First Pass Yield (FPY)" value={basicInfo.fpy} onChange={v => handleBasicInfoChange('fpy', Number(v))} type="number" />
+                    <InputField label="OEE - Placement" value={basicInfo.oeePlacement} onChange={v => handleBasicInfoChange('oeePlacement', Number(v))} type="number" />
+                    <InputField label="OEE - Others" value={basicInfo.oeeOthers} onChange={v => handleBasicInfoChange('oeeOthers', Number(v))} type="number" />
+                    </div>
+
+                    <div className="bg-slate-800 p-5 rounded-lg border border-slate-700 shadow-sm space-y-4">
+                    <h3 className="font-semibold text-slate-300 border-b border-slate-700 pb-2">Batch Settings</h3>
+                    <InputField label="Lot Size" value={basicInfo.lotSize} onChange={v => handleBasicInfoChange('lotSize', Number(v))} type="number" suffix="boards" />
+                    <InputField label="Setup Time / Lot" value={basicInfo.setupTimeMin} onChange={v => handleBasicInfoChange('setupTimeMin', Number(v))} type="number" suffix="min" />
+                    <InputField label="Boards per Panel" value={basicInfo.boardsPerPanel} onChange={v => handleBasicInfoChange('boardsPerPanel', Number(v))} type="number" />
+                    </div>
+                </div>
+
+                <div className="flex justify-end mt-4">
+                    <button 
+                    onClick={() => setActiveTab('rates')}
+                    className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition-colors"
+                    >
+                    <span>Next: Machine Rates</span>
+                    <Icons.ChevronRight size={16} />
+                    </button>
+                </div>
+                </div>
+            );
+
+            const renderMachineRates = () => (
+                <div className="animate-in fade-in duration-500">
+                <SectionHeader 
+                    title="Machine Rates" 
+                    description="Define nominal throughput rates for each equipment type."
+                />
+                
+                <div className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden shadow-sm">
+                    <table className="w-full text-left border-collapse">
+                    <thead>
+                        <tr className="bg-slate-900 text-slate-400 text-sm uppercase tracking-wider">
+                        <th className="p-4 font-semibold border-b border-slate-700">Group</th>
+                        <th className="p-4 font-semibold border-b border-slate-700">Description</th>
+                        <th className="p-4 font-semibold border-b border-slate-700">Nominal Rate (Units/Hr)</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-700">
+                        {machines.map((m) => (
+                        <tr key={m.id} className="hover:bg-slate-700 transition-colors">
+                            <td className="p-4 font-medium text-slate-200">{m.group}</td>
+                            <td className="p-4 text-slate-400">{m.description}</td>
+                            <td className="p-4">
+                            <input
+                                type="number"
+                                value={m.rate}
+                                onChange={(e) => updateMachineRate(m.id, e.target.value)}
+                                className="w-32 p-1.5 bg-slate-700 border border-slate-600 rounded text-right text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            />
+                            </td>
+                        </tr>
+                        ))}
+                    </tbody>
+                    </table>
+                </div>
+                
+                <div className="flex justify-end mt-6">
+                    <button 
+                    onClick={() => setActiveTab('bom')}
+                    className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition-colors"
+                    >
+                    <span>Next: BOM Map</span>
+                    <Icons.ChevronRight size={16} />
+                    </button>
+                </div>
+                </div>
+            );
+
+            const renderBomMap = () => (
+                <div className="animate-in fade-in duration-500">
+                <SectionHeader 
+                    title="BOM Mapping" 
+                    description="Map component counts to machine groups for Top and Bottom sides."
+                />
+
+                <div className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden shadow-sm">
+                    <table className="w-full text-left border-collapse">
+                    <thead>
+                        <tr className="bg-slate-900 text-slate-400 text-sm uppercase tracking-wider">
+                        <th className="p-4 font-semibold border-b border-slate-700">Side</th>
+                        <th className="p-4 font-semibold border-b border-slate-700">Package Bucket</th>
+                        <th className="p-4 font-semibold border-b border-slate-700">Machine Group</th>
+                        <th className="p-4 font-semibold border-b border-slate-700 text-right">Count</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-700">
+                        {bomMap.map((b) => (
+                        <tr key={b.id} className="hover:bg-slate-700 transition-colors">
+                            <td className="p-4 font-medium">
+                            <span className={`px-2 py-1 rounded text-xs font-bold ${b.side === 'Top' ? 'bg-orange-900 text-orange-200' : 'bg-indigo-900 text-indigo-200'}`}>
+                                {b.side}
+                            </span>
+                            </td>
+                            <td className="p-4 text-slate-400">{b.bucket}</td>
+                            <td className="p-4 text-slate-400 font-mono text-sm">{b.machineGroup}</td>
+                            <td className="p-4 text-right">
+                            <input
+                                type="number"
+                                value={b.count}
+                                onChange={(e) => updateBomCount(b.id, e.target.value)}
+                                className="w-24 p-1.5 bg-slate-700 border border-slate-600 rounded text-right text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            />
+                            </td>
+                        </tr>
+                        ))}
+                    </tbody>
+                    </table>
+                </div>
+
+                <div className="flex justify-end mt-6">
+                    <button 
+                    onClick={() => setActiveTab('process')}
+                    className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition-colors"
+                    >
+                    <span>Next: Process Sequence</span>
+                    <Icons.ChevronRight size={16} />
+                    </button>
+                </div>
+                </div>
+            );
+
+            const renderProcess = () => (
+                <div className="animate-in fade-in duration-500">
+                <SectionHeader 
+                    title="Model Process" 
+                    description="Define the sequence of operations. This determines the flow of the simulation."
+                />
+
+                <div className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden shadow-sm max-h-[600px] overflow-y-auto">
+                    <table className="w-full text-left border-collapse relative">
+                    <thead className="sticky top-0 z-10">
+                        <tr className="bg-slate-900 text-slate-400 text-sm uppercase tracking-wider shadow-sm">
+                        <th className="p-4 font-semibold border-b border-slate-700">Seq</th>
+                        <th className="p-4 font-semibold border-b border-slate-700">Process / Machine Group</th>
+                        <th className="p-4 font-semibold border-b border-slate-700">Side</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-700">
+                        {processSteps.map((step) => (
+                        <tr key={step.step} className="hover:bg-slate-700 transition-colors">
+                            <td className="p-4 text-slate-500 font-mono w-16 text-center">{step.step}</td>
+                            <td className="p-4 font-medium text-slate-200">{step.process}</td>
+                            <td className="p-4">
+                            <span className={`px-2 py-1 rounded text-xs font-bold 
+                                ${step.side === 'Top' ? 'bg-orange-900 text-orange-200' : 
+                                step.side === 'Bottom' ? 'bg-indigo-900 text-indigo-200' : 'bg-slate-700 text-slate-300'}`}>
+                                {step.side}
+                            </span>
+                            </td>
+                        </tr>
+                        ))}
+                    </tbody>
+                    </table>
+                </div>
+
+                <div className="flex justify-end mt-6">
+                    <button 
+                    onClick={() => setActiveTab('simulation')}
+                    className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md transition-colors shadow-lg shadow-green-900/50"
+                    >
+                    <Icons.PlayCircle size={20} />
+                    <span>Run Simulation</span>
+                    </button>
+                </div>
+                </div>
+            );
+
+            const renderSimulation = () => {
+                const { taktTime, steps, uph, bottleneck, lineBalanceEfficiency, weeklyOutput } = simulationResults;
+
+                return (
+                <div className="animate-in fade-in duration-500 space-y-6">
+                    <div className="flex items-center justify-between">
+                    <div>
+                        <h2 className="text-2xl font-bold text-slate-100">Simulation Results</h2>
+                        <p className="text-slate-400">Analysis for Model: <span className="font-semibold text-blue-400">{basicInfo.modelName}</span></p>
+                    </div>
+                    <button className="flex items-center space-x-2 text-blue-400 bg-blue-900/30 px-4 py-2 rounded-md hover:bg-blue-900/50 transition-colors">
+                        <Icons.Save size={18} />
+                        <span>Export Report</span>
+                    </button>
+                    </div>
+
+                    {/* KPI Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="bg-slate-800 p-5 rounded-lg border border-slate-700 shadow-sm">
+                        <p className="text-xs font-bold text-slate-400 uppercase">System UPH</p>
+                        <p className="text-3xl font-bold text-slate-100 mt-1">{uph.toFixed(0)}</p>
+                        <p className="text-sm text-green-400 mt-2 flex items-center">
+                        <Icons.CheckCircle2 size={14} className="mr-1" />
+                        Boards / Hour
+                        </p>
+                    </div>
+                    <div className="bg-slate-800 p-5 rounded-lg border border-slate-700 shadow-sm">
+                        <p className="text-xs font-bold text-slate-400 uppercase">Takt Time</p>
+                        <p className="text-3xl font-bold text-slate-100 mt-1">{taktTime.toFixed(1)} <span className="text-lg text-slate-500">s</span></p>
+                        <p className="text-sm text-slate-400 mt-2">Required pace</p>
+                    </div>
+                    <div className="bg-slate-800 p-5 rounded-lg border border-slate-700 shadow-sm">
+                        <p className="text-xs font-bold text-slate-400 uppercase">Line Balance (LBE)</p>
+                        <p className="text-3xl font-bold text-slate-100 mt-1">{lineBalanceEfficiency.toFixed(1)}%</p>
+                        <div className="w-full bg-slate-700 rounded-full h-2 mt-3">
+                        <div className="bg-blue-500 h-2 rounded-full" style={{ width: `${lineBalanceEfficiency}%` }}></div>
+                        </div>
+                    </div>
+                    <div className={`p-5 rounded-lg border shadow-sm ${weeklyOutput >= basicInfo.demandWeekly ? 'bg-green-900/20 border-green-800' : 'bg-red-900/20 border-red-800'}`}>
+                        <p className={`text-xs font-bold uppercase ${weeklyOutput >= basicInfo.demandWeekly ? 'text-green-400' : 'text-red-400'}`}>Weekly Capacity</p>
+                        <p className={`text-3xl font-bold mt-1 ${weeklyOutput >= basicInfo.demandWeekly ? 'text-green-200' : 'text-red-200'}`}>
+                        {weeklyOutput.toFixed(0)}
+                        </p>
+                        <p className="text-sm mt-2 opacity-80 text-slate-300">Target: {basicInfo.demandWeekly}</p>
+                    </div>
+                    </div>
+
+                    {/* Bottleneck Alert */}
+                    <div className="bg-orange-900/20 border border-orange-800 p-4 rounded-md flex items-start space-x-3">
+                    <Icons.AlertCircle className="text-orange-500 shrink-0 mt-0.5" />
+                    <div>
+                        <h4 className="font-bold text-orange-200">Bottleneck Detected: {bottleneck && bottleneck.process} ({bottleneck && bottleneck.side})</h4>
+                        <p className="text-orange-300 text-sm mt-1">
+                        Cycle time is <span className="font-bold">{bottleneck && bottleneck.cycleTime.toFixed(2)}s</span> ({bottleneck && (bottleneck.cycleTime / taktTime * 100).toFixed(0)}% of Takt). 
+                        This station limits the entire line output.
+                        </p>
+                    </div>
+                    </div>
+
+                    {/* Main Chart */}
+                    <div className="bg-slate-800 p-6 rounded-lg border border-slate-700 shadow-sm h-[500px]">
+                    <h3 className="font-bold text-slate-200 mb-6 flex items-center">
+                        <Icons.BarChart3 size={20} className="mr-2 text-slate-400" />
+                        Cycle Time Analysis vs Takt Time
+                    </h3>
+                    <ResponsiveContainer width="100%" height="90%">
+                        <BarChart data={steps} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" />
+                        <XAxis 
+                            dataKey="step" 
+                            stroke="#94a3b8"
+                            label={{ value: 'Process Step', position: 'insideBottomRight', offset: -10, fill: '#94a3b8' }} 
+                        />
+                        <YAxis 
+                            stroke="#94a3b8"
+                            label={{ value: 'Seconds', angle: -90, position: 'insideLeft', fill: '#94a3b8' }} 
+                        />
+                        <RechartsTooltip 
+                            content={({ active, payload }) => {
+                            if (active && payload && payload.length) {
+                                const data = payload[0].payload;
+                                return (
+                                <div className="bg-slate-800 p-3 border border-slate-600 shadow-lg rounded text-sm text-slate-200">
+                                    <p className="font-bold text-white">{data.step}. {data.process}</p>
+                                    <p className="text-slate-400">{data.side} Side</p>
+                                    <div className="my-2 border-t border-slate-600 pt-2">
+                                    <p>Cycle Time: <span className="font-mono font-bold text-blue-400">{data.cycleTime.toFixed(2)}s</span></p>
+                                    <p>Utilization: <span className="font-mono text-blue-400">{data.utilization.toFixed(1)}%</span></p>
+                                    {data.componentCount > 0 && <p>Components: {data.componentCount}</p>}
+                                    </div>
+                                </div>
+                                );
+                            }
+                            return null;
+                            }}
+                        />
+                        <Legend verticalAlign="top" height={36}/>
+                        <ReferenceLine y={taktTime} label="Takt Time" stroke="red" strokeDasharray="3 3" />
+                        <Bar 
+                            dataKey="cycleTime" 
+                            fill="#3b82f6" 
+                            name="Cycle Time (s)"
+                            radius={[4, 4, 0, 0]}
+                        >
+                            {steps.map((entry, index) => (
+                            <cell key={`cell-${index}`} fill={entry.isBottleneck ? '#f97316' : '#3b82f6'} />
+                            ))}
+                        </Bar>
+                        </BarChart>
+                    </ResponsiveContainer>
+                    </div>
+
+                    {/* Detailed Table */}
+                    <div className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden shadow-sm">
+                    <table className="w-full text-left border-collapse text-sm">
+                        <thead>
+                        <tr className="bg-slate-900 text-slate-400 uppercase tracking-wider">
+                            <th className="p-3 font-semibold border-b border-slate-700">Step</th>
+                            <th className="p-3 font-semibold border-b border-slate-700">Process</th>
+                            <th className="p-3 font-semibold border-b border-slate-700">Side</th>
+                            <th className="p-3 font-semibold border-b border-slate-700 text-right">Raw CT (s)</th>
+                            <th className="p-3 font-semibold border-b border-slate-700 text-right">OEE Loss + Setup</th>
+                            <th className="p-3 font-semibold border-b border-slate-700 text-right bg-slate-700/50">Final CT (s)</th>
+                            <th className="p-3 font-semibold border-b border-slate-700 text-right">Utilization</th>
+                        </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-700">
+                        {steps.map((step) => (
+                            <tr key={step.step} className={step.isBottleneck ? 'bg-orange-900/20' : 'hover:bg-slate-700'}>
+                            <td className="p-3 font-mono text-slate-500">{step.step}</td>
+                            <td className="p-3 font-medium text-slate-200">
+                                {step.process}
+                                {step.isBottleneck && <span className="ml-2 px-2 py-0.5 bg-orange-900 text-orange-200 text-xs rounded-full border border-orange-700">Bottleneck</span>}
+                            </td>
+                            <td className="p-3 text-slate-300">{step.side}</td>
+                            <td className="p-3 text-right text-slate-500">{step.rawCycleTime.toFixed(2)}</td>
+                            <td className="p-3 text-right text-slate-500">{(step.cycleTime - step.rawCycleTime).toFixed(2)}</td>
+                            <td className="p-3 text-right font-bold bg-slate-700/30 text-slate-200">{step.cycleTime.toFixed(2)}</td>
+                            <td className="p-3 text-right">
+                                <div className="w-24 ml-auto h-2 bg-slate-700 rounded-full overflow-hidden">
+                                <div 
+                                    className={`h-full ${step.isBottleneck ? 'bg-orange-500' : 'bg-blue-500'}`} 
+                                    style={{ width: `${step.utilization}%` }}
+                                ></div>
+                                </div>
+                            </td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+                );
+            };
+
+            const addLaborRow = (kind) => {
+                const id = `${kind}-${Date.now()}`;
+                const newRow = { id, name: 'New', headcount: 0, uphSource: 'line' };
+                if (kind === 'dl') setDirectLaborRows(prev => [...prev, newRow]);
+                if (kind === 'idl') setIndirectLaborRows(prev => [...prev, newRow]);
+            };
+
+            const updateLaborRow = (kind, id, patch) => {
+                const updater = (rows) => rows.map(r => r.id === id ? { ...r, ...patch } : r);
+                if (kind === 'dl') setDirectLaborRows(prev => updater(prev));
+                if (kind === 'idl') setIndirectLaborRows(prev => updater(prev));
+            };
+
+            const deleteLaborRow = (kind, id) => {
+                if (kind === 'dl') setDirectLaborRows(prev => prev.filter(r => r.id !== id));
+                if (kind === 'idl') setIndirectLaborRows(prev => prev.filter(r => r.id !== id));
+            };
+
+            const importMonthYearUpdateCsv = async (file) => {
+                if (!file) return;
+                const mod = await loadMvaImporters();
+                if (!mod?.parseMonthYearUpdateCsv) {
+                    console.warn('Month/year importer not available');
+                    return;
+                }
+                const text = await file.text();
+                const parsed = mod.parseMonthYearUpdateCsv(text);
+                setMvaRates(prev => ({
+                    ...prev,
+                    directLaborHourlyRate: parsed.directLaborHourlyRate ?? prev.directLaborHourlyRate,
+                    indirectLaborHourlyRate: parsed.indirectLaborHourlyRate ?? prev.indirectLaborHourlyRate,
+                    efficiency: parsed.efficiency ?? prev.efficiency,
+                }));
+            };
+
+            const importEquipmentListCsv = async (file) => {
+                if (!file) return;
+                const mod = await loadMvaImporters();
+                if (!mod?.parseEquipmentListSetupCsv) {
+                    console.warn('Equipment list importer not available');
+                    return;
+                }
+                const text = await file.text();
+                const parsed = mod.parseEquipmentListSetupCsv(text);
+                setMvaOverhead(prev => ({
+                    ...prev,
+                    equipmentDepreciationPerMonth: Number(parsed.equipmentCostPerMonth ?? prev.equipmentDepreciationPerMonth),
+                }));
+            };
+
+            function downloadTextFile({ filename, content, mimeType }) {
+                // Test hook: allow puppeteer e2e to capture downloads deterministically.
+                if (window.__captureDownloads) {
+                    if (!Array.isArray(window.__downloads)) window.__downloads = [];
+                    window.__downloads.push({ filename, content, mimeType });
+                    return;
+                }
+                const blob = new Blob([content], { type: mimeType });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+            }
+
+            function formatTimestamp() {
+                const d = new Date();
+                const pad = (n) => String(n).padStart(2, '0');
+                return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+            }
+
+            const exportMvaReport = async () => {
+                const ts = formatTimestamp();
+                const safeModel = (basicInfo?.modelName || 'model').replace(/[^\w\-\.]+/g, '_');
+                const jsonName = `mva_${safeModel}_${ts}.json`;
+                const csvName = `mva_${safeModel}_${ts}.csv`;
+
+                const helpers = await loadMvaHelpers();
+
+                const lineUph = simulationResults?.uph || 0;
+                const convertedMonthly = (mvaVolume?.demandMode === 'weekly' && Number(mvaVolume?.weeklyDemand) > 0)
+                    ? (Number(mvaVolume.weeklyDemand) * (Number(mvaVolume?.workDaysPerMonth || 0) / Math.max(1, Number(mvaVolume?.workDaysPerWeek || 0))))
+                    : 0;
+
+                const monthlyVolume = convertedMonthly || helpers.monthlyVolumeFromPlan({
+                    rfqQtyPerMonth: mvaVolume?.rfqQtyPerMonth,
+                    lineUph,
+                    shiftsPerDay: basicInfo?.shiftsPerDay,
+                    hoursPerShift: basicInfo?.hoursPerShift,
+                    workDaysPerMonth: mvaVolume?.workDaysPerMonth,
+                    utilization: basicInfo?.targetUtilization ?? 1,
+                });
+
+                const computed = helpers.computeMvaMvp({
+                    directLaborRows,
+                    indirectLaborRows,
+                    rates: mvaRates,
+                    overhead: mvaOverhead,
+                    lineUph,
+                    monthlyVolume,
+                });
+
+                const payload = {
+                    meta: {
+                        generatedAt: new Date().toISOString(),
+                        version: 'mva-demo-mvp',
+                    },
+                    basicInfo,
+                    machines,
+                    bomMap,
+                    processSteps,
+                    simulationResults,
+                    mvaInputs: {
+                        rates: mvaRates,
+                        volume: mvaVolume,
+                        overhead: mvaOverhead,
+                        directLaborRows,
+                        indirectLaborRows,
+                    },
+                    mvaComputed: {
+                        lineUph,
+                        monthlyVolume,
+                        ...computed,
+                    }
+                };
+
+                downloadTextFile({ filename: jsonName, content: JSON.stringify(payload, null, 2), mimeType: 'application/json' });
+
+                const csvRows = [
+                    ['Section', 'Item', 'Value'],
+                    ['MVA', 'DL_per_unit', computed.dlPerUnit],
+                    ['MVA', 'IDL_per_unit', computed.idlPerUnit],
+                    ['MVA', 'Overhead_per_unit', computed.overhead.totalOverheadPerUnit],
+                    ['MVA', 'Total_per_unit', computed.totalPerUnit],
+                    ['MVA', 'Line_UPH', lineUph],
+                    ['MVA', 'Monthly_Volume', monthlyVolume],
+                    ['Inputs', 'DL_rate', mvaRates.directLaborHourlyRate],
+                    ['Inputs', 'IDL_rate', mvaRates.indirectLaborHourlyRate],
+                    ['Inputs', 'Efficiency', mvaRates.efficiency],
+                ];
+
+                const csvMod = await loadCsvHelpers();
+                const csvText = csvMod?.toCsv ? csvMod.toCsv(csvRows) : csvRows.map(r => r.join(',')).join('\n');
+                downloadTextFile({ filename: csvName, content: csvText, mimeType: 'text/csv' });
+            };
+
+            const renderMvaSetup = () => (
+                <div className="space-y-6 animate-in fade-in duration-500">
+                    <SectionHeader
+                        title="MVA Setup"
+                        description="Configure labor rates, efficiency, volume, and overhead inputs for MVA cost summary."
+                    />
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="bg-slate-800 p-5 rounded-lg border border-slate-700 shadow-sm space-y-4">
+                            <h3 className="font-semibold text-slate-300 border-b border-slate-700 pb-2">Labor Rates & Efficiency</h3>
+                            <InputField label="Direct Labor - Hourly Rate" value={mvaRates.directLaborHourlyRate} onChange={v => setMvaRates(prev => ({ ...prev, directLaborHourlyRate: Number(v) }))} type="number" inputProps={{ 'data-testid': 'mva-dl-rate' }} />
+                            <InputField label="Indirect Labor - Hourly Rate" value={mvaRates.indirectLaborHourlyRate} onChange={v => setMvaRates(prev => ({ ...prev, indirectLaborHourlyRate: Number(v) }))} type="number" inputProps={{ 'data-testid': 'mva-idl-rate' }} />
+                            <InputField label="Efficiency (0-1)" value={mvaRates.efficiency} onChange={v => setMvaRates(prev => ({ ...prev, efficiency: Number(v) }))} type="number" inputProps={{ 'data-testid': 'mva-efficiency' }} />
+
+                            <div className="pt-3 border-t border-slate-700">
+                                <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Import (Month/Year Update CSV)</div>
+                                <input
+                                    type="file"
+                                    accept=".csv,text/csv"
+                                    onChange={(e) => importMonthYearUpdateCsv(e.target.files?.[0])}
+                                    data-testid="mva-import-month-year"
+                                    className="block w-full text-sm text-slate-300 file:mr-3 file:py-2 file:px-3 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-slate-700 file:text-slate-100 hover:file:bg-slate-600"
+                                />
+                                <div className="text-xs text-slate-500 mt-1">Supports: Direct Labor Hourly Rate, IDirect Labor Hourly Rate, Efficiency.</div>
+                            </div>
+                        </div>
+
+                        <div className="bg-slate-800 p-5 rounded-lg border border-slate-700 shadow-sm space-y-4">
+                            <h3 className="font-semibold text-slate-300 border-b border-slate-700 pb-2">Volume</h3>
+                            <div className="flex flex-col">
+                                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Demand Mode</label>
+                                <select
+                                    value={mvaVolume.demandMode}
+                                    onChange={(e) => setMvaVolume(prev => ({ ...prev, demandMode: e.target.value }))}
+                                    data-testid="mva-demand-mode"
+                                    className="w-full p-2.5 bg-slate-800 border border-slate-700 rounded-md text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
+                                >
+                                    <option value="monthly">Monthly demand (RFQ / Month)</option>
+                                    <option value="weekly">Weekly demand (convert to monthly)</option>
+                                </select>
+                            </div>
+
+                            {mvaVolume.demandMode === 'monthly' ? (
+                                <InputField label="RFQ Qty / Month" value={mvaVolume.rfqQtyPerMonth} onChange={v => setMvaVolume(prev => ({ ...prev, rfqQtyPerMonth: Number(v) }))} type="number" suffix="units" inputProps={{ 'data-testid': 'mva-rfq-month' }} />
+                            ) : (
+                                <>
+                                    <InputField label="Weekly Demand" value={mvaVolume.weeklyDemand} onChange={v => setMvaVolume(prev => ({ ...prev, weeklyDemand: Number(v) }))} type="number" suffix="units" inputProps={{ 'data-testid': 'mva-weekly-demand' }} />
+                                    <InputField label="Work Days / Week" value={mvaVolume.workDaysPerWeek} onChange={v => setMvaVolume(prev => ({ ...prev, workDaysPerWeek: Number(v) }))} type="number" suffix="days" inputProps={{ 'data-testid': 'mva-workdays-week' }} />
+                                </>
+                            )}
+
+                            <InputField label="Work Days / Month" value={mvaVolume.workDaysPerMonth} onChange={v => setMvaVolume(prev => ({ ...prev, workDaysPerMonth: Number(v) }))} type="number" suffix="days" inputProps={{ 'data-testid': 'mva-workdays-month' }} />
+                            <div className="text-xs text-slate-500">
+                                If demand inputs are 0, monthly volume is inferred from simulation UPH × shifts × hours × work days × utilization.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-slate-800 p-5 rounded-lg border border-slate-700 shadow-sm space-y-4">
+                        <h3 className="font-semibold text-slate-300 border-b border-slate-700 pb-2">Overhead (MVP)</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <InputField label="Equipment Depreciation / Month" value={mvaOverhead.equipmentDepreciationPerMonth} onChange={v => setMvaOverhead(prev => ({ ...prev, equipmentDepreciationPerMonth: Number(v) }))} type="number" inputProps={{ 'data-testid': 'mva-equip-dep-month' }} />
+                            <InputField label="Equipment Maintenance Ratio" value={mvaOverhead.equipmentMaintenanceRatio} onChange={v => setMvaOverhead(prev => ({ ...prev, equipmentMaintenanceRatio: Number(v) }))} type="number" inputProps={{ 'data-testid': 'mva-equip-maint-ratio' }} />
+                            <InputField label="Space/Rental/Cleaning (Monthly)" value={mvaOverhead.spaceMonthlyCost} onChange={v => setMvaOverhead(prev => ({ ...prev, spaceMonthlyCost: Number(v) }))} type="number" inputProps={{ 'data-testid': 'mva-space-month' }} />
+                            <InputField label="Power Cost (per unit)" value={mvaOverhead.powerCostPerUnit} onChange={v => setMvaOverhead(prev => ({ ...prev, powerCostPerUnit: Number(v) }))} type="number" inputProps={{ 'data-testid': 'mva-power-per-unit' }} />
+                        </div>
+
+                        <div className="pt-3 border-t border-slate-700">
+                            <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Import (Equipment List Setup CSV)</div>
+                            <input
+                                type="file"
+                                accept=".csv,text/csv"
+                                onChange={(e) => importEquipmentListCsv(e.target.files?.[0])}
+                                data-testid="mva-import-equipment"
+                                className="block w-full text-sm text-slate-300 file:mr-3 file:py-2 file:px-3 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-slate-700 file:text-slate-100 hover:file:bg-slate-600"
+                            />
+                            <div className="text-xs text-slate-500 mt-1">Maps to: Equipment Depreciation / Month.</div>
+                        </div>
+                    </div>
+
+                    <div className="flex justify-end mt-4">
+                        <button
+                            onClick={() => setActiveTab('mva_labor')}
+                            className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition-colors"
+                        >
+                            <span>Next: MVA Labor</span>
+                            <Icons.ChevronRight size={16} />
+                        </button>
+                    </div>
+                </div>
+            );
+
+            const LaborTable = ({ title, rows, kind }) => (
+                <div className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden shadow-sm">
+                    <div className="flex items-center justify-between p-4 border-b border-slate-700">
+                        <h3 className="font-semibold text-slate-200">{title}</h3>
+                        <button
+                            onClick={() => addLaborRow(kind)}
+                            className="text-sm bg-slate-700 hover:bg-slate-600 text-slate-100 px-3 py-1.5 rounded"
+                        >
+                            + Add Row
+                        </button>
+                    </div>
+                    <table className="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr className="bg-slate-900 text-slate-400 uppercase tracking-wider">
+                                <th className="p-3 font-semibold border-b border-slate-700">Name</th>
+                                <th className="p-3 font-semibold border-b border-slate-700 text-right">HC</th>
+                                <th className="p-3 font-semibold border-b border-slate-700">UPH Source</th>
+                                <th className="p-3 font-semibold border-b border-slate-700 text-right">Override UPH</th>
+                                <th className="p-3 font-semibold border-b border-slate-700 text-right">Cost/Unit</th>
+                                <th className="p-3 font-semibold border-b border-slate-700 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-700">
+                            {rows.map((r) => (
+                                <tr key={r.id} className="hover:bg-slate-700">
+                                    <td className="p-3">
+                                        <input
+                                            value={r.name}
+                                            onChange={(e) => updateLaborRow(kind, r.id, { name: e.target.value })}
+                                            className="w-full p-1.5 bg-slate-700 border border-slate-600 rounded text-slate-100"
+                                        />
+                                    </td>
+                                    <td className="p-3 text-right">
+                                        <input
+                                            type="number"
+                                            value={r.headcount}
+                                            onChange={(e) => updateLaborRow(kind, r.id, { headcount: Number(e.target.value) })}
+                                            className="w-24 p-1.5 bg-slate-700 border border-slate-600 rounded text-right text-slate-100"
+                                        />
+                                    </td>
+                                    <td className="p-3">
+                                        <select
+                                            value={r.uphSource}
+                                            onChange={(e) => updateLaborRow(kind, r.id, { uphSource: e.target.value })}
+                                            className="p-1.5 bg-slate-700 border border-slate-600 rounded text-slate-100"
+                                        >
+                                            <option value="line">Line UPH</option>
+                                            <option value="override">Override</option>
+                                        </select>
+                                    </td>
+                                    <td className="p-3 text-right">
+                                        <input
+                                            type="number"
+                                            value={r.overrideUph ?? ''}
+                                            onChange={(e) => updateLaborRow(kind, r.id, { overrideUph: Number(e.target.value) })}
+                                            className="w-28 p-1.5 bg-slate-700 border border-slate-600 rounded text-right text-slate-100"
+                                            disabled={r.uphSource !== 'override'}
+                                        />
+                                    </td>
+                                    <td className="p-3 text-right font-mono text-slate-200">{(Number(r.costPerUnit) || 0).toFixed(2)}</td>
+                                    <td className="p-3 text-right">
+                                        <button
+                                            onClick={() => deleteLaborRow(kind, r.id)}
+                                            className="text-xs bg-red-900/40 hover:bg-red-900/60 text-red-200 px-2 py-1 rounded"
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            );
+
+            const renderMvaLabor = () => (
+                <div className="space-y-6 animate-in fade-in duration-500">
+                    <SectionHeader
+                        title="MVA Labor"
+                        description="Define direct and indirect labor rows used to compute labor cost per unit."
+                    />
+
+                    <LaborTable title="Direct Labor" rows={mvaResults.dlBreakdown} kind="dl" />
+                    <LaborTable title="Indirect Labor" rows={mvaResults.idlBreakdown} kind="idl" />
+
+                    <div className="flex justify-end">
+                        <button
+                            onClick={() => setActiveTab('mva_summary')}
+                            className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition-colors"
+                        >
+                            <span>Next: MVA Summary</span>
+                            <Icons.ChevronRight size={16} />
+                        </button>
+                    </div>
+                </div>
+            );
+
+            const renderMvaSummary = () => (
+                <div className="space-y-6 animate-in fade-in duration-500">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h2 className="text-2xl font-bold text-slate-100">MVA Summary (MVP)</h2>
+                            <p className="text-slate-400">Model: <span className="font-semibold text-blue-400">{basicInfo.modelName}</span></p>
+                        </div>
+                        <button
+                            onClick={exportMvaReport}
+                            className="flex items-center space-x-2 text-blue-200 bg-blue-600/40 px-4 py-2 rounded-md hover:bg-blue-600/60 transition-colors"
+                            data-testid="mva-export"
+                        >
+                            <Icons.Save size={18} />
+                            <span>Export MVA</span>
+                        </button>
+                    </div>
+
+                    {(mvaResults.warnings.missingUph || mvaResults.warnings.missingEfficiency || mvaResults.warnings.missingMonthlyVolume) && (
+                        <div className="bg-orange-900/20 border border-orange-800 p-4 rounded-md">
+                            <div className="flex items-start space-x-3">
+                                <Icons.AlertCircle className="text-orange-500 shrink-0 mt-0.5" />
+                                <div className="text-sm text-orange-200">
+                                    <div className="font-bold">Input warning</div>
+                                    <ul className="mt-1 text-orange-300 list-disc pl-5 space-y-1">
+                                        {mvaResults.warnings.missingUph && <li>Line UPH is 0 (run simulation or adjust inputs).</li>}
+                                        {mvaResults.warnings.missingEfficiency && <li>Efficiency is 0 (set in MVA Setup).</li>}
+                                        {mvaResults.warnings.missingMonthlyVolume && <li>Monthly volume is 0 (set RFQ Qty/Month or calendar).</li>}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="bg-slate-800 p-5 rounded-lg border border-slate-700 shadow-sm">
+                            <p className="text-xs font-bold text-slate-400 uppercase">DL / Unit</p>
+                            <p className="text-3xl font-bold text-slate-100 mt-1">{mvaResults.dlPerUnit.toFixed(2)}</p>
+                        </div>
+                        <div className="bg-slate-800 p-5 rounded-lg border border-slate-700 shadow-sm">
+                            <p className="text-xs font-bold text-slate-400 uppercase">IDL / Unit</p>
+                            <p className="text-3xl font-bold text-slate-100 mt-1">{mvaResults.idlPerUnit.toFixed(2)}</p>
+                        </div>
+                        <div className="bg-slate-800 p-5 rounded-lg border border-slate-700 shadow-sm">
+                            <p className="text-xs font-bold text-slate-400 uppercase">Overhead / Unit</p>
+                            <p className="text-3xl font-bold text-slate-100 mt-1">{mvaResults.overhead.totalOverheadPerUnit.toFixed(2)}</p>
+                        </div>
+                        <div className="bg-blue-900/20 p-5 rounded-lg border border-blue-800 shadow-sm">
+                            <p className="text-xs font-bold text-blue-300 uppercase">Total / Unit</p>
+                            <p className="text-3xl font-bold text-blue-100 mt-1">{mvaResults.totalPerUnit.toFixed(2)}</p>
+                        </div>
+                    </div>
+
+                    <div className="bg-slate-800 border border-slate-700 rounded-lg p-5">
+                        <h3 className="font-semibold text-slate-200 mb-3">Traceability</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-slate-300">
+                            <div className="bg-slate-900/40 border border-slate-700 rounded p-3">
+                                <div className="text-slate-400 text-xs uppercase font-bold">UPH / Volume</div>
+                                <div className="mt-2 font-mono">
+                                    Line UPH: {mvaResults.lineUph.toFixed(2)}
+                                    <br />
+                                    Monthly Volume: {Number(mvaResults.monthlyVolume).toFixed(0)}
+                                </div>
+                            </div>
+                            <div className="bg-slate-900/40 border border-slate-700 rounded p-3">
+                                <div className="text-slate-400 text-xs uppercase font-bold">Rates</div>
+                                <div className="mt-2 font-mono">
+                                    DL rate: {Number(mvaRates.directLaborHourlyRate).toFixed(2)}
+                                    <br />
+                                    IDL rate: {Number(mvaRates.indirectLaborHourlyRate).toFixed(2)}
+                                    <br />
+                                    Efficiency: {Number(mvaRates.efficiency).toFixed(2)}
+                                </div>
+                            </div>
+                            <div className="bg-slate-900/40 border border-slate-700 rounded p-3">
+                                <div className="text-slate-400 text-xs uppercase font-bold">Formula</div>
+                                <div className="mt-2 font-mono text-xs">
+                                    Cost/Unit = HourlyRate × HC / (UPH × Efficiency)
+                                    <br />
+                                    EquipDep/Unit = Dep/Month / MonthlyVolume
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            return (
+                <div className="flex h-screen w-full bg-slate-900 text-slate-100 font-sans">
+                {/* Sidebar */}
+                <div className="w-64 bg-slate-800 border-r border-slate-700 flex flex-col shadow-lg z-10">
+                    <div className="p-6 border-b border-slate-700">
+                    <h1 className="text-xl font-extrabold text-blue-500 tracking-tight">Inventec L6 Simu</h1>
+                    <p className="text-xs text-slate-400 mt-1">Line Balance System</p>
+                    </div>
+                    
+                    <nav className="flex-1 py-4 space-y-1">
+                    <SidebarItem 
+                        icon={Icons.Settings} 
+                        label="Basic Info" 
+                        active={activeTab === 'basic'} 
+                        onClick={() => setActiveTab('basic')} 
+                    />
+                    <SidebarItem 
+                        icon={Icons.Database} 
+                        label="Machine Rates" 
+                        active={activeTab === 'rates'} 
+                        onClick={() => setActiveTab('rates')} 
+                    />
+                    <SidebarItem 
+                        icon={Icons.LayoutDashboard} 
+                        label="BOM Map" 
+                        active={activeTab === 'bom'} 
+                        onClick={() => setActiveTab('bom')} 
+                    />
+                    <SidebarItem 
+                        icon={Icons.ListOrdered} 
+                        label="Model Process" 
+                        active={activeTab === 'process'} 
+                        onClick={() => setActiveTab('process')} 
+                    />
+                    <div className="my-4 border-t border-slate-700 mx-4"></div>
+                    <SidebarItem 
+                        icon={Icons.BarChart3} 
+                        label="Simulation Results" 
+                        active={activeTab === 'simulation'} 
+                        onClick={() => setActiveTab('simulation')} 
+                    />
+
+                    <div className="my-4 border-t border-slate-700 mx-4"></div>
+                    <SidebarItem 
+                        icon={Icons.Settings} 
+                        label="MVA Setup" 
+                        active={activeTab === 'mva_setup'} 
+                        onClick={() => setActiveTab('mva_setup')} 
+                        testId="tab-mva-setup"
+                    />
+                    <SidebarItem 
+                        icon={Icons.ListOrdered} 
+                        label="MVA Labor" 
+                        active={activeTab === 'mva_labor'} 
+                        onClick={() => setActiveTab('mva_labor')} 
+                        testId="tab-mva-labor"
+                    />
+                    <SidebarItem 
+                        icon={Icons.LayoutDashboard} 
+                        label="MVA Summary" 
+                        active={activeTab === 'mva_summary'} 
+                        onClick={() => setActiveTab('mva_summary')} 
+                        testId="tab-mva-summary"
+                    />
+                    </nav>
+
+                    <div className="p-4 border-t border-slate-700 bg-slate-800/50">
+                        <div className="flex items-center space-x-3 mb-3">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-xs shadow-md">
+                                AY
+                            </div>
+                            <div>
+                                <p className="text-sm font-bold text-slate-200">Avery Yeh</p>
+                                <p className="text-xs text-slate-500">Engineer</p>
+                            </div>
+                        </div>
+                        <div className="text-[10px] text-slate-600 text-center uppercase tracking-widest">
+                        v1.0.0 Proposal Demo
+                        </div>
+                    </div>
+                </div>
+
+                {/* Main Content Area */}
+                <div className="flex-1 overflow-auto p-8">
+                    <div className="max-w-6xl mx-auto">
+                    {activeTab === 'basic' && renderBasicInfo()}
+                    {activeTab === 'rates' && renderMachineRates()}
+                    {activeTab === 'bom' && renderBomMap()}
+                    {activeTab === 'process' && renderProcess()}
+                    {activeTab === 'simulation' && renderSimulation()}
+                    {activeTab === 'mva_setup' && renderMvaSetup()}
+                    {activeTab === 'mva_labor' && renderMvaLabor()}
+                    {activeTab === 'mva_summary' && renderMvaSummary()}
+                    </div>
+                </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<L6Simulation />);
+    </script>
+</body>
+</html>

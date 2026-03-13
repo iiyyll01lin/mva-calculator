@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>叮叮貓 DDM - Phase 2 Digital Twin Dashboard</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #1e293b;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 3px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #64748b;
+    }
+    @keyframes slide-in-from-right {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    .animate-in {
+      animation: slide-in-from-right 0.3s ease-out;
+    }
+    #loading {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 24px;
+      font-family: sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-slate-900">
+  <div id="loading">Loading Dashboard...</div>
+  <div id="root"></div>
+
+  <!-- 按順序載入所有依賴 -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <!-- Prop Types (Recharts dependency) -->
+  <script src="https://unpkg.com/prop-types/prop-types.min.js"></script>
+  
+  <!-- 使用穩定的 Recharts 版本 (UMD) -->
+  <script src="https://unpkg.com/recharts@2.10.3/umd/Recharts.js"></script>
+
+  <script type="text/babel">
+    // 等待所有資源載入完成後再執行
+    window.addEventListener('load', function() {
+      try {
+        // 隱藏 Loading
+        const loadingEl = document.getElementById('loading');
+        if (loadingEl) loadingEl.style.display = 'none';
+        
+        const { useState, useEffect, useMemo } = React;
+        
+        // 確保 Recharts 已載入
+        if (!window.Recharts) {
+          throw new Error("Recharts library failed to load");
+        }
+        const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } = window.Recharts;
+
+        // SVG Icon Components
+        const Zap = ({size = 24, className = ""}) => (
+          <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+        );
+
+        const Activity = ({size = 24, className = ""}) => (
+          <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+        );
+
+        const BarChart2 = ({size = 24, className = ""}) => (
+          <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+        );
+
+        const Settings = ({size = 24, className = ""}) => (
+          <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M12 1v6m0 6v6m5.196-14.196l-4.243 4.243M10.757 13.757l-4.243 4.243M23 12h-6m-6 0H1m14.196 5.196l-4.243-4.243M10.757 10.243L6.514 6"></path>
+          </svg>
+        );
+
+        const Clock = ({size = 24, className = ""}) => (
+          <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+        );
+
+        const CheckCircle = ({size = 24, className = ""}) => (
+          <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+        );
+
+        const AlertTriangle = ({size = 24, className = ""}) => (
+          <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        );
+
+        const AlertOctagon = ({size = 24, className = ""}) => (
+          <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        );
+
+        const TrendingUp = ({size = 24, className = ""}) => (
+          <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+            <polyline points="17 6 23 6 23 12"></polyline>
+          </svg>
+        );
+
+        const User = ({size = 24, className = ""}) => (
+          <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        );
+
+        const Cpu = ({size = 24, className = ""}) => (
+          <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+            <rect x="9" y="9" width="6" height="6"></rect>
+            <line x1="9" y1="1" x2="9" y2="4"></line>
+            <line x1="15" y1="1" x2="15" y2="4"></line>
+            <line x1="9" y1="20" x2="9" y2="23"></line>
+            <line x1="15" y1="20" x2="15" y2="23"></line>
+            <line x1="20" y1="9" x2="23" y2="9"></line>
+            <line x1="20" y1="14" x2="23" y2="14"></line>
+            <line x1="1" y1="9" x2="4" y2="9"></line>
+            <line x1="1" y1="14" x2="4" y2="14"></line>
+          </svg>
+        );
+
+        const Wind = ({size = 24, className = ""}) => (
+          <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"></path>
+          </svg>
+        );
+
+        const Wrench = ({size = 24, className = ""}) => (
+          <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+          </svg>
+        );
+
+        const INITIAL_STATIONS = [
+          {
+            id: 'ST-01',
+            name: '組裝 - M/B (主板)',
+            operator: 'OP-101',
+            skillLevel: 0.95,
+            standardCT: 45.0,
+            iotDevices: [
+              { id: 'FAN-01', name: '離子風扇 A', type: 'ION_FAN', status: 'active', value: '2000 RPM' },
+              { id: 'ESD-01', name: '靜電環', type: 'ESD', status: 'pass', value: '10e6 Ω' }
+            ],
+            targetObject: 'M/B (主板)',
+            status: 'running'
+          },
+          {
+            id: 'ST-02',
+            name: '鎖附 - Thermal Module',
+            operator: 'OP-102',
+            skillLevel: 0.85,
+            standardCT: 32.5,
+            iotDevices: [
+              { id: 'SCR-01', name: '智能電批', type: 'SCREWDRIVER', status: 'active', value: '3.5 kgf.cm' },
+              { id: 'FAN-02', name: '離子風扇 B', type: 'ION_FAN', status: 'active', value: '1980 RPM' }
+            ],
+            targetObject: 'Thermal（導熱管）',
+            status: 'running'
+          },
+          {
+            id: 'ST-03',
+            name: '檢測 - LCD外觀',
+            operator: 'OP-103',
+            skillLevel: 1.1,
+            standardCT: 28.0,
+            iotDevices: [
+              { id: 'CAM-01', name: 'AOI 鏡頭', type: 'CAMERA', status: 'idle', value: 'Ready' }
+            ],
+            targetObject: 'LCD (顯示屏)',
+            status: 'idle'
+          }
+        ];
+
+        const getRandomVariance = (base, variance) => {
+          return base + (Math.random() * variance * 2 - variance);
+        };
+
+        function DDM_P2_Dashboard() {
+          const [stations, setStations] = useState(INITIAL_STATIONS);
+          const [selectedStationId, setSelectedStationId] = useState('ST-02');
+          const [timeSeriesData, setTimeSeriesData] = useState([]);
+          const [alerts, setAlerts] = useState([]);
+          const [isSimulationRunning, setIsSimulationRunning] = useState(true);
+
+          const currentStation = useMemo(() => 
+            stations.find(s => s.id === selectedStationId) || stations[0], 
+          [stations, selectedStationId]);
+
+          useEffect(() => {
+            if (!isSimulationRunning) return;
+
+            const interval = setInterval(() => {
+              const timestamp = new Date().toLocaleTimeString();
+              
+              setStations(prev => prev.map(station => {
+                const efficiencyFactor = 2 - station.skillLevel; 
+                const actualCT = getRandomVariance(station.standardCT * efficiencyFactor, 3);
+                
+                const updatedDevices = station.iotDevices.map(dev => {
+                  if (dev.type === 'SCREWDRIVER' && station.status === 'running') {
+                    return { ...dev, value: `${getRandomVariance(3.5, 0.2).toFixed(1)} kgf.cm` };
+                  }
+                  if (dev.type === 'ION_FAN') {
+                    return { ...dev, value: `${Math.floor(getRandomVariance(2000, 50))} RPM` };
+                  }
+                  return dev;
+                });
+
+                let newStatus = station.status;
+                const deviationPercent = ((actualCT - station.standardCT) / station.standardCT) * 100;
+                
+                if (deviationPercent > 40) {
+                  newStatus = 'error';
+                } else if (deviationPercent > 20) {
+                  newStatus = 'warning';
+                } else {
+                  newStatus = 'running';
+                }
+
+                return {
+                  ...station,
+                  currentActualCT: actualCT,
+                  currentDeviation: deviationPercent,
+                  status: newStatus,
+                  iotDevices: updatedDevices
+                };
+              }));
+
+              setTimeSeriesData(prev => {
+                const newData = [...prev, {
+                  time: timestamp,
+                  standard: currentStation.standardCT,
+                  actual: currentStation.currentActualCT || currentStation.standardCT
+                }];
+                return newData.slice(-20);
+              });
+
+            }, 2000);
+
+            return () => clearInterval(interval);
+          }, [isSimulationRunning, selectedStationId, currentStation.standardCT, currentStation.currentActualCT]);
+
+          useEffect(() => {
+            const criticalStations = stations.filter(s => s.status === 'error' || s.status === 'warning');
+            if (criticalStations.length > 0) {
+              const lastAlert = alerts[0];
+              const newStation = criticalStations[0];
+              
+              if (!lastAlert || lastAlert.station !== newStation.name || Date.now() - lastAlert.id > 5000) {
+                const newAlert = {
+                  id: Date.now(),
+                  station: newStation.name,
+                  message: `Cycle Time Deviation: ${newStation.currentDeviation?.toFixed(1)}%`,
+                  type: newStation.status,
+                  timestamp: new Date().toLocaleTimeString()
+                };
+                setAlerts(prev => [newAlert, ...prev].slice(0, 5));
+              }
+            }
+          }, [stations]);
+
+          const handleForceError = () => {
+            setStations(prev => prev.map(s => 
+              s.id === selectedStationId ? { ...s, skillLevel: 0.5 } : s
+            ));
+          };
+
+          const handleReset = () => {
+            setStations(INITIAL_STATIONS);
+            setAlerts([]);
+            setTimeSeriesData([]);
+          };
+
+          return (
+            <div className="flex h-screen bg-slate-900 text-slate-100 font-sans overflow-hidden">
+              
+              {/* SIDEBAR NAVIGATION */}
+              <div className="w-64 bg-slate-800 border-r border-slate-700 flex flex-col">
+                <div className="p-6 border-b border-slate-700">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                      <Zap className="text-white" size={20} />
+                    </div>
+                    <span className="text-xl font-bold tracking-tight">叮叮貓 DDM</span>
+                  </div>
+                  <div className="mt-2 text-xs text-slate-400">Phase 2: Operational Hub</div>
+                </div>
+
+                <nav className="flex-1 p-4 space-y-2">
+                  <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Module</div>
+                  <button className="w-full flex items-center gap-3 px-4 py-3 bg-blue-600/20 text-blue-400 rounded-lg border border-blue-600/30">
+                    <Activity size={18} />
+                    <span>Digital Twin</span>
+                  </button>
+                  <button className="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-700/50 rounded-lg transition-colors">
+                    <BarChart2 size={18} />
+                    <span>MOST Planning</span>
+                  </button>
+                  <button className="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-700/50 rounded-lg transition-colors">
+                    <Settings size={18} />
+                    <span>Settings</span>
+                  </button>
+                </nav>
+
+                <div className="p-4 border-t border-slate-700">
+                  <div className="bg-slate-900 rounded-lg p-3">
+                    <div className="text-xs text-slate-400 mb-2">System Status</div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                      <span className="text-sm font-medium text-green-400">MES Connected</span>
+                    </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                      <span className="text-sm font-medium text-green-400">IoT Gateway Online</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* MAIN CONTENT */}
+              <div className="flex-1 flex flex-col overflow-hidden">
+                
+                <header className="h-16 bg-slate-800 border-b border-slate-700 flex items-center justify-between px-6">
+                  <div className="flex items-center gap-4">
+                    <h1 className="text-lg font-medium text-white">Line Balance Monitor (ASSY-Line-01)</h1>
+                    <span className="px-2 py-1 rounded bg-slate-700 text-xs text-slate-300 border border-slate-600">Model: HDL50_鋁版</span>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 text-sm text-slate-400 bg-slate-900 px-3 py-1.5 rounded-full border border-slate-700">
+                      <Clock size={14} />
+                      <span>Shift: A (08:00 - 20:00)</span>
+                    </div>
+                    <button 
+                      onClick={() => setIsSimulationRunning(!isSimulationRunning)}
+                      className={`px-3 py-1.5 text-sm rounded-md font-medium transition-colors ${isSimulationRunning ? 'bg-amber-500/20 text-amber-400 hover:bg-amber-500/30' : 'bg-green-500/20 text-green-400 hover:bg-green-500/30'}`}
+                    >
+                      {isSimulationRunning ? 'Pause Sim' : 'Resume Sim'}
+                    </button>
+                    <button 
+                      onClick={handleForceError}
+                      className="px-3 py-1.5 bg-red-500/20 text-red-400 text-sm rounded-md hover:bg-red-500/30 font-medium transition-colors"
+                    >
+                      Simulate Delay
+                    </button>
+                    <button 
+                      onClick={handleReset}
+                      className="px-3 py-1.5 bg-slate-700 text-slate-300 text-sm rounded-md hover:bg-slate-600 font-medium transition-colors"
+                    >
+                      Reset
+                    </button>
+                  </div>
+                </header>
+
+                <main className="flex-1 overflow-y-auto p-6 bg-slate-900/50">
+                  <div className="grid grid-cols-12 gap-6 h-full">
+                    
+                    {/* LEFT COL: LINE VISUALIZATION */}
+                    <div className="col-span-8 flex flex-col gap-6">
+                      
+                      {/* Station Cards */}
+                      <div className="grid grid-cols-3 gap-4">
+                        {stations.map((station) => (
+                          <div 
+                            key={station.id}
+                            onClick={() => setSelectedStationId(station.id)}
+                            className={`p-4 rounded-xl border cursor-pointer transition-all ${
+                              selectedStationId === station.id 
+                                ? 'bg-slate-800 border-blue-500 ring-1 ring-blue-500' 
+                                : 'bg-slate-800 border-slate-700 hover:border-slate-600'
+                            }`}
+                          >
+                            <div className="flex justify-between items-start mb-3">
+                              <div className="flex items-center gap-2">
+                                <div className={`w-2 h-2 rounded-full ${
+                                  station.status === 'running' ? 'bg-green-500' : 
+                                  station.status === 'warning' ? 'bg-amber-500' : 'bg-red-500'
+                                }`}></div>
+                                <span className="font-medium text-sm text-slate-200">{station.id}</span>
+                              </div>
+                              <span className={`text-xs px-2 py-0.5 rounded-full ${
+                                station.status === 'running' ? 'bg-green-500/20 text-green-400' : 
+                                station.status === 'warning' ? 'bg-amber-500/20 text-amber-400' : 'bg-red-500/20 text-red-400'
+                              }`}>
+                                {station.status.toUpperCase()}
+                              </span>
+                            </div>
+                            <div className="text-sm text-slate-400 mb-1">{station.name}</div>
+                            <div className="flex justify-between items-end mt-2">
+                              <div>
+                                <div className="text-xs text-slate-500">Cycle Time</div>
+                                <div className="text-lg font-semibold text-slate-200">
+                                  {station.currentActualCT ? station.currentActualCT.toFixed(1) : '-'}s
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <div className="text-xs text-slate-500">Target</div>
+                                <div className="text-sm text-slate-400">{station.standardCT}s</div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Real-time Chart */}
+                      <div className="flex-1 bg-slate-800 rounded-xl border border-slate-700 p-5 min-h-[300px]">
+                        <div className="flex justify-between items-center mb-6">
+                          <div>
+                            <h3 className="text-lg font-medium text-white flex items-center gap-2">
+                              <TrendingUp size={18} className="text-blue-400" />
+                              Real-time Cycle Time Analysis
+                            </h3>
+                            <p className="text-sm text-slate-400 mt-1">Monitoring {currentStation.name}</p>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-2">
+                              <div className="w-3 h-0.5 bg-blue-500"></div>
+                              <span className="text-xs text-slate-400">Actual</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-3 h-0.5 bg-slate-500 border-t border-dashed"></div>
+                              <span className="text-xs text-slate-400">Standard</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="h-[250px] w-full">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={timeSeriesData}>
+                              <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+                              <XAxis 
+                                dataKey="time" 
+                                stroke="#64748b" 
+                                tick={{fill: '#64748b', fontSize: 12}}
+                                tickLine={false}
+                                axisLine={false}
+                              />
+                              <YAxis 
+                                stroke="#64748b" 
+                                tick={{fill: '#64748b', fontSize: 12}}
+                                tickLine={false}
+                                axisLine={false}
+                                domain={['auto', 'auto']}
+                              />
+                              <Tooltip 
+                                contentStyle={{backgroundColor: '#1e293b', borderColor: '#334155', color: '#f1f5f9'}}
+                                itemStyle={{color: '#f1f5f9'}}
+                              />
+                              <ReferenceLine y={currentStation.standardCT} stroke="#94a3b8" strokeDasharray="3 3" />
+                              <Line 
+                                type="monotone" 
+                                dataKey="actual" 
+                                stroke="#3b82f6" 
+                                strokeWidth={2} 
+                                dot={false} 
+                                activeDot={{r: 4, fill: '#3b82f6'}} 
+                                isAnimationActive={false}
+                              />
+                            </LineChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </div>
+
+                    </div>
+
+                    {/* RIGHT COL: DIGITAL TWIN DETAILS */}
+                    <div className="col-span-4 flex flex-col gap-6">
+                      
+                      {/* Operator & Skill */}
+                      <div className="bg-slate-800 rounded-xl border border-slate-700 p-5">
+                        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                          <User size={16} />
+                          Operator Status
+                        </h3>
+                        <div className="flex items-center gap-4 mb-4">
+                          <div className="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-lg font-bold text-slate-300">
+                            {currentStation.operator.split('-')[1]}
+                          </div>
+                          <div>
+                            <div className="text-lg font-medium text-white">{currentStation.operator}</div>
+                            <div className="text-sm text-slate-400">Senior Technician</div>
+                          </div>
+                          <div className="ml-auto text-right">
+                            <div className="text-2xl font-bold text-blue-400">{(currentStation.skillLevel * 100).toFixed(0)}%</div>
+                            <div className="text-xs text-slate-500">Efficiency</div>
+                          </div>
+                        </div>
+                        <div className="w-full bg-slate-700 rounded-full h-1.5">
+                          <div 
+                            className="bg-blue-500 h-1.5 rounded-full transition-all duration-500" 
+                            style={{width: `${Math.min(currentStation.skillLevel * 100, 100)}%`}}
+                          ></div>
+                        </div>
+                      </div>
+
+                      {/* IoT Device Status */}
+                      <div className="bg-slate-800 rounded-xl border border-slate-700 p-5 flex-1">
+                        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                          <Cpu size={16} />
+                          IoT Devices
+                        </h3>
+                        <div className="space-y-3">
+                          {currentStation.iotDevices.map((device) => (
+                            <div key={device.id} className="bg-slate-900/50 rounded-lg p-3 border border-slate-700/50 flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <div className={`p-2 rounded-lg ${
+                                  device.status === 'active' ? 'bg-green-500/10 text-green-400' : 'bg-slate-700/50 text-slate-400'
+                                }`}>
+                                  {device.type === 'ION_FAN' ? <Wind size={16} /> : 
+                                   device.type === 'SCREWDRIVER' ? <Wrench size={16} /> :
+                                   <Activity size={16} />}
+                                </div>
+                                <div>
+                                  <div className="text-sm font-medium text-slate-200">{device.name}</div>
+                                  <div className="text-xs text-slate-500">{device.id}</div>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <div className="text-sm font-mono text-blue-400">{device.value}</div>
+                                <div className="text-[10px] text-slate-500 uppercase">{device.status}</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Alert Feed */}
+                      <div className="bg-slate-800 rounded-xl border border-slate-700 p-5 max-h-[250px] overflow-hidden flex flex-col">
+                        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                          <AlertOctagon size={16} />
+                          Live Alerts
+                        </h3>
+                        <div className="flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-2">
+                          {alerts.length === 0 ? (
+                            <div className="text-center py-8 text-slate-500 text-sm">
+                              <CheckCircle size={24} className="mx-auto mb-2 opacity-50" />
+                              System Normal
+                            </div>
+                          ) : (
+                            alerts.map((alert) => (
+                              <div key={alert.id} className="animate-in flex gap-3 p-3 rounded-lg bg-slate-900/50 border border-slate-700/50">
+                                <AlertTriangle size={16} className="text-amber-500 shrink-0 mt-0.5" />
+                                <div>
+                                  <div className="text-xs font-bold text-amber-500 mb-0.5">{alert.station}</div>
+                                  <div className="text-xs text-slate-300">{alert.message}</div>
+                                  <div className="text-[10px] text-slate-500 mt-1">{alert.timestamp}</div>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </main>
+              </div>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<DDM_P2_Dashboard />);
+      } catch (err) {
+        console.error("Error initializing app:", err);
+        document.body.innerHTML = `<div style="color:red; padding:20px;">Error: ${err.message}</div>`;
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ding Ding Mao (DDM) - Phase 1</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #e2e8f0; }
+        /* Custom scrollbar for better look */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo, createContext, useContext } = React;
+
+        // --- Language Context ---
+        const LanguageContext = createContext();
+        
+        const translations = {
+            'zh-TW': {
+                // App
+                appTitle: '叮叮貓 DDM',
+                phase: 'Phase 1 (v1.0)',
+                loggedIn: '登入中',
+                ieEngineer: 'IE 工程師',
+                
+                // Navigation
+                mostEngine: 'MOST 計算引擎',
+                sopStudio: 'SOP 製作工作室',
+                lineBalance: '線平衡模擬',
+                
+                // Header
+                mostEngineTitle: 'MOST 標準工時計算 (MOST Engine)',
+                sopStudioTitle: 'SOP 影像與動作分析 (SOP Studio)',
+                lineBalanceTitle: '線平衡模擬 (Line Balance Simulation)',
+                projectSettings: '專案設定',
+                saveChanges: '儲存變更',
+                
+                // MOST Engine
+                analysisCard: '動作分析卡 (Analysis)',
+                generalMove: '一般移動 (General Move)',
+                controlledMove: '控制移動 (Controlled Move)',
+                distanceA1: '距離 A1',
+                bodyB1: '身體 B1',
+                controlG: '控制 G',
+                distanceA2: '距離 A2',
+                bodyB2: '身體 B2',
+                placeP: '放置 P',
+                moveM: '移動 M',
+                processX: '程序 X',
+                alignI: '校準 I',
+                returnA3: '返回 A3',
+                component: '操作元件 (Component)',
+                location: '目的地 (Location)',
+                stationAssignment: '分配站點 (Station Assignment)',
+                miDescription: '動作描述 (MI Description)',
+                autoGenerate: '自動生成',
+                move: '移動',
+                operate: '操作',
+                to: '到',
+                addAction: '新增動作',
+                actionList: '動作清單 (Action List)',
+                total: '共',
+                items: '筆',
+                sequence: '序號',
+                description: '描述',
+                type: '類型',
+                seconds: '秒數',
+                station: '站點',
+                operation: '操作',
+                noActionData: '尚無動作數據，請從左側新增。',
+                
+                // SOP Studio
+                sop: '標準作業程序 (SOP)',
+                exportPdf: '匯出 PDF',
+                videoPreview: '作業影片預覽 (Video Simulation)',
+                noSource: '無來源',
+                keyAction: '關鍵動作 (CTQ)',
+                illustration: '[示意圖]',
+                noStepsCreated: '尚未建立動作步驟',
+                addActionsFromMost: '請至 MOST 引擎新增動作',
+                
+                // Line Balance
+                taktTime: '目標節拍 (Takt Time)',
+                balanceRate: '平衡率 (Balance Rate)',
+                exportReport: '匯出報告',
+                yamazumiChart: '山積圖 (Yamazumi Chart)',
+                simulationTip: '模擬提示：',
+                skillAdjustNote: '站點時間已根據作業員技能係數進行調整 (Actual Time = Std Time / Skill Level)。',
+                skillExample: 'ST-02 (李大華) 技能係數 0.85，導致工時延長；ST-03 (陳小美) 係數 1.1，工時縮短。',
+                skillEfficiency: '技能效率',
+                
+                // Stations
+                station31a: '第3-1站 (組裝DIMM站)',
+                station31b: '第3-1站 (組裝假DIMM站)',
+                station41: '第4-1站 (組裝主板站)',
+                
+                // Components
+                components: ["MLB(主機板)", "內存(Memory)", "假DIMM", "DIMM", "拇指螺絲", "主板", "機箱", "CPU散熱器"],
+                
+                // Locations
+                locations: ["潔淨柵工作台", "DIMM槽", "機箱內", "DIMM壓合治具", "主板DIMM槽", "MVS站", "離子風扇下"],
+                
+                // Actions descriptions
+                actionDescriptions: [
+                    '將過完MVS站的主板放置在潔淨柵內的工作台上',
+                    '掰開主板上DIMM槽，將過完MVS的DIMM按照配置要求放在DIMM槽內',
+                    '將假DIMM按照配置需求數量裝入主板DIMM槽內',
+                    '將兩顆拇指螺絲鎖緊，電動起子: 3±0.2 lbf.in，起子頭: δ,05,2#'
+                ]
+            },
+            'en': {
+                // App
+                appTitle: 'Ding Ding Mao DDM',
+                phase: 'Phase 1 (v1.0)',
+                loggedIn: 'Logged In',
+                ieEngineer: 'IE Engineer',
+                
+                // Navigation
+                mostEngine: 'MOST Engine',
+                sopStudio: 'SOP Studio',
+                lineBalance: 'Line Balance',
+                
+                // Header
+                mostEngineTitle: 'MOST Standard Time Calculation',
+                sopStudioTitle: 'SOP Video & Motion Analysis',
+                lineBalanceTitle: 'Line Balance Simulation',
+                projectSettings: 'Project Settings',
+                saveChanges: 'Save Changes',
+                
+                // MOST Engine
+                analysisCard: 'Motion Analysis Card',
+                generalMove: 'General Move',
+                controlledMove: 'Controlled Move',
+                distanceA1: 'Distance A1',
+                bodyB1: 'Body B1',
+                controlG: 'Control G',
+                distanceA2: 'Distance A2',
+                bodyB2: 'Body B2',
+                placeP: 'Place P',
+                moveM: 'Move M',
+                processX: 'Process X',
+                alignI: 'Align I',
+                returnA3: 'Return A3',
+                component: 'Component',
+                location: 'Location',
+                stationAssignment: 'Station Assignment',
+                miDescription: 'MI Description',
+                autoGenerate: 'Auto-generate',
+                move: 'Move',
+                operate: 'Operate',
+                to: 'to',
+                addAction: 'Add Action',
+                actionList: 'Action List',
+                total: 'Total',
+                items: 'items',
+                sequence: 'Seq',
+                description: 'Description',
+                type: 'Type',
+                seconds: 'Seconds',
+                station: 'Station',
+                operation: 'Action',
+                noActionData: 'No action data. Please add from the left panel.',
+                
+                // SOP Studio
+                sop: 'Standard Operating Procedure',
+                exportPdf: 'Export PDF',
+                videoPreview: 'Video Simulation Preview',
+                noSource: 'No Source',
+                keyAction: 'Key Action (CTQ)',
+                illustration: '[Illustration]',
+                noStepsCreated: 'No steps created yet',
+                addActionsFromMost: 'Please add actions from MOST Engine',
+                
+                // Line Balance
+                taktTime: 'Takt Time',
+                balanceRate: 'Balance Rate',
+                exportReport: 'Export Report',
+                yamazumiChart: 'Yamazumi Chart',
+                simulationTip: 'Simulation Tip:',
+                skillAdjustNote: 'Station time has been adjusted based on operator skill factor (Actual Time = Std Time / Skill Level).',
+                skillExample: 'ST-02 skill factor 0.85, leading to extended time; ST-03 factor 1.1, reduced time.',
+                skillEfficiency: 'Skill Efficiency',
+                
+                // Stations
+                station31a: 'ST-3-1 (DIMM Assembly)',
+                station31b: 'ST-3-1 (Dummy DIMM Assembly)',
+                station41: 'ST-4-1 (Mainboard Assembly)',
+                
+                // Components
+                components: ["MLB (Mainboard)", "Memory", "Dummy DIMM", "DIMM", "Thumb Screw", "Mainboard", "Chassis", "CPU Heatsink"],
+                
+                // Locations
+                locations: ["Clean Station Workbench", "DIMM Slot", "Inside Chassis", "DIMM Press Fixture", "Mainboard DIMM Slot", "MVS Station", "Under Ion Fan"],
+                
+                // Actions descriptions
+                actionDescriptions: [
+                    'Place the mainboard from MVS station onto the clean station workbench',
+                    'Open the DIMM slot on mainboard, insert DIMM from MVS according to configuration',
+                    'Install dummy DIMM into mainboard DIMM slot according to configuration requirements',
+                    'Tighten two thumb screws, Electric screwdriver: 3±0.2 lbf.in, Bit: δ,05,2#'
+                ]
+            }
+        };
+        
+        const useLanguage = () => useContext(LanguageContext);
+
+        // --- Icons (Lucide Replacements) ---
+        const Icon = ({ children, className, size = 24, fill = "none", ...props }) => (
+            <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width={size} 
+                height={size} 
+                viewBox="0 0 24 24" 
+                fill={fill} 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                className={className}
+                {...props}
+            >
+                {children}
+            </svg>
+        );
+
+        const Calculator = (props) => <Icon {...props}><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></Icon>;
+        const FileText = (props) => <Icon {...props}><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></Icon>;
+        const BarChart3 = (props) => <Icon {...props}><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></Icon>;
+        const Play = (props) => <Icon {...props}><polygon points="5 3 19 12 5 21 5 3"/></Icon>;
+        const Save = (props) => <Icon {...props}><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></Icon>;
+        const Plus = (props) => <Icon {...props}><path d="M5 12h14"/><path d="M12 5v14"/></Icon>;
+        const Trash2 = (props) => <Icon {...props}><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></Icon>;
+        const Users = (props) => <Icon {...props}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></Icon>;
+        const Clock = (props) => <Icon {...props}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></Icon>;
+        const Settings = (props) => <Icon {...props}><path d="M12.22 2h-.44a2 2 0 0 1-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.09a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.09a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></Icon>;
+        const AlertCircle = (props) => <Icon {...props}><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></Icon>;
+        const CheckCircle2 = (props) => <Icon {...props}><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></Icon>;
+        const ChevronRight = (props) => <Icon {...props}><path d="m9 18 6-6-6-6"/></Icon>;
+        const Globe = (props) => <Icon {...props}><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></Icon>;
+
+        // --- Constants & Mock Data (Source: SQT-K860G6--BASY 作業指導書) ---
+        const TMU_FACTOR = 0.036;
+        
+        // 元件清單 - 來自 PDF 實際資料
+        const COMPONENTS = [
+            "MLB(主機板)", "內存(Memory)", "假DIMM", "DIMM", 
+            "拇指螺絲", "主板", "機箱", "CPU散熱器"
+        ];
+        
+        // 位置清單 - 來自 PDF 實際資料
+        const LOCATIONS = [
+            "潔淨柵工作台", "DIMM槽", "機箱內", "DIMM壓合治具", 
+            "主板DIMM槽", "MVS站", "離子風扇下"
+        ];
+        
+        // 工具清單 - 來自 PDF 實際資料
+        const TOOLS = [
+            "電動起子(3±0.2 lbf.in, δ,05,2#)", 
+            "手套(ESD)", 
+            "靜電氣槍", 
+            "吸塵器"
+        ];
+        
+        const MOST_INDICES = [0, 1, 3, 6, 10, 16];
+        
+        // 產品資訊 - 來自 PDF
+        const PRODUCT_INFO = {
+            family: "K860G6",
+            processType: "BASY",
+            sku: "W*3558",
+            version: "1.3",
+            effectiveDate: "2025/8/7",
+            compliance: "RoHS2",
+            factory: "SQT",
+            totalPages: 49
+        };
+
+        // --- Components ---
+
+        const NavButton = ({ active, onClick, icon, label }) => (
+            <button 
+                onClick={onClick}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                active 
+                    ? 'bg-blue-600 text-white shadow-lg translate-x-1' 
+                    : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                }`}
+            >
+                {icon}
+                <span className="font-medium">{label}</span>
+            </button>
+        );
+
+        const MostEngine = ({ actions, setActions }) => {
+            const { t, lang, getActionDescription } = useLanguage();
+            const components = t.components;
+            const locations = t.locations;
+            
+            const [seqType, setSeqType] = useState('GENERAL');
+            const [params, setParams] = useState({
+                A1: 1, B1: 0, G: 1, // Get
+                A2: 1, B2: 0, P: 1, // Put
+                A3: 0, // Return
+                M: 1, X: 0, I: 0 // Controlled specific
+            });
+
+            const [description, setDescription] = useState("");
+            const [targetComponentIdx, setTargetComponentIdx] = useState(0);
+            const [targetLocationIdx, setTargetLocationIdx] = useState(0);
+            const [targetStation, setTargetStation] = useState('ST-3-1a');
+            
+            // 根據索引取得當前語言的元件和位置名稱
+            const targetComponent = components[targetComponentIdx] || components[0];
+            const targetLocation = locations[targetLocationIdx] || locations[0];
+
+            const tmu = useMemo(() => {
+                let sum = 0;
+                if (seqType === 'GENERAL') {
+                    sum = params.A1 + params.B1 + params.G + params.A2 + params.B2 + params.P + params.A3;
+                } else {
+                    sum = params.A1 + params.B1 + params.G + params.M + params.X + params.I + params.A3;
+                }
+                return sum * 10;
+            }, [seqType, params]);
+
+            const seconds = (tmu * TMU_FACTOR).toFixed(2);
+
+            const handleAddAction = () => {
+                // 生成雙語描述
+                const zhComponents = translations['zh-TW'].components;
+                const zhLocations = translations['zh-TW'].locations;
+                const enComponents = translations['en'].components;
+                const enLocations = translations['en'].locations;
+                
+                const zhComp = zhComponents[targetComponentIdx] || targetComponent;
+                const zhLoc = zhLocations[targetLocationIdx] || targetLocation;
+                const enComp = enComponents[targetComponentIdx] || targetComponent;
+                const enLoc = enLocations[targetLocationIdx] || targetLocation;
+                
+                const zhAutoDesc = `${seqType === 'GENERAL' ? '移動' : '操作'} ${zhComp} 到 ${zhLoc}`;
+                const enAutoDesc = `${seqType === 'GENERAL' ? 'Move' : 'Operate'} ${enComp} to ${enLoc}`;
+                
+                const newAction = {
+                    id: Date.now().toString(),
+                    seqType,
+                    descriptions: {
+                        'zh-TW': description || zhAutoDesc,
+                        'en': description || enAutoDesc
+                    },
+                    tmu,
+                    seconds: parseFloat(seconds),
+                    params: { ...params },
+                    stationId: targetStation
+                };
+                setActions([...actions, newAction]);
+                setDescription("");
+            };
+
+            const ParamSelect = ({ label, code }) => (
+                <div className="flex flex-col">
+                    <label className="text-xs font-semibold text-slate-400 mb-1">{label} ({code})</label>
+                    <select 
+                        value={params[code] || 0}
+                        onChange={(e) => setParams({...params, [code]: parseInt(e.target.value)})}
+                        className="border border-slate-700 rounded p-2 bg-slate-800 text-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    >
+                        {MOST_INDICES.map(val => (
+                        <option key={val} value={val}>{val}</option>
+                        ))}
+                    </select>
+                </div>
+            );
+
+            return (
+                <div className="grid grid-cols-12 gap-6 h-full">
+                    <div className="col-span-12 lg:col-span-5 bg-slate-900 rounded-xl shadow-sm border border-slate-800 flex flex-col">
+                        <div className="p-4 border-b border-slate-800 bg-slate-800/50">
+                            <h3 className="font-bold text-slate-200 flex items-center gap-2">
+                                <Calculator size={18} /> {t.analysisCard}
+                            </h3>
+                        </div>
+                        
+                        <div className="p-6 space-y-6 flex-1 overflow-y-auto">
+                            <div className="flex p-1 bg-slate-800 rounded-lg border border-slate-700">
+                                <button 
+                                    onClick={() => setSeqType('GENERAL')}
+                                    className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${seqType === 'GENERAL' ? 'bg-slate-700 shadow-sm text-blue-400' : 'text-slate-400 hover:text-slate-200'}`}
+                                >
+                                    {t.generalMove}
+                                </button>
+                                <button 
+                                    onClick={() => setSeqType('CONTROLLED')}
+                                    className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${seqType === 'CONTROLLED' ? 'bg-slate-700 shadow-sm text-blue-400' : 'text-slate-400 hover:text-slate-200'}`}
+                                >
+                                    {t.controlledMove}
+                                </button>
+                            </div>
+
+                            <div className="bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+                                <div className="text-xs text-slate-500 mb-2 font-mono">
+                                    {seqType === 'GENERAL' ? 'SEQ: A B G A B P A' : 'SEQ: A B G M X I A'}
+                                </div>
+                                <div className="grid grid-cols-4 gap-3">
+                                    <ParamSelect label={t.distanceA1} code="A1" />
+                                    <ParamSelect label={t.bodyB1} code="B1" />
+                                    <ParamSelect label={t.controlG} code="G" />
+                                    {seqType === 'GENERAL' ? (
+                                        <>
+                                        <ParamSelect label={t.distanceA2} code="A2" />
+                                        <ParamSelect label={t.bodyB2} code="B2" />
+                                        <ParamSelect label={t.placeP} code="P" />
+                                        </>
+                                    ) : (
+                                        <>
+                                        <ParamSelect label={t.moveM} code="M" />
+                                        <ParamSelect label={t.processX} code="X" />
+                                        <ParamSelect label={t.alignI} code="I" />
+                                        </>
+                                    )}
+                                    <ParamSelect label={t.returnA3} code="A3" />
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="text-xs font-semibold text-slate-400">{t.component}</label>
+                                        <select 
+                                            value={targetComponentIdx} onChange={(e) => setTargetComponentIdx(parseInt(e.target.value))}
+                                            className="w-full mt-1 p-2 border border-slate-700 rounded bg-slate-800 text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
+                                        >
+                                            {components.map((c, idx) => <option key={idx} value={idx}>{c}</option>)}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-semibold text-slate-400">{t.location}</label>
+                                        <select 
+                                            value={targetLocationIdx} onChange={(e) => setTargetLocationIdx(parseInt(e.target.value))}
+                                            className="w-full mt-1 p-2 border border-slate-700 rounded bg-slate-800 text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
+                                        >
+                                            {locations.map((c, idx) => <option key={idx} value={idx}>{c}</option>)}
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label className="text-xs font-semibold text-slate-400">{t.stationAssignment} - K860G6</label>
+                                    <select 
+                                        value={targetStation} onChange={(e) => setTargetStation(e.target.value)}
+                                        className="w-full mt-1 p-2 border border-slate-700 rounded bg-slate-800 text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
+                                    >
+                                        <option value="ST-3-1a">{t.station31a}</option>
+                                        <option value="ST-3-1b">{t.station31b}</option>
+                                        <option value="ST-4-1">{t.station41}</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="text-xs font-semibold text-slate-400">{t.miDescription}</label>
+                                    <input 
+                                        type="text" 
+                                        value={description}
+                                        onChange={(e) => setDescription(e.target.value)}
+                                        placeholder={`${t.autoGenerate}: ${seqType === 'GENERAL' ? t.move : t.operate} ${targetComponent} ${t.to} ${targetLocation}`}
+                                        className="w-full mt-1 p-2 border border-slate-700 rounded bg-slate-800 text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none placeholder-slate-600"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="p-4 bg-slate-800/50 border-t border-slate-800 flex items-center justify-between">
+                            <div>
+                                <div className="text-2xl font-bold text-blue-400">{tmu} <span className="text-sm font-normal text-slate-500">TMU</span></div>
+                                <div className="text-sm text-slate-500">≈ {seconds} {t.seconds}</div>
+                            </div>
+                            <button 
+                                onClick={handleAddAction}
+                                className="flex items-center gap-2 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 shadow-sm transition active:scale-95"
+                            >
+                                <Plus size={18} /> {t.addAction}
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="col-span-12 lg:col-span-7 flex flex-col bg-slate-900 rounded-xl shadow-sm border border-slate-800">
+                        <div className="p-4 border-b border-slate-800 flex justify-between items-center">
+                            <h3 className="font-bold text-slate-200">{t.actionList}</h3>
+                            <span className="text-xs bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">{t.total} {actions.length} {t.items}</span>
+                        </div>
+                        <div className="flex-1 overflow-auto">
+                            <table className="w-full text-sm text-left">
+                                <thead className="bg-slate-800 text-slate-400 font-medium sticky top-0">
+                                    <tr>
+                                        <th className="px-4 py-3">{t.sequence}</th>
+                                        <th className="px-4 py-3">{t.description}</th>
+                                        <th className="px-4 py-3">{t.type}</th>
+                                        <th className="px-4 py-3">TMU</th>
+                                        <th className="px-4 py-3">{t.seconds}</th>
+                                        <th className="px-4 py-3">{t.station}</th>
+                                        <th className="px-4 py-3">{t.operation}</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-800">
+                                    {actions.map((action, idx) => (
+                                        <tr key={action.id} className="hover:bg-slate-800/50 group">
+                                            <td className="px-4 py-3 text-slate-500 font-mono">{idx + 1}</td>
+                                            <td className="px-4 py-3 font-medium text-slate-300">{getActionDescription(action)}</td>
+                                            <td className="px-4 py-3">
+                                                <span className={`text-[10px] px-2 py-0.5 rounded-full border ${action.seqType === 'GENERAL' ? 'bg-blue-900/30 border-blue-800 text-blue-400' : 'bg-purple-900/30 border-purple-800 text-purple-400'}`}>
+                                                {action.seqType === 'GENERAL' ? 'ABG' : 'MXI'}
+                                                </span>
+                                            </td>
+                                            <td className="px-4 py-3 font-mono text-slate-400">{action.tmu}</td>
+                                            <td className="px-4 py-3 font-bold text-slate-300">{action.seconds}s</td>
+                                            <td className="px-4 py-3">
+                                                <span className="text-xs bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">{action.stationId}</span>
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <button 
+                                                    onClick={() => setActions(actions.filter(a => a.id !== action.id))}
+                                                    className="text-red-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    {actions.length === 0 && (
+                                        <tr>
+                                            <td colSpan={7} className="text-center py-10 text-slate-500">
+                                                {t.noActionData}
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const SopStudio = ({ actions }) => {
+            const { t, getActionDescription } = useLanguage();
+            
+            return (
+                <div className="flex h-full gap-6">
+                    <div className="w-1/2 bg-black rounded-xl overflow-hidden shadow-lg relative flex flex-col border border-slate-800">
+                        <div className="flex-1 flex items-center justify-center bg-slate-900">
+                            <div className="text-center">
+                                <div className="w-16 h-16 rounded-full border-2 border-white/30 flex items-center justify-center mx-auto mb-4">
+                                    <Play className="text-white ml-1" size={32} fill="white" />
+                                </div>
+                                <p className="text-slate-400">{t.videoPreview}</p>
+                                <p className="text-xs text-slate-600 mt-2">Source: {actions.length > 0 ? 'Recorded_Session_001.mp4' : t.noSource}</p>
+                            </div>
+                        </div>
+                        <div className="h-14 bg-slate-800 border-t border-slate-700 flex items-center px-4 gap-4">
+                            <Play size={18} className="text-white" />
+                            <div className="flex-1 h-1 bg-slate-600 rounded-full overflow-hidden">
+                                <div className="w-1/3 h-full bg-blue-500"></div>
+                            </div>
+                            <span className="text-xs text-slate-400 font-mono">00:04 / 00:15</span>
+                        </div>
+                    </div>
+
+                    <div className="w-1/2 bg-slate-900 rounded-xl shadow-sm border border-slate-800 flex flex-col">
+                        <div className="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50">
+                            <h3 className="font-bold text-slate-200 flex items-center gap-2">
+                                <FileText size={18} /> {t.sop}
+                            </h3>
+                            <button className="text-xs bg-slate-800 border border-slate-700 text-slate-300 px-3 py-1 rounded hover:bg-slate-700">
+                                {t.exportPdf}
+                            </button>
+                        </div>
+
+                        <div className="flex-1 overflow-auto p-4 space-y-3">
+                            {actions.map((action, idx) => (
+                                <div key={action.id} className="flex gap-4 p-3 border border-slate-800 rounded-lg hover:border-blue-800 hover:bg-blue-900/20 transition group cursor-pointer">
+                                    <div className="flex flex-col items-center gap-1 min-w-[3rem]">
+                                        <div className="w-6 h-6 rounded-full bg-blue-900 text-blue-400 flex items-center justify-center text-xs font-bold border border-blue-800">
+                                            {idx + 1}
+                                        </div>
+                                        <div className="h-full w-0.5 bg-slate-800 group-last:hidden"></div>
+                                    </div>
+                                    
+                                    <div className="flex-1">
+                                        <div className="flex justify-between mb-1">
+                                            <h4 className="font-semibold text-slate-200 text-sm">{getActionDescription(action)}</h4>
+                                            <span className="text-xs font-mono text-slate-500">{action.seconds}s</span>
+                                        </div>
+                                        
+                                        <div className="flex gap-2 text-xs text-slate-500 mt-1">
+                                            <span className="flex items-center gap-1 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
+                                                <Settings size={10} /> {action.params.G ? 'G: ' + action.params.G : 'M: ' + action.params.M}
+                                            </span>
+                                            <span className="flex items-center gap-1 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
+                                                <Clock size={10} /> {action.tmu} TMU
+                                            </span>
+                                            {idx === 0 && (
+                                                <span className="flex items-center gap-1 text-green-400 bg-green-900/30 px-2 py-0.5 rounded border border-green-800">
+                                                    <CheckCircle2 size={10} /> {t.keyAction}
+                                                </span>
+                                            )}
+                                        </div>
+                                        
+                                        <div className="mt-2 h-16 w-24 bg-slate-800 rounded border border-slate-700 flex items-center justify-center text-[10px] text-slate-500">
+                                            {t.illustration}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                            
+                            {actions.length === 0 && (
+                                <div className="text-center py-20 text-slate-500">
+                                    <p>{t.noStepsCreated}</p>
+                                    <p className="text-xs mt-2">{t.addActionsFromMost}</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const LineBalanceSimulator = ({ actions, stations, taktTime }) => {
+            const { t, getActionDescription } = useLanguage();
+            
+            const stationLoad = useMemo(() => {
+                const load = {};
+                const skillFactor = {};
+                
+                stations.forEach(s => {
+                    load[s.id] = 0;
+                    skillFactor[s.id] = s.skillLevel;
+                });
+
+                actions.forEach(action => {
+                    if (load[action.stationId] !== undefined) {
+                        const adjustedTime = action.seconds / (skillFactor[action.stationId] || 1);
+                        load[action.stationId] += adjustedTime;
+                    }
+                });
+                return load;
+            }, [actions, stations]);
+
+            const maxLoad = Math.max(...Object.values(stationLoad), taktTime * 1.2);
+
+            return (
+                <div className="flex flex-col h-full gap-6">
+                    <div className="flex items-center justify-between bg-slate-900 p-4 rounded-xl border border-slate-800 shadow-sm">
+                        <div className="flex items-center gap-6">
+                            <div className="flex items-center gap-2">
+                                <div className="p-2 bg-purple-900/30 text-purple-400 rounded-lg border border-purple-800">
+                                    <Clock size={20} />
+                                </div>
+                                <div>
+                                    <p className="text-xs text-slate-400">{t.taktTime}</p>
+                                    <p className="text-xl font-bold text-slate-200">{taktTime.toFixed(1)}s</p>
+                                </div>
+                            </div>
+                            <div className="h-8 w-px bg-slate-700"></div>
+                            <div className="flex items-center gap-2">
+                                <div className="p-2 bg-green-900/30 text-green-400 rounded-lg border border-green-800">
+                                    <Users size={20} />
+                                </div>
+                                <div>
+                                    <p className="text-xs text-slate-400">{t.balanceRate}</p>
+                                    <p className="text-xl font-bold text-slate-200">
+                                        {(() => {
+                                            const times = Object.values(stationLoad);
+                                            const totalTime = times.reduce((a,b) => a+b, 0);
+                                            const max = Math.max(...times);
+                                            if (max === 0) return "0%";
+                                            return Math.round((totalTime / (max * stations.length)) * 100) + "%";
+                                        })()}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex gap-2">
+                            <button className="text-sm px-3 py-1.5 bg-slate-800 text-slate-300 rounded hover:bg-slate-700 border border-slate-700">{t.exportReport}</button>
+                        </div>
+                    </div>
+
+                    <div className="flex-1 bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-sm overflow-hidden flex flex-col">
+                        <h3 className="font-bold text-slate-200 mb-6 flex items-center gap-2">
+                            <BarChart3 size={18} /> {t.yamazumiChart}
+                        </h3>
+                        
+                        <div className="flex-1 flex items-end justify-around pb-8 relative border-b border-slate-700">
+                            <div 
+                                className="absolute w-full border-t-2 border-dashed border-red-500/50 z-10 flex items-end justify-end pointer-events-none"
+                                style={{ bottom: `${(taktTime / maxLoad) * 100}%` }}
+                            >
+                                <span className="text-xs text-red-400 font-bold bg-slate-900 px-1 -translate-y-1/2 border border-red-900/50 rounded">T.T: {taktTime}s</span>
+                            </div>
+
+                            {stations.map(station => {
+                                const load = stationLoad[station.id] || 0;
+                                const heightPct = (load / maxLoad) * 100;
+                                const isOverloaded = load > taktTime;
+                                const stationActions = actions.filter(a => a.stationId === station.id);
+
+                                return (
+                                    <div key={station.id} className="w-24 flex flex-col items-center group relative h-full justify-end">
+                                        <div className="absolute bottom-full mb-2 opacity-0 group-hover:opacity-100 transition pointer-events-none bg-slate-800 text-white text-xs p-2 rounded w-40 z-20 border border-slate-700 shadow-xl">
+                                            <p className="font-bold">{station.name}</p>
+                                            <p>OP: {station.operator}</p>
+                                            <p>{t.skillEfficiency}: {station.skillLevel * 100}%</p>
+                                            <div className="border-t border-slate-600 my-1"></div>
+                                            <ul className="list-disc pl-3 text-[10px]">
+                                                {stationActions.map(a => <li key={a.id}>{getActionDescription(a)}</li>)}
+                                            </ul>
+                                        </div>
+
+                                        <div className="w-full relative flex flex-col-reverse" style={{ height: `${heightPct}%` }}>
+                                            {stationActions.map((action, i) => {
+                                                const actionHeight = (action.seconds / (station.skillLevel)) / load * 100; 
+                                                return (
+                                                    <div 
+                                                        key={action.id}
+                                                        className={`w-full border-t border-white/10 flex items-center justify-center text-[10px] text-white overflow-hidden ${
+                                                            isOverloaded ? 'bg-red-500/80' : (i % 2 === 0 ? 'bg-blue-600' : 'bg-blue-500')
+                                                        }`}
+                                                        style={{ height: `${actionHeight}%`, minHeight: '10px' }}
+                                                    >
+                                                        {action.seconds}s
+                                                    </div>
+                                                )
+                                            })}
+                                            {stationActions.length === 0 && <div className="w-full h-px bg-slate-700"></div>}
+                                        </div>
+
+                                        <div className="mt-3 text-center">
+                                            <p className="font-bold text-sm text-slate-300">{station.id}</p>
+                                            <p className="text-xs text-slate-500">{load.toFixed(2)}s</p>
+                                            {isOverloaded && <div className="mt-1 flex justify-center text-red-400"><AlertCircle size={12}/></div>}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        <div className="mt-4 p-4 bg-yellow-900/20 rounded-lg text-xs text-yellow-200 border border-yellow-800/50 flex gap-2 items-start">
+                            <AlertCircle size={14} className="mt-0.5 text-yellow-400" />
+                            <div>
+                                <span className="font-bold text-yellow-400">{t.simulationTip}</span> 
+                                {t.skillAdjustNote}
+                                <br/>
+                                {t.skillExample}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        function DingDingMaoSystem() {
+            const [activeTab, setActiveTab] = useState('MOST');
+            const [lang, setLang] = useState('zh-TW');
+            const t = translations[lang];
+            
+            // 初始動作資料 - 存儲雙語描述
+            const getInitialActions = () => {
+                const zhDesc = translations['zh-TW'].actionDescriptions;
+                const enDesc = translations['en'].actionDescriptions;
+                return [
+                    {
+                        id: '1',
+                        seqType: 'GENERAL',
+                        descriptions: { 'zh-TW': zhDesc[0], 'en': enDesc[0] },
+                        tmu: 80,
+                        seconds: 2.88,
+                        params: { A1: 6, B1: 0, G: 1, A2: 3, B2: 0, P: 1, A3: 0 },
+                        stationId: 'ST-3-1a'
+                    },
+                    {
+                        id: '2',
+                        seqType: 'CONTROLLED',
+                        descriptions: { 'zh-TW': zhDesc[1], 'en': enDesc[1] },
+                        tmu: 150,
+                        seconds: 5.4,
+                        params: { A1: 3, B1: 0, G: 3, M: 6, X: 3, I: 3, A3: 0 },
+                        stationId: 'ST-3-1a'
+                    },
+                    {
+                        id: '3',
+                        seqType: 'CONTROLLED',
+                        descriptions: { 'zh-TW': zhDesc[2], 'en': enDesc[2] },
+                        tmu: 120,
+                        seconds: 4.32,
+                        params: { A1: 3, B1: 0, G: 1, M: 6, X: 3, I: 1, A3: 0 },
+                        stationId: 'ST-3-1b'
+                    },
+                    {
+                        id: '4',
+                        seqType: 'CONTROLLED',
+                        descriptions: { 'zh-TW': zhDesc[3], 'en': enDesc[3] },
+                        tmu: 100,
+                        seconds: 3.6,
+                        params: { A1: 1, B1: 0, G: 1, M: 3, X: 6, I: 1, A3: 0 },
+                        stationId: 'ST-4-1'
+                    }
+                ];
+            };
+            
+            // 動作清單 - 來自 SQT-K860G6--BASY 作業指導書實際操作步驟
+            const [actions, setActions] = useState(() => getInitialActions());
+            
+            // 輔助函數：取得動作描述（根據當前語言）
+            const getActionDescription = (action) => {
+                if (action.descriptions) {
+                    return action.descriptions[lang] || action.descriptions['zh-TW'] || action.descriptions['en'];
+                }
+                return action.description || '';
+            };
+
+            // 站點資料 - 來自 SQT-K860G6--BASY 作業指導書
+            const stations = useMemo(() => [
+                { id: 'ST-3-1a', name: t.station31a, operator: 'EMP-001', skillLevel: 1.0 },
+                { id: 'ST-3-1b', name: t.station31b, operator: 'EMP-002', skillLevel: 0.9 },
+                { id: 'ST-4-1', name: t.station41, operator: 'EMP-003', skillLevel: 1.1 },
+            ], [t]);
+
+            const [taktTime, setTaktTime] = useState(5.0);
+
+            const renderTabContent = () => {
+                switch (activeTab) {
+                    case 'MOST':
+                        return <MostEngine actions={actions} setActions={setActions} />;
+                    case 'SOP':
+                        return <SopStudio actions={actions} />;
+                    case 'LB':
+                        return <LineBalanceSimulator actions={actions} stations={stations} taktTime={taktTime} />;
+                    default:
+                        return <MostEngine actions={actions} setActions={setActions} />;
+                }
+            };
+
+            const toggleLanguage = () => {
+                setLang(prev => prev === 'zh-TW' ? 'en' : 'zh-TW');
+            };
+
+            return (
+                <LanguageContext.Provider value={{ t, lang, toggleLanguage, getActionDescription }}>
+                <div className="flex h-screen bg-slate-950 font-sans text-slate-200 overflow-hidden">
+                    <aside className="w-64 bg-slate-900 text-white flex flex-col shadow-xl border-r border-slate-800">
+                        <div className="p-6 border-b border-slate-800">
+                            <h1 className="text-xl font-bold flex items-center gap-2">
+                                <span className="text-blue-400 text-2xl">⚡</span> {t.appTitle}
+                            </h1>
+                            <p className="text-xs text-slate-400 mt-1">{t.phase}</p>
+                            <p className="text-[10px] text-slate-500 mt-1">K860G6-BASY | SKU: W*3558</p>
+                        </div>
+                        
+                        <nav className="flex-1 p-4 space-y-2">
+                            <NavButton 
+                                active={activeTab === 'MOST'} 
+                                onClick={() => setActiveTab('MOST')} 
+                                icon={<Calculator size={20} />} 
+                                label={t.mostEngine} 
+                            />
+                            <NavButton 
+                                active={activeTab === 'SOP'} 
+                                onClick={() => setActiveTab('SOP')} 
+                                icon={<FileText size={20} />} 
+                                label={t.sopStudio} 
+                            />
+                            <NavButton 
+                                active={activeTab === 'LB'} 
+                                onClick={() => setActiveTab('LB')} 
+                                icon={<BarChart3 size={20} />} 
+                                label={t.lineBalance} 
+                            />
+                        </nav>
+
+                        <div className="p-4 bg-slate-800/50 border-t border-slate-800">
+                            <div className="flex items-center gap-3 mb-2">
+                                <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-sm font-bold">IE</div>
+                                <div>
+                                    <p className="text-sm font-medium">{t.ieEngineer}</p>
+                                    <p className="text-xs text-slate-400">{t.loggedIn}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
+
+                    <main className="flex-1 flex flex-col overflow-hidden">
+                        <header className="h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-8 shadow-sm">
+                            <h2 className="text-lg font-semibold text-slate-200">
+                                {activeTab === 'MOST' && t.mostEngineTitle}
+                                {activeTab === 'SOP' && t.sopStudioTitle}
+                                {activeTab === 'LB' && t.lineBalanceTitle}
+                            </h2>
+                            <div className="flex items-center gap-4">
+                                <button 
+                                    onClick={toggleLanguage}
+                                    className="flex items-center gap-2 px-3 py-2 bg-slate-800 text-slate-300 border border-slate-700 rounded-lg text-sm hover:bg-slate-700 transition"
+                                    title={lang === 'zh-TW' ? 'Switch to English' : '切換為中文'}
+                                >
+                                    <Globe size={16} />
+                                    <span className="font-medium">{lang === 'zh-TW' ? 'EN' : '中'}</span>
+                                </button>
+                                <button className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-blue-400 border border-slate-700 rounded-lg text-sm hover:bg-slate-700 transition">
+                                    <Settings size={16} /> {t.projectSettings}
+                                </button>
+                                <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm shadow-md hover:bg-blue-700 transition">
+                                    <Save size={16} /> {t.saveChanges}
+                                </button>
+                            </div>
+                        </header>
+
+                        <div className="flex-1 overflow-auto p-6">
+                            {renderTabContent()}
+                        </div>
+                    </main>
+                </div>
+                </LanguageContext.Provider>
+            );
+        }
+
+        // --- Mount App ---
+        window.addEventListener('load', () => {
+            const root = ReactDOM.createRoot(document.getElementById('root'));
+            root.render(<DingDingMaoSystem />);
+        });
+    </script>
+</body>
+</html>

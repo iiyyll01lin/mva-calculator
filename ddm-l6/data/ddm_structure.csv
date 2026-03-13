@@ -1,0 +1,1398 @@
+﻿Name,Column1,Column2,Column3,Column4,Column5,Column6,Column7,Column8,Column9,Column10,Column11,Item,Kind,Hidden
+Benefit,1. 提高SOP制定效率：,Note:,,,,,,,,,,Benefit,Sheet,FALSE
+Benefit,   1) 使用Smart MI後，IE工程師制定SOP的時間可縮短30%~50%。,基於Phase1是無法縮短時間的，但經過半年至一年的時間累積資料庫，並優化網站，有機會縮短10%-15%的時間,,,,,,,,,,Benefit,Sheet,FALSE
+Benefit, 2) 提升SOP質量和標準化：,,,,,,,,,,,Benefit,Sheet,FALSE
+Benefit, 3) 使用Smart MI後，SOP中關鍵操作步驟和參數的覆蓋率可提高20%~30%。,覆蓋率是指？,,,,,,,,,,Benefit,Sheet,FALSE
+Benefit,4) 生産過程中因SOP不標準導致的偏差降低15%~25%。,偏差是指？,,,,,,,,,,Benefit,Sheet,FALSE
+Benefit,,,,,,,,,,,,Benefit,Sheet,FALSE
+Benefit,2. 縮短SOP編寫周期：,,,,,,,,,,,Benefit,Sheet,FALSE
+Benefit, 1) 使用Smart MI後，IE工程師編寫SOP的周期可縮短40%~60%。,周期指的是？,,,,,,,,,,Benefit,Sheet,FALSE
+Benefit,,,,,,,,,,,,Benefit,Sheet,FALSE
+Benefit,3. 優化生産運營：,,,,,,,,,,,Benefit,Sheet,FALSE
+Benefit, 1) 使用基於Smart MI分析的SOP後，生産效率提升10%~15%。,基於IE工程師新人初次編寫的MI，line balance有機會提升10-15%，生產效率是與各部門協作的結果，IE的MI佔的因素較小,,,,,,,,,,Benefit,Sheet,FALSE
+Benefit, 2) 産品合格率提高8%~12%。,不合適,,,,,,,,,,Benefit,Sheet,FALSE
+Benefit,,,,,,,,,,,,Benefit,Sheet,FALSE
+Benefit,4. 提高文件管理效率：,,,,,,,,,,,Benefit,Sheet,FALSE
+Benefit, 1) 使用Smart MI後，IE工程師查找所需文件的時間縮短50%~70%。,不合適,,,,,,,,,,Benefit,Sheet,FALSE
+Benefit, 2) 文件變更追溯的準確性提高20%~30%。,,,,,,,,,,,Benefit,Sheet,FALSE
+Benefit,,,,,,,,,,,,Benefit,Sheet,FALSE
+Benefit,,,,,,,,,,,,Benefit,Sheet,FALSE
+Benefit,Phase 1 Benefit,,,,,,,,,,,Benefit,Sheet,FALSE
+Benefit,1. 基於Mini MOST 序列模型建立MI動作，可模擬理論性工時，並統一名稱(動作/材料/治工具等)的一致性,,,,,,,,,,,Benefit,Sheet,FALSE
+Benefit,2. 系統性排站，可提升新人工程師排站的Line Balance 10-15%,,,,,,,,,,,Benefit,Sheet,FALSE
+Benefit,,,,,,,,,,,,Benefit,Sheet,FALSE
+Benefit,Phase 2 Benefit (串聯other系統),,,,,,,,,,,Benefit,Sheet,FALSE
+Benefit,1. 減少其他系統(DPM/RMS/E-ISO/EMI等)的重複性資料上傳/維護，並降低資料錯誤/漏傳的問題,,,,,,,,,,,Benefit,Sheet,FALSE
+Benefit,2. 多數資料可從系統追朔並且進行統計分析，ex: DL HC/ CWS/ 換線治工具List,,,,,,,,,,,Benefit,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,,工作表1,Sheet,FALSE
+工作表1,,,,,,,,,,,3765.939,工作表1,Sheet,FALSE
+痛點,痛點,,,,,,,,,,,痛點,Sheet,FALSE
+痛點,Line Balance 計算 無法計算一人兩機的狀態--- 希望可以針對此有勾選的選項，避免線平衡失真,,,,,,,,,,,痛點,Sheet,FALSE
+痛點,計算次數過高時 (over 5000次，電腦容易過熱 & 當機),,,,,,,,,,,痛點,Sheet,FALSE
+痛點,輸出標準MI時間過長 (over 10 mins & 當機),,,,,,,,,,,痛點,Sheet,FALSE
+痛點,需要手動匯入Excel or 檔案新增至根目錄 才可進行下一步驟，無網頁版,,,,,,,,,,,痛點,Sheet,FALSE
+痛點,山積圖的站別描述無法在一個頁面呈現 (無法換行),,,,,,,,,,,痛點,Sheet,FALSE
+痛點,子動作無法拖拉更改,,,,,,,,,,,痛點,Sheet,FALSE
+痛點,導出的標準MI需手動更新Cover頁,,,,,,,,,,,痛點,Sheet,FALSE
+MOST系統WEB化-細分流程圖,,,,,,,,,,,,MOST系統WEB化-細分流程圖,Sheet,FALSE
+MOST系統WEB化-細分流程圖,,,,,,,,,,,,MOST系統WEB化-細分流程圖,Sheet,FALSE
+MOST系統WEB化-細分流程圖,權限控管,CKS/CCD/CHV A31 資深IE工程師,,,,,,,,,,MOST系統WEB化-細分流程圖,Sheet,FALSE
+MOST系統WEB化-細分流程圖,,MOST系統WEB化,,,,,,,,,,MOST系統WEB化-細分流程圖,Sheet,FALSE
+MOST系統WEB化-細分流程圖,,注意事項建立,,,從哪裡建立,,,目標物建立,,,到哪裡建立,MOST系統WEB化-細分流程圖,Sheet,FALSE
+MOST系統WEB化-細分流程圖,,,,,,,,,,,,MOST系統WEB化-細分流程圖,Sheet,FALSE
+MOST系統WEB化-細分流程圖,,Step1,"點選新增注意事項類型- ""一般注意事項""/ ""锁螺丝注意事项""/""手套注意事项""…",,Step1,"點選新增 ""選項""",,Step1,"點選類型-""NB""/ ""工治具""/ ""XX料""",,Step1,MOST系統WEB化-細分流程圖,Sheet,FALSE
+MOST系統WEB化-細分流程圖,,,"點選新增 ""選項""",,,"建立 ""從哪裡"" 清單",,,點選子項目,,,MOST系統WEB化-細分流程圖,Sheet,FALSE
+MOST系統WEB化-細分流程圖,,,"建立 ""注意事項"" 清單",,,點選儲存,,,"點選新增 ""選項""",,,MOST系統WEB化-細分流程圖,Sheet,FALSE
+MOST系統WEB化-細分流程圖,,,點選儲存,,,,,,"建立 ""目標物"" 清單",,,MOST系統WEB化-細分流程圖,Sheet,FALSE
+MOST系統WEB化-細分流程圖,,,,,,,,,點選儲存,,,MOST系統WEB化-細分流程圖,Sheet,FALSE
+MOST系統WEB化-細分流程圖,,,,,,,,,,,,MOST系統WEB化-細分流程圖,Sheet,FALSE
+MOST系統WEB化-細分流程圖,,,,,,,,,,,,MOST系統WEB化-細分流程圖,Sheet,FALSE
+MOST系統WEB化-細分流程圖,,,,,,,,,,,,MOST系統WEB化-細分流程圖,Sheet,FALSE
+MOST系統WEB化-細分流程圖,,,,,,,,,,,,MOST系統WEB化-細分流程圖,Sheet,FALSE
+MOST系統WEB化-細分流程圖,,,,,,,,,,,,MOST系統WEB化-細分流程圖,Sheet,FALSE
+MOST系統WEB化-細分流程圖,,,,,,,,,,,,MOST系統WEB化-細分流程圖,Sheet,FALSE
+MOST系統WEB化-細分流程圖,,,,,,,,,,,,MOST系統WEB化-細分流程圖,Sheet,FALSE
+MOST系統WEB化-細分流程圖,,,,,,,,,,,,MOST系統WEB化-細分流程圖,Sheet,FALSE
+MOST系統WEB化-細分流程圖,,,,,,,,,,,,MOST系統WEB化-細分流程圖,Sheet,FALSE
+MOST系統WEB化-細分流程圖,,,,,,,,,,,,MOST系統WEB化-細分流程圖,Sheet,FALSE
+MOST系統WEB化-細分流程圖,,,,,,,,,,,,MOST系統WEB化-細分流程圖,Sheet,FALSE
+MOST系統WEB化-細分流程圖,,,,,,,,,,,,MOST系統WEB化-細分流程圖,Sheet,FALSE
+MOST系統WEB化-細分流程圖,,,,,,,,,,,,MOST系統WEB化-細分流程圖,Sheet,FALSE
+MOST系統WEB化-細分流程圖,,,,,,,,,,,,MOST系統WEB化-細分流程圖,Sheet,FALSE
+MOST系統WEB化-細分流程圖,,,,,,,,,,,,MOST系統WEB化-細分流程圖,Sheet,FALSE
+MOST系統WEB化-細分流程圖,,,,,,,,,,,,MOST系統WEB化-細分流程圖,Sheet,FALSE
+MOST系統WEB化-細分流程圖,,,,,,,,,,,,MOST系統WEB化-細分流程圖,Sheet,FALSE
+MOST系統WEB化-細分流程圖,,,,,,,,,,,,MOST系統WEB化-細分流程圖,Sheet,FALSE
+MOST系統WEB化-細分流程圖,,,,,,,,,,,,MOST系統WEB化-細分流程圖,Sheet,FALSE
+MOST系統WEB化-細分流程圖,,,,,,,,,,,,MOST系統WEB化-細分流程圖,Sheet,FALSE
+工作表4,,,,,,,,,,,,工作表4,Sheet,FALSE
+工作表4,,,,,,,,,,,,工作表4,Sheet,FALSE
+工作表4,,,,,,,,,,,,工作表4,Sheet,FALSE
+工作表4,,,,,,,,,,,,工作表4,Sheet,FALSE
+工作表2,,,,,,,,,,,,工作表2,Sheet,FALSE
+語法邏輯,(伸手60cm)右手抓握刷枪(60cm)保持住到工单二维码,右手,a,b,,,G,目標物,,a,,語法邏輯,Sheet,FALSE
+語法邏輯,按刷枪按钮并确认MES电脑,,a,b,,,G,目標物,,M0,,語法邏輯,Sheet,FALSE
+語法邏輯,(伸手60cm)右手从捡料架亮灯位置拿取M/B(主板)(40cm)左手保持住到PPID,右手,a,b,從,從哪裡,G,目標物,左手,a,,語法邏輯,Sheet,FALSE
+語法邏輯,按刷枪按钮并确认MES电脑,,a,b,,,G,目標物,,M0,,語法邏輯,Sheet,FALSE
+語法邏輯,右手放到百宝箱图示位置,右手,a,b,,,G0,,,a,,語法邏輯,Sheet,FALSE
+語法邏輯,(伸手60cm)右手从百宝箱拿取Cover(上盖),右手,a,b,從,從哪裡,G,目標物,,a,,語法邏輯,Sheet,FALSE
+語法邏輯,(40cm)左手抓握Cover(上盖)的包装袋去除,左手,a,b,,,G,目標物→對象,,M,,語法邏輯,Sheet,FALSE
+語法邏輯,丢到垃圾桶(60cm),,a,b,,,G0,,,a,,語法邏輯,Sheet,FALSE
+語法邏輯,右手放到泡棉,,a,b,,,G0,,右手,a,,語法邏輯,Sheet,FALSE
+語法邏輯,(伸手60cm)右手从百宝箱拿取黑色天线(10cm),右手,a,b,從,從哪裡,G,目標物,,a,,語法邏輯,Sheet,FALSE
+語法邏輯,"左手抓握黑色天线的包装袋去除,",左手,a,b,,,G,目標物→對象,,M,,語法邏輯,Sheet,FALSE
+語法邏輯,丢到垃圾桶(60cm),,a,b,,,G0,,,a,,語法邏輯,Sheet,FALSE
+語法邏輯,"(伸手60cm)[右手从材料盒拿取mylar（麦拉）,贴附到黑色天线,并对齐mark线,",右手,a,b,從,從哪裡,G,目標物,,M,到哪裡,語法邏輯,Sheet,FALSE
+語法邏輯,右手按一下到Cover(上盖)](*3),,,,,,,,,,,語法邏輯,Sheet,FALSE
+語法邏輯,,,,,,,,,,,,語法邏輯,Sheet,FALSE
+語法邏輯,,,,,,,,,,,,語法邏輯,Sheet,FALSE
+語法邏輯,,,,,,,,,,,,語法邏輯,Sheet,FALSE
+語法邏輯,,,,,,,,,,,,語法邏輯,Sheet,FALSE
+語法邏輯,,左右手選項,小寫字母不顯示字，但依然要計算TMU,,"若有選擇""從哪裡""資料庫，則需要 ""從""這個字",,如果係數為0則不需要字,,左右手選項,小寫字母不顯示字，但依然要計算TMU,,語法邏輯,Sheet,FALSE
+語法邏輯,,新增雙手,,,,,,,刪除,,,語法邏輯,Sheet,FALSE
+語法邏輯,,,,,,,,,,,,語法邏輯,Sheet,FALSE
+MOST 系统逻辑,时间换算,1 TMU=0.036 second,,,,,,,,,1second=27.8 TMU,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,一般移动,,"從+""從哪裡""+ ( A+B) +G + 對象/目標物+ (A+B)+ P+ A+ ""到哪裡""",,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,单选取较大值,,,,,,,单选,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,目标物,,,A,,"INDEXx1
+(TMU)","A
+距離",,,,B,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,伸手,(距离cm),,手,,腳,,眼部动作,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,手度,(角度),,英吋(公分),角度,英吋(公分),,起身或彎腰/坐,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,脚步,(距离cm),,,,,,站,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,0,<=1(2.5),<=30,-,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,1,<=2(5),<=60,-,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,3,<=4(10),<=120,-,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,6,<=8(20),<=180,"<=8(20)
+Foot action",,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,10,<=14(35),-,<=12(30),,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,16,<=24(60),-,"<=18(45)
+1 步",,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,24,>24(60),-,<=26(65),,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,32,-,-,">26(65)
+2 步",,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,选择,,获得,,,,,,,控制,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,左手,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,右手,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,双手,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,控制移动,,"從+""從哪裡""+ ( A+B) +G + 對象/目標物+ M+ X + I + A+ ""到哪裡""",,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,单选取较大值,,,,,,,单选,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,目标物,,,A,,"INDEXx1
+(TMU)","A
+距離",,,,B,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,伸手,(距离cm),,手,,腳,,眼部动作,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,手度,(角度),,英吋(公分),角度,英吋(公分),,起身或彎腰/坐,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,脚步,(距离cm),,,,,,站,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,0,<=1(2.5),<=30,-,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,1,<=2(5),<=60,-,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,3,<=4(10),<=120,-,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,6,<=8(20),<=180,"<=8(20)
+Foot action",,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,10,<=14(35),-,<=12(30),,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,16,<=24(60),-,"<=18(45)
+1 步",,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,24,>24(60),-,<=26(65),,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,32,-,-,">26(65)
+2 步",,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,选择,,获得,,,,,,,控制,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,左手,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,右手,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,双手,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,,MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,刷工单，依据MES电脑指示拣料,,,,,,,,,→,"(伸手60cm)右手抓握刷枪(60cm)保持住到工单二维码,按刷枪按钮并确认MES电脑",MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,"捡M/B(主板)，刷M/B PPID,放于料箱固定位置",,,,,,,,,→,"(伸手60cm)右手从捡料架亮灯位置拿取M/B(主板)(40cm)左手保持住到PPID,按刷枪按钮并确认MES电脑,(60cm)右手放到百宝箱图示位置",MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,从百宝箱取Cover(上盖)撕除包装袋，将cover放于泡棉,,,,,,,,,→,"(伸手60cm)右手从百宝箱拿取Cover(上盖)(40cm)左手抓握Cover(上盖)的包装袋去除,丢到垃圾桶(60cm)右手放到泡棉",MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,从百宝箱取黑色天线去除包装袋按图示撕除小板背胶贴至图示卡槽,,,,,,,,,→,"(伸手60cm)右手从百宝箱拿取黑色天线(10cm)左手抓握黑色天线的包装袋去除,丢到垃圾桶(60cm)",MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,"右手重新抓握翻转左手抓握黑色天线的小板背胶撕除,丢到垃圾桶,左手抓握黑色天线的小板贴附到卡槽",MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,按图示理黑色天线至Cover(上盖)左下角卡勾,,,,,,,,,→,"(伸手40cm)左手从Cover(上盖)抓握黑色天线,理(20cm)到Cover(上盖),并对齐线槽,[右手按一下到卡槽](*2)",MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,取3个mylar（麦拉）按图示标注位置固定天线,,,,,,,,,→,"(伸手60cm)[右手从材料盒拿取mylar（麦拉）,贴附到黑色天线,并对齐mark线,右手按一下到Cover(上盖)](*3)",MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,从百宝箱取白色天线去除包装袋，按图示2.0组裸天线部分,,,,,,,,,→,"(伸手60cm)右手从百宝箱拿取白色天线(10cm)左手抓握白色天线的包装袋去除,丢到垃圾桶(60cm)",MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,"(补充组裸天线部分,档大于2.5CM用穿属于移动,小于2.5用组属于一般)",,,,,,,,,,"(伸手60cm)右手重新抓握白色天线,穿/组到卡勾",MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,按图示3.0将铝箔贴回固定天线并将铝箔压平整,,,,,,,,,→,"(伸手60cm)左手抓握铝箔贴附到Cover(上盖),右手抓握压天线简易治具轻按到铝箔",MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,拿取显示屏，将显示屏排线按箭头方向平行插入显示屏接口,,,,,,,,,→,"(伸手60cm)左手从百宝箱拿取 Panel(显示屏)翻转,(40cm)右手从Cover(上盖)拿取 Panel(显示屏)排线,重新抓取,对准插入 Panel(显示屏)接口",MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,将显示屏排线扣环扣于接口,,,,,,,,,→,"右手抓握 Panel(显示屏)排线扣环,卡合到 Panel(显示屏)接口",MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,撕除显示屏排线插头处背胶贴于panel,,,,,,,,,→,"右手抓握 Panel(显示屏)的排线插头背胶撕除,丢到垃圾桶.右手抓握 Panel(显示屏)的排线插头,贴附到 Panel(显示屏)接口",MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,将 Panel(显示屏)装于Cover(上盖),,,,,,,,,→,"右手翻转,双手抓握 Panel(显示屏),(60cm)对准组到Cover(上盖)",MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,按图示1.0-2.0锁附1颗螺丝固定转轴支架,,,,,,,,,→,"(伸手60cm)右手抓握电动起子,[拉(60cm)到螺丝供料器,接触螺丝滑出,拉到转轴支架并对准螺丝孔,接触螺丝锁附固定](*1)",MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,卡合下侧panel(显示屏)与bezel(显示屏边框)左右角区域,,,,,,,,,→,"(伸手60cm)右手从百宝箱抓握bezel(显示屏边框),[(40cm)左手抓握bezel(显示屏边框)的左下角,(40cm)右手重新抓握bezel(显示屏边框)的左下角,对准组到Cover(上盖)并卡合](*2)",MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,按图示顺序卡合Bezel(显示屏边框)上侧左右角区域,,,,,,,,,→,"[(伸手60cm)右手从泡棉抓握bezel(显示屏边框)的右上角,对准组到Cover(上盖)并卡合](*2)",MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,按图示卡合Bezel下侧,,,,,,,,,→,"(伸手60cm)双手从泡棉抓握bezel(显示屏边框)的下侧,[卡合到Cover(上盖)](*4)",MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,将LCD放于绑定治具内，刷工单，双手按压启动按钮，自动卡合&压合机台,,,,,,,,,,"(伸手60cm)双手从泡棉抓握LCD,(60cm)对准放到LCD&Bezel  压合治具",MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,"(伸手60cm)右手从百宝箱抓握工单撕除, (60cm)到LCD&Bezel  压合治具的刷枪扫描, (60cm)轻按贴附到百宝箱",MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,,,,,,,,,,,"(伸手60cm)双手按压LCD&Bezel  压合治具的启动按钮,压合(10S)LCD",MOST 系统逻辑,Sheet,FALSE
+MOST 系统逻辑,将压合完成后的LCD放回泡棉,,,,,,,,,,"(伸手60cm)双手抓握LCD, (60cm)放到泡棉",MOST 系统逻辑,Sheet,FALSE
+員工技能匹配表 (2),M,目標物,一般技能,"CTQ技能
+CTQ動作",,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),按动按钮,,一般作业,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),理,排線,插理排线,理線,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),穿,,一般作业,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),滑出螺丝,,锁螺丝,锁螺丝,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),推,,一般作业,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),拉,,一般作业,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),贴附,,一般作业,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),去除,,一般作业,,,优先级,一般技能,,,,CTQ技能,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),撕除,,一般作业,,,1,插理排线,待新增,,,鎖螺絲,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),折,排線,插理排线,理線,,2,锁螺丝,MFG001,,,理線,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),擦拭,,危險化學品操作,,,3,刷槍,MFG002,,,插線,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),旋转,,-,,,4,带電设备操作,MFG017,,,插金手指,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),旋转,,-,,,5,一般作业,MFG015,,,卡合,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),撕开,,一般作业,,,6,目视,MFG013,,,裝配,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),手度,,一般作业,,,7,危險化學品操作,MFG012,,,壓合&熱熔,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),脚步,,,,,8,无铅操作,MFG000,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),X,,,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),并压合机台,,带電设备操作,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),并卡合&压合机台,,带電设备操作,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),并热熔机台,,带電设备操作,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),并点胶,,带電设备操作,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),并锁附固定上个序列模型目标物(锁附顺序如图所示),,锁螺丝,锁螺丝,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),并镭雕,,带電设备操作,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),刷PPID,,刷槍,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),刷工单二维码,,刷槍,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),刷条形码,,刷槍,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),P,,,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),丢,,一般作业,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),保持住,,一般作业,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),放,,一般作业,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),放,,一般作业,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),放,,一般作业,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),组,,一般作业,裝配,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),组,,一般作业,裝配,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),复选,,一般作业,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),对准,,一般作业,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),,,一般作业,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),插入,排線,插理排线,插線,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),插入,金手指,,插金手指,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),較難處理 ,,一般作业,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),卡合,,一般作业,卡合,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),施加壓力,,一般作业,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),I,,,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),并检查,,目视,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),并确认,,目视,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),并对准,,目视,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),并对齐,,目视,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),并检查,,目视,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),并确认,,目视,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),并对准,,目视,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+員工技能匹配表 (2),并对齐,,目视,,,,,,,,,員工技能匹配表 (2),Sheet,FALSE
+问题点,No.,Item.,Picture,Date,Status,,,,,,,问题点,Sheet,FALSE
+问题点,1,登入接口可以居中，并且Follow MES，记录用户账号,,45391,,优化项目，可以在下一阶段规划,,,,,,问题点,Sheet,FALSE
+问题点,2,距离标准化，未来可透过可视化图片点选直接带出距离,,45391,优化---未来,优化项目，可以在下一阶段规划,,,,,,问题点,Sheet,FALSE
+问题点,3,TMU的计算序列模型希望可呈现，以便Check是否漏掉or对比,,45391,OK,,,,,,,问题点,Sheet,FALSE
+问题点,4,"数据库搜寻模式：
+1.下拉式选单并搭配ABC拼音顺序排列
+2.增加关键词模糊搜寻",,45391,Open,不改会操作困难，希望现阶段可以修正,,,,,,问题点,Sheet,FALSE
+问题点,5,ABG/ABP & ABG/MXI 颜色区隔开来,,45391,,,,,,,,问题点,Sheet,FALSE
+问题点,6,资料暂存目前还未体现 (Level system返回MOST system需有数据),,45391,OK,,,,,,,问题点,Sheet,FALSE
+问题点,7,愿望：可从语句数据库搜寻标准语句，并让使用者可自行调整,,45391,优化,优化项目，可以在下一阶段规划,,,,,,问题点,Sheet,FALSE
+问题点,8,删除按钮点击一下就删除了，能否弹出确认框确认删除。防止误删，误删后能否找回,,45391,OK,,,,,,,问题点,Sheet,FALSE
+问题点,9,bug:  假设我需要新增一个动作，只需要在上一个基础上修改的时候，(B）和返回（A)下面不需要动作了，然后去点击“请选择”然后点击save changes没有反应,,45391,OK,,,,,,,问题点,Sheet,FALSE
+问题点,10,"第1、2、3句话组成一段话，选择V之后。第4句就没有了，需要点击编辑第四句话才出现。希望选择几个组成一段话，剩下还可以打V选择组成一段话新增到下面
+新增一栏：生成MI，使工程师可以分析多个动作，一次性点选",,45391,OK,,,,,,,问题点,Sheet,FALSE
+问题点,11,增加动作步骤的序号1、2、3、4，便于显示动作数量,,45391,OK,,,,,,,问题点,Sheet,FALSE
+问题点,12,取消编辑选项，希望可以直接按，就可清空所有动作,,45391,OK,,,,,,,问题点,Sheet,FALSE
+问题点,13,BUG：调换顺序的按钮没有作用,,45391,OK,,,,,,,问题点,Sheet,FALSE
+问题点,14,"新增命名方式：Follow MI 命名方式分页
+若是自动化的设备，希望呈现自动化设备List",,45391,,优化项目，可以在下一阶段规划,,,,,,问题点,Sheet,FALSE
+问题点,15,BUG：哪里、到哪里，摆反了 0.0,,45391,OK,,,,,,,问题点,Sheet,FALSE
+问题点,16,BUG：控制移动的I，少了加层级,,45391,OK,,,,,,,问题点,Sheet,FALSE
+问题点,17,"语句通顺，因MI会有I在M前面的情况，希望可以一个打勾，调换下语句顺序
+Before： A+B+从哪里+目标物+组件+M+到哪里+I+哪里+返回(A)
+After 新增这个一键变换成这个顺序的语句:A+B+从哪里+目标物+组件+I++哪里+M+到哪里+返回(A)",,45391,OK,,,,,,,问题点,Sheet,FALSE
+问题点,18,"若没有选择""手部""，生成MI则默认显示""然后""的转折语句",,45391,OK,,,,,,,问题点,Sheet,FALSE
+问题点,19,新增的维护界面PROPOSAL,,45391,OK,试用中,,,,,,问题点,Sheet,FALSE
+问题点,20,若是用A机种的序列模型，修改成B机种的，是否可以~?,,45391,OK,,,,,,,问题点,Sheet,FALSE
+问题点,21,新增动作CTQ选项勾选,,45400,OK,不改MI做不出来,,,,,,问题点,Sheet,FALSE
+问题点,22,将动作进行分类：有价值/无价值----统计时间,,45400,,优化项目，可以在下一阶段规划,,,,,,问题点,Sheet,FALSE
+问题点,23,控制移动逻辑更新----X---锁附固定，时间固定为0.216秒 (以L6螺丝的为标准),,45400,OK,,,,,,,问题点,Sheet,FALSE
+问题点,24,序列模型link技能--IE提供员工技能匹配表,,45400,优化,优化项目，可以在下一阶段规划,,,,,,问题点,Sheet,FALSE
+问题点,25,一般动作类型：P，当选错后，想让他变成空白值，无法直接恢复,,45407,OK,,,,,,,问题点,Sheet,FALSE
+问题点,27,"新增 ""组件"" 数据库",,45407,OK,,,,,,,问题点,Sheet,FALSE
+问题点,29,MI 标准文件名称--- HDL50_铝版_集中捡料_自动_ASSY_16_1.0,,45407,,优化项目，可以在下一阶段规划,,,,,,问题点,Sheet,FALSE
+问题点,32,全部使用简体字,,45407,OK,不改MI做不出来,,,,,,问题点,Sheet,FALSE
+问题点,33,删除下面的MI，不删除中间的，须独立删除，互不影响,,45407,OK,,,,,,,问题点,Sheet,FALSE
+问题点,34,"中间的动作，点选新增MI以后，则自动跳到下面，不保留；
+若下面点选修改编辑，则在返回到中间的部份",,45407,Open,不改会操作困难，希望现阶段可以修正,,,,,,问题点,Sheet,FALSE
+问题点,35,若完成以后，新增一个按钮，全返回至中间,,45407,优化,,,,,,,问题点,Sheet,FALSE
+问题点,36,"点错一般OR控制 动作，希望：
+ABG内容固定，可自由切换一般及控制序列，节省点选时间",,45407,Open,不改会操作困难，希望现阶段可以修正,,,,,,问题点,Sheet,FALSE
+问题点,37,目标物/哪里/去哪里/组件，尽量呈现所有内容，可以直接点选，减少点选次数,,45407,优化,优化项目，可以在下一阶段规划,,,,,,问题点,Sheet,FALSE
+问题点,38,"控制移动：
+没有选择 ""使用手""，但有选择 ""I""，则不需要 ""然后""的字样",,45407,OK,,,,,,,问题点,Sheet,FALSE
+问题点,39,"一般移动的G，新增 ""轻拍"" & ""抓取""",,45407,OK,,,,,,,问题点,Sheet,FALSE
+问题点,40,"一般移动的第二个A，若有选择手度，则需新增 ""翻转"" 字样+ ""目标物""",,45407,OK,,,,,,,问题点,Sheet,FALSE
+问题点,41,一般移动的P，程序逻辑错误，为可以复选并迭加层级，若只选择上面的则只SHOW上面的字样，若选择下面的，需迭加TMU，并且依照MOST系统逻辑的方式呈现字样,,45407,OK,第一目标~~~~~,,,,,,问题点,Sheet,FALSE
+问题点,42,一般移动&控制移动，最后的A，没有按照设定的逻辑变动TMU,,45407,OK,,,,,,,问题点,Sheet,FALSE
+问题点,43,"控制移动的G，新增 ""轻拍""＆　＂抓取＂",,45407,OK,,,,,,,问题点,Sheet,FALSE
+问题点,44,"控制移动的Ｍ，新增 ""按动按钮""、＂折＂、＂擦拭＂，及更改　＂滑出螺丝＂",,45407,OK,,,,,,,问题点,Sheet,FALSE
+问题点,45,控制移动的Ｘ，更新语法逻辑,,45407,OK,,,,,,,问题点,Sheet,FALSE
+问题点,46,类别增加筛选功能，并增加序列号,,45428,Open,不改会操作困难，希望现阶段可以修正,,,,,,问题点,Sheet,FALSE
+问题点,47,"MOST选项设定----可以让工程师自己创立类别卷标
+EXCEL 一键汇入所有选项",,45429,Open,不改会操作困难，希望现阶段可以修正,,,,,,问题点,Sheet,FALSE
+问题点,48,"新增 ""编辑MI"" & ""新增MI"" 的选项",,45429,OK,,,,,,,问题点,Sheet,FALSE
+问题点,49,生成MI 后，想同时修改第一句和第二句就没办法做到，只能修改当句的MI。,,45435,Open,不改会操作困难，希望现阶段可以修正,,,,,,问题点,Sheet,FALSE
+问题点,50,目标物选择了之后，没有办法取消不选择,,45435,Open,不改会操作困难，希望现阶段可以修正,,,,,,问题点,Sheet,FALSE
+问题点,51,新增MI后，如果忘记点上传机种MI或者电脑死机或误刷新页面，做的所有资料全部没有历史记录，需要重新做,,45435,Open,不改会操作困难，希望现阶段可以修正,,,,,,问题点,Sheet,FALSE
+问题点,52,"控制动作""M"" 增加 ""撕开""",,45435,OK,不改MI做不出来,,,,,,问题点,Sheet,FALSE
+问题点,53,上传后的MI不能同时多个或者全部选择后进行编辑,,45435,Open,不改会操作困难，希望现阶段可以修正,,,,,,问题点,Sheet,FALSE
+问题点,54,"当不勾选G且有目标物时产生""将""字样，变成""然后将喇叭放到百宝箱固定位置""",,45435,OK,不改MI做不出来,,,,,,问题点,Sheet,FALSE
+问题点,55,若已经编辑了10句，但突然发现下面的某一句合成以后有问题，这时候点选编辑，则上面的其他语句全部被覆盖，需全部重新处理,,45435,Open,不改会操作困难，希望现阶段可以修正,,,,,,问题点,Sheet,FALSE
+问题点,56,"语句通顺问题：
+----------> M+目标物+组件
+Before： A+B+从哪里+G+目标物+组件+M+到哪里+X+I+哪里+返回(A)
+After： 打勾 I 的时---- A+B+从哪里+G+目标物+组件+I+哪里+M+到哪里+返回(A)
+After： 打勾 M 的时---- A+B+从哪里+G+M+目标物+组件+到哪里+X+I+哪里+返回(A)
+After： 打勾 I & M 的时---- A+B+从哪里+G+I+哪里+M+目标物+组件+到哪里+X+返回(A)",增加可倒装的勾勾,45435,OK,不改MI做不出来,,,,,,问题点,Sheet,FALSE
+问题点,57,右手/左手/双手 隐藏,,45435,OK,不改MI做不出来,,,,,,问题点,Sheet,FALSE
+问题点,58,"没有选择G，则增加 ""将""
+有选择G，但把G隐藏，也需要增加 ""将""",,45449,OK,不改MI做不出来,,,,,,问题点,Sheet,FALSE
+问题点,59,"有G+目标物+手部 
+G+目标物+并翻转+目标物
+
+没有G+目标物+手部
+翻转+目标物",,45449,OK,不改MI做不出来,,,,,,问题点,Sheet,FALSE
+问题点,60,多种状态根据工单则1的情况，调整Level system & line balance,,45449,OK,不改MI做不出来,,,,,,问题点,Sheet,FALSE
+问题点,61,"一般移动
+P：对准 需显示字样
+
+当对准打勾则
+对准+ ""可选择的哪里""+ (丢/放/组/插入/卡合)",,45455,OK,不改MI做不出来,,,,,,问题点,Sheet,FALSE
+问题点,62,按动按钮----3TMU固定,,45455,OK,不改MI做不出来,,,,,,问题点,Sheet,FALSE
+问题点,63,控制移动---X时间隐藏,,45455,OK,,,,,,,问题点,Sheet,FALSE
+问题点,64,"叮叮貓MI多種類型line balance 需新增一條功能--- 增加此語句 ""无此物件就没有这个动作""",,45478,Open,,,,,,,问题点,Sheet,FALSE
+问题点,65,"控制移動 需在 ""M"" 增加手度/腳部相關的標籤",,45478,Open,,,,,,,问题点,Sheet,FALSE
+问题点,66,line balance公式有問題,,45478,Open,,,,,,,问题点,Sheet,FALSE
+問題點Review,4,"数据库搜寻模式：
+1.下拉式选单并搭配ABC拼音顺序排列
+2.增加关键词模糊搜寻",,,,,,,,,,問題點Review,Sheet,FALSE
+問題點Review,14,"新增命名方式：Follow MI 命名方式分页
+若是自动化的设备，希望呈现自动化设备List",,,,,,,,,,問題點Review,Sheet,FALSE
+問題點Review,34,"中间的动作，点选新增MI以后，则自动跳到下面，不保留；
+若下面点选修改编辑，则在返回到中间的部份",,,,,,,,,,問題點Review,Sheet,FALSE
+問題點Review,36,"点错一般OR控制 动作，希望：
+ABG内容固定，可自由切换一般及控制序列，节省点选时间",,,,,,,,,,問題點Review,Sheet,FALSE
+問題點Review,46,类别增加筛选功能，并增加序列号,,,,,,,,,,問題點Review,Sheet,FALSE
+問題點Review,47,"MOST选项设定----可以让工程师自己创立类别卷标+note
+EXCEL 一键汇入所有选项+匯出的功能",,,,,,,,,,問題點Review,Sheet,FALSE
+問題點Review,49,生成MI 后，想同时修改第一句和第二句就没办法做到，只能修改当句的MI。,,,,,,,,,,問題點Review,Sheet,FALSE
+問題點Review,50,目标物选择了之后，没有办法取消不选择,,,,,,,,,,問題點Review,Sheet,FALSE
+問題點Review,51,新增MI后，如果忘记点上传机种MI或者电脑死机或误刷新页面，做的所有资料全部没有历史记录，需要重新做,,,,,,,,,,問題點Review,Sheet,FALSE
+問題點Review,53,上传后的MI不能同时多个或者全部选择后进行编辑,,,,,,,,,,問題點Review,Sheet,FALSE
+問題點Review,55,若已经编辑了10句，但突然发现下面的某一句合成以后有问题，这时候点选编辑，则上面的其他语句全部被覆盖，需全部重新处理,,,,,,,,,,問題點Review,Sheet,FALSE
+問題點Review,64,"叮叮貓MI多種類型line balance 需新增一條功能--- 增加此語句 ""无此物件就没有这个动作""",,,,,,,,,,問題點Review,Sheet,FALSE
+問題點Review,65,"控制移動 需在 ""M"" 增加手度相關的標籤，選擇手度則須""翻轉"" 字樣",,,,,,,,,,問題點Review,Sheet,FALSE
+問題點Review,66,Line Balance 計算公式有問題,,,,,,,,,,問題點Review,Sheet,FALSE
+問題點Review,67,"同樣的語句若組合在一起，自動合併成一個語句
+例如
+1.0打螺絲
+2.0打螺絲
+3.0打螺絲
+
+顯示在mi則為 1.0打螺絲[*3]",,,,,,,,,,問題點Review,Sheet,FALSE
+問題點Review,68,控制移動：M 滑出螺絲  固定3 TMU,,,,,,,,,,問題點Review,Sheet,FALSE
+問題點Review,69,X:增加打印,V,,,,,,,,,問題點Review,Sheet,FALSE
+問題點Review,70,增加SIMO選項，顯示MI，但不記錄時間,V,,,,,,,,,問題點Review,Sheet,FALSE
+問題點Review,71,顯示選項，增加CT,V,,,,,,,,,問題點Review,Sheet,FALSE
+問題點Review,72,頁面需增加倒敘選項,V,,,,,,,,,問題點Review,Sheet,FALSE
+問題點Review,,,,,,,,,,預知問題----給開發部門,,問題點Review,Sheet,FALSE
+問題點Review,,,,,,,,,,,,問題點Review,Sheet,FALSE
+問題點Review,,,,,,,,,,,,問題點Review,Sheet,FALSE
+問題點Review,,,,,,,,,,,,問題點Review,Sheet,FALSE
+問題點Review,,,,,,,,,,,,問題點Review,Sheet,FALSE
+問題點Review,,,,,,,,,,,,問題點Review,Sheet,FALSE
+問題點Review,73,線類別綁定-與RMS設定一致,,,,,,,,,,問題點Review,Sheet,FALSE
+問題點Review,74,需要整理出 離子風扇與目標物的匹配---MI生成時自動帶出,,,,,,,一般移動,方向/移動距離-不受到任何限制,,問題點Review,Sheet,FALSE
+問題點Review,75,"考慮控制移動是否要增加 插入/組 的動作---IE
+EX: 取PANEL，將EDP排線插入PANEL的接口 (控制動作:將某物品移動至其他物品表面上或與其他物品連結情況下移動。)",,,,,,,控制移動,方向和移動距離，其中有一個受到限制則為控制移動,,問題點Review,Sheet,FALSE
+問題點Review,76,"針對目標物/元件給予定義NOTE---IE
+EX: 和胶面接触的叫离型纸，非胶面的接触叫保护膜",,,,,,,,,,問題點Review,Sheet,FALSE
+問題點Review,77,"序列模型link技能--IE提供员工技能匹配表
+針對CTQ需另做勾選處理",,,,,,,一般,人的主動性---自主性/物理性/心理性 (無任何限制),,問題點Review,Sheet,FALSE
+問題點Review,78,增加直接輸入並移動，不拖動,,,,,,,,生理-手掌大小/視覺/注意力,,問題點Review,Sheet,FALSE
+問題點Review,79,"1. Level system 希望可以跳號填寫
+2.  Level system 前面加一欄行號，方便操作
+3.  most system 語句更動時，level system 不要清空",V,,,,,,,,,問題點Review,Sheet,FALSE
+問題點Review,,,,,,,,,,非人工化---一定是控制,,問題點Review,Sheet,FALSE
+問題點Review,,,,,,,,,,,,問題點Review,Sheet,FALSE
+問題點Review,,,,,,,,,,自動化是盲點----無法消除的浪費,,問題點Review,Sheet,FALSE
+問題點Review,,,,,,,,,,,,問題點Review,Sheet,FALSE
+問題點Review,,,,,,,,,,會影響良率--- 可以將他設為控制,,問題點Review,Sheet,FALSE
+針對Phase1 問題點,46,类别增加筛选功能，并增加序列号,,元件/去哪兒/哪兒 無法用類別區分 & +註釋,9月13日,,,,,,,針對Phase1 問題點,Sheet,FALSE
+針對Phase1 問題點,34,中间的动作，点选新增MI以后，则自动跳到下面，不保留；,,OK,,,,,,,,針對Phase1 問題點,Sheet,FALSE
+針對Phase1 問題點,,若下面点选修改编辑，则在返回到中间的部份,,OK,,,,,,,,針對Phase1 問題點,Sheet,FALSE
+針對Phase1 問題點,71,顯示選項，增加CT,,OK,,,,,,,,針對Phase1 問題點,Sheet,FALSE
+針對Phase1 問題點,72,頁面需增加倒敘選項,,OK,,,,,,,,針對Phase1 問題點,Sheet,FALSE
+針對Phase1 問題點,74,Level system 前面加一欄行號，方便操作,,OK,,,,,,,,針對Phase1 問題點,Sheet,FALSE
+針對Phase1 問題點,75,Level system 新增存檔功能,匯入匯出檔案功能,OK,,,,,,,,針對Phase1 問題點,Sheet,FALSE
+針對Phase1 問題點,47,"MOST选项设定----可以让工程师自己创立类别卷标(共三個欄位 ""分類"" ""物件"" ""註解"")",,,9月27日,,,,,,,針對Phase1 問題點,Sheet,FALSE
+針對Phase1 問題點,,EXCEL 一键汇入所有选项,,,,,,,,,,針對Phase1 問題點,Sheet,FALSE
+針對Phase1 問題點,,一鍵匯出Excel 功能,,,,,,,,,,針對Phase1 問題點,Sheet,FALSE
+針對Phase1 問題點,67,同樣的語句若組合在一起，自動合併成一個語句,,,,,,,,,,針對Phase1 問題點,Sheet,FALSE
+針對Phase1 問題點,,例如,,,,,,,,,,針對Phase1 問題點,Sheet,FALSE
+針對Phase1 問題點,,1.0打螺絲,,,,,,,,,,針對Phase1 問題點,Sheet,FALSE
+針對Phase1 問題點,,2.0打螺絲,,,,,,,,,,針對Phase1 問題點,Sheet,FALSE
+針對Phase1 問題點,,3.0打螺絲,,,,,,,,,,針對Phase1 問題點,Sheet,FALSE
+針對Phase1 問題點,,,,,,,,,,,,針對Phase1 問題點,Sheet,FALSE
+針對Phase1 問題點,,顯示在mi則為 1.0打螺絲[*3],,,,,,,,,,針對Phase1 問題點,Sheet,FALSE
+針對Phase1 問題點,70,增加SIMO選項，顯示MI，但不記錄時間,,,,,,,,,,針對Phase1 問題點,Sheet,FALSE
+針對Phase1 問題點,73,Level system 希望可以跳號填寫,,,,,,,,,,針對Phase1 問題點,Sheet,FALSE
+針對Phase1 問題點,76,Level system 排列規則更動,main 加入範圍,,,,,,,,,針對Phase1 問題點,Sheet,FALSE
+針對Phase1 問題點,,1. main 加入範圍功能,或的功能,,,,,,,,,針對Phase1 問題點,Sheet,FALSE
+針對Phase1 問題點,,2. main 加入 或的功能 (e.g.  1/3/4 ),CUB可以填寫數字,,,,,,,,,針對Phase1 問題點,Sheet,FALSE
+針對Phase1 問題點,,3. cub 修改為可以填寫數字,,,,,,,,,,針對Phase1 問題點,Sheet,FALSE
+針對Phase1 問題點,77,"Level system新增人員選項 (操作人數*2 , 計算時間/2 , LineBalance & MI皆會顯示2次)",,,,,,,,,,針對Phase1 問題點,Sheet,FALSE
+針對Phase1 問題點,14,新增命名方式：Follow MI 命名方式分页,,,10月9日,,,,,,,針對Phase1 問題點,Sheet,FALSE
+針對Phase1 問題點,,若是自动化的设备，希望呈现自动化设备List,,,,,,,,,,針對Phase1 問題點,Sheet,FALSE
+針對Phase1 問題點,51,新增MI后，如果忘记点上传机种MI或者电脑死机或误刷新页面，做的所有资料全部没有历史记录，需要重新做,,,,,,,,,,針對Phase1 問題點,Sheet,FALSE
+針對Phase1 問題點,49,生成MI 后，想同时修改第一句和第二句就没办法做到，只能修改当句的MI。,,,,,,,,,,針對Phase1 問題點,Sheet,FALSE
+針對Phase1 問題點,53,上传后的MI不能同时多个或者全部选择后进行编辑,,,,,,,,,,針對Phase1 問題點,Sheet,FALSE
+針對Phase1 問題點,55,若已经编辑了10句，但突然发现下面的某一句合成以后有问题，这时候点选编辑，则上面的其他语句全部被覆盖，需全部重新处理,,,,,,,,,,針對Phase1 問題點,Sheet,FALSE
+針對Phase1 問題點,,,,,,,,,,,,針對Phase1 問題點,Sheet,FALSE
+離子風扇與目標物綁定,,目標物,,,,,,,,,,離子風扇與目標物綁定,Sheet,FALSE
+離子風扇與目標物綁定,高单价,3D摄像头,,,,,,,,,,離子風扇與目標物綁定,Sheet,FALSE
+離子風扇與目標物綁定,高单价,HDD(机械硬盘),,,,,,,,,,離子風扇與目標物綁定,Sheet,FALSE
+離子風扇與目標物綁定,高单价,LCD(显示屏),,,,,,,,,,離子風扇與目標物綁定,Sheet,FALSE
+離子風扇與目標物綁定,高单价,RAM(内存条),,,,,,,,,,離子風扇與目標物綁定,Sheet,FALSE
+離子風扇與目標物綁定,高单价,SIM卡,,,,,,,,,,離子風扇與目標物綁定,Sheet,FALSE
+離子風扇與目標物綁定,高单价,SSD(固态硬盘),,,,,,,,,,離子風扇與目標物綁定,Sheet,FALSE
+離子風扇與目標物綁定,高单价,WLAN(网卡),,,,,,,,,,離子風扇與目標物綁定,Sheet,FALSE
+離子風扇與目標物綁定,高单价,WWAN卡,,,,,,,,,,離子風扇與目標物綁定,Sheet,FALSE
+離子風扇與目標物綁定,高单价,摄像头,,,,,,,,,,離子風扇與目標物綁定,Sheet,FALSE
+離子風扇與目標物綁定,高单价,电池,,,,,,,,,,離子風扇與目標物綁定,Sheet,FALSE
+離子風扇與目標物綁定,板,Audio小板,,,,,,,,,,離子風扇與目標物綁定,Sheet,FALSE
+離子風扇與目標物綁定,板,Function（功能）小板,,,,,,,,,,離子風扇與目標物綁定,Sheet,FALSE
+離子風扇與目標物綁定,板,IO小板,,,,,,,,,,離子風扇與目標物綁定,Sheet,FALSE
+離子風扇與目標物綁定,板,M/B(主板),,,,,,,,,,離子風扇與目標物綁定,Sheet,FALSE
+離子風扇與目標物綁定,板,MCU小板,,,,,,,,,,離子風扇與目標物綁定,Sheet,FALSE
+離子風扇與目標物綁定,板,Sensor（感应）小板,,,,,,,,,,離子風扇與目標物綁定,Sheet,FALSE
+離子風扇與目標物綁定,板,TP 小板,,,,,,,,,,離子風扇與目標物綁定,Sheet,FALSE
+離子風扇與目標物綁定,板,导光小板,,,,,,,,,,離子風扇與目標物綁定,Sheet,FALSE
+離子風扇與目標物綁定,板,开机小板,,,,,,,,,,離子風扇與目標物綁定,Sheet,FALSE
+離子風扇與目標物綁定,板,指纹小板,,,,,,,,,,離子風扇與目標物綁定,Sheet,FALSE
+手套使用的定義,,目標物,元件,G,P,M,X,手套規定,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,高单价,3D摄像头,,拿取/抓取,組,,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,高单价,LCD(显示屏),,拿取/抓取,組,,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,高单价,RAM(内存条),,,插入,,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,高单价,SIM卡,,拿取/抓取,組,,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,高单价,SSD(固态硬盘),,,插入,,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,高单价,WLAN(网卡),,,插入,,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,高单价,WWAN卡,,,插入,,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,高单价,摄像头,,拿取/抓取,組,,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,板,Audio小板,,拿取/抓取,,,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,板,Function（功能）小板,,拿取/抓取,,,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,板,IO小板,,拿取/抓取,,,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,板,M/B(主板),,拿取/抓取,,,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,板,MCU小板,,拿取/抓取,,,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,板,Sensor（感应）小板,,拿取/抓取,,,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,板,TP 小板,,拿取/抓取,,,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,板,导光小板,,拿取/抓取,,,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,板,开机小板,,拿取/抓取,,,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,板,指纹小板,,拿取/抓取,,,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,板,Audio小板,,,,,刷PPID,一只半指手套；一只全指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,板,Function（功能）小板,,,,,刷PPID,一只半指手套；一只全指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,板,IO小板,,,,,刷PPID,一只半指手套；一只全指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,板,M/B(主板),,,,,刷PPID,一只半指手套；一只全指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,板,MCU小板,,,,,刷PPID,一只半指手套；一只全指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,板,Sensor（感应）小板,,,,,刷PPID,一只半指手套；一只全指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,板,TP 小板,,,,,刷PPID,一只半指手套；一只全指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,板,导光小板,,,,,刷PPID,一只半指手套；一只全指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,板,开机小板,,,,,刷PPID,一只半指手套；一只全指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,板,指纹小板,,,,,刷PPID,一只半指手套；一只全指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,排线,KB排线,,,插入,理,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,排线,MCU 排线,,,插入,理,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,排线,Sensor排线,,,插入,理,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,排线,TP排线,,,插入,理,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,排线,导光排线,,,插入,理,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,排线,指纹排线,,,插入,理,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,排线,摄像头排线,,,插入,理,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,排线,电池排线,,,插入,理,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,,,mylar,,,去除/撕開/撕除,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,,,离型纸,,,去除/撕開/撕除,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,,,醋酸胶布,,,去除/撕開/撕除,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,,,保护膜,,,去除/撕開/撕除,,一只半指手套；一只全指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,,,,,,滑出螺絲,鎖附固定,一只半指手套；一只全指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,Rubber,MB Rubber,,拿取/抓取,,,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,Rubber,TP Rubber,,拿取/抓取,,,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,Rubber,hinge rubber,,拿取/抓取,,,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,Rubber,摄像头Rubber,,拿取/抓取,,,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+手套使用的定義,Rubber,蓝色Rubber,,拿取/抓取,,,,兩只半指手套,,,,手套使用的定義,Sheet,FALSE
+MI命名方式,MI命名原則,,,,,,,,,,,MI命名方式,Sheet,FALSE
+MI命名方式,,,,,,,,,,,,MI命名方式,Sheet,FALSE
+MI命名方式,MOST區分,,,,,,,Line Balance,,,,MI命名方式,Sheet,FALSE
+MI命名方式,機種五碼,機種狀態,捡料方式,製程別,是否為CFI,Line,區域,秒數 (CT),,,,MI命名方式,Sheet,FALSE
+MI命名方式,(手填),(手填),即捡即組,ASSY,CFI,手動,(手填),依照Line balance產出,,,,MI命名方式,Sheet,FALSE
+MI命名方式,"未填則顯示 ""All model""",,集中捡料,PACK,,自動,Runin,,,,,MI命名方式,Sheet,FALSE
+MI命名方式,,,,Muti-PACK,,,,,,,,MI命名方式,Sheet,FALSE
+MI命名方式,,,無,SUB,,"無 
+(選擇此則不顯示字樣)",Packslip,,,,,MI命名方式,Sheet,FALSE
+MI命名方式,,,(下拉式選單),DOCK,勾選則顯示,,,,,,,MI命名方式,Sheet,FALSE
+MI命名方式,,,,TNB,,,,,,,,MI命名方式,Sheet,FALSE
+MI命名方式,,,,CELL,,,,,,,,MI命名方式,Sheet,FALSE
+MI命名方式,,,可選擇是否顯示在MI名稱,SMT,,(下拉式選單),,可選擇是否顯示在MI名稱,,,,MI命名方式,Sheet,FALSE
+MI命名方式,,,,PCBA,,,,,,,,MI命名方式,Sheet,FALSE
+MI命名方式,,,,"無 
+(選擇此則不顯示字樣)",,,,,,,,MI命名方式,Sheet,FALSE
+MI命名方式,,,,(下拉式選單),,,,,,,,MI命名方式,Sheet,FALSE
+MI命名方式,必填,,必填,必填,,必填,,,,,,MI命名方式,Sheet,FALSE
+MI命名方式,,,,,,,,,,,,MI命名方式,Sheet,FALSE
+MI命名方式,Note: 自動化需另外加一個設備 list，以便區分MI,,,,,,,,,,,MI命名方式,Sheet,FALSE
+MI命名方式,,,,,,,,,,,,MI命名方式,Sheet,FALSE
+MI命名方式,MI 標準文件名稱--- HDL50_鋁版_集中捡料_ASSY_自動_16,,,,,,,,,,,MI命名方式,Sheet,FALSE
+工作表3,動作,,狀態1,,,,狀態2,,,狀態3,,工作表3,Sheet,FALSE
+工作表3,1,,1,X-1,,,1,X-1,,1,1/2,工作表3,Sheet,FALSE
+工作表3,2,,2,X-1,,,2,X-1,,2,1/2,工作表3,Sheet,FALSE
+工作表3,3,,3,X-1,,,3,X-1,,3,1/2,工作表3,Sheet,FALSE
+工作表3,4,,4,X-1,,,4,X-1,,4,1/2,工作表3,Sheet,FALSE
+工作表3,5,,,,,,5,X-1,,5,1/2,工作表3,Sheet,FALSE
+工作表3,6,,5,X-2,,,6,X-1,,6,X-1,工作表3,Sheet,FALSE
+工作表3,7,,6,X-2,,,7,1/2,,7,X-1,工作表3,Sheet,FALSE
+工作表3,8,,7,X-2,,,8,1/2,,,,工作表3,Sheet,FALSE
+工作表3,9,,8,X-2,,,9,1/2,,1,1/2,工作表3,Sheet,FALSE
+工作表3,10,,9,X-2,,,10,1/2,,2,1/2,工作表3,Sheet,FALSE
+工作表3,,,10,X-2,,,,,,3,1/2,工作表3,Sheet,FALSE
+工作表3,,,,,,,7,,,4,1/2,工作表3,Sheet,FALSE
+工作表3,,,,,,,8,,,5,1/2,工作表3,Sheet,FALSE
+工作表3,,,,,,,9,,,8,2,工作表3,Sheet,FALSE
+工作表3,,,,,,,10,,,9,2,工作表3,Sheet,FALSE
+工作表3,,,,,,,,,,10,2,工作表3,Sheet,FALSE
+工作表3,,,,,,,,,,,,工作表3,Sheet,FALSE
+工作表3,,,,,,,,,,,,工作表3,Sheet,FALSE
+工作表3,,,,,,,,,,,,工作表3,Sheet,FALSE
+工作表3,,,,,,,,,,,,工作表3,Sheet,FALSE
+工作表3,,,,,,,,,,,,工作表3,Sheet,FALSE
+工作表3,,,,,,,,,,,,工作表3,Sheet,FALSE
+工作表3,,,,,,,,,,,,工作表3,Sheet,FALSE
+工作表3,,,,,,,,,,,,工作表3,Sheet,FALSE
+工作表3,,,,,,,,,,,,工作表3,Sheet,FALSE
+工作表3,,,,,,,,,,,,工作表3,Sheet,FALSE
+工作表3,,,5,,,,1,,,1,,工作表3,Sheet,FALSE
+工作表3,,,6,,,,2,,,2,,工作表3,Sheet,FALSE
+工作表3,,,7,,,,3,,,3,,工作表3,Sheet,FALSE
+工作表3,,,8,,,,4,,,4,,工作表3,Sheet,FALSE
+工作表3,,,9,,,,5,,,5,,工作表3,Sheet,FALSE
+工作表3,,,10,,,,6,,,8,,工作表3,Sheet,FALSE
+工作表3,,,,,,,7,,,9,,工作表3,Sheet,FALSE
+工作表3,,,,,,,8,,,10,,工作表3,Sheet,FALSE
+工作表3,,,,,,,9,,,,,工作表3,Sheet,FALSE
+工作表3,,,,,,,10,,,,,工作表3,Sheet,FALSE
+目标物,NB,,,,,,,,,治具,,目标物,Sheet,FALSE
+目标物,半成品&成品,四大件,高单价,排线,板,铁件,Rubber,其它,包材/配件,ASSY,PACK,目标物,Sheet,FALSE
+目标物,LCD,Lower(下盖),WLAN(网卡),黑白天线,M/B(主板),K/B铁件,摄像头Rubber,TP麦拉,pizz盒,压天线简易治具,贴Lower面COO Label（长）治具,目标物,Sheet,FALSE
+目标物,UP,cover(上盖),RAM(内存条),EDP排线,IO小板,DC-IN 铁件,TP Rubber,Thermal（导热管）,卡通,panel 支撑治具,贴Lower面COO Label（短）治具,目标物,Sheet,FALSE
+目标物,Lower,UP（掌托）,HDD(机械硬盘),TP排线,指纹小板,大板铁件,MB Rubber,MB铜箔,精品盒,掰Hinge 支架治具,贴lower面label治具,目标物,Sheet,FALSE
+目标物,机台,Bezel(显示屏边框),SSD(固态硬盘),HDD排线,TP 小板,短SSD 铁件,蓝色Rubber,MB麦拉,"U-Pad（隔板）
+",MB盖板治具,贴Lower面windows Label（长）治具,目标物,Sheet,FALSE
+目标物,,,电池,IO排线,MCU小板,长SSD 铁件,hinge rubber,RAM铜箔,Cushion（保利龙）,锁USB&AUDIO小板螺丝治具,贴Lower面windows Label（短）治具,目标物,Sheet,FALSE
+目标物,,,摄像头,DC-IN排线,Audio小板,开机小板铁件,,LCD铜箔,"PE袋
+",锁小板治具,贴UP面 Label治具,目标物,Sheet,FALSE
+目标物,,,LCD(显示屏),电池排线,开机小板,SSD铁件,,IO铜箔,不织布袋,锁thermal（导热管）治具,贴UP面左边Label（QR label）治具,目标物,Sheet,FALSE
+目标物,,,3D摄像头,MCU  排线,导光小板,K/B铁件,,麦拉,"键盘膜
+",组装开机小板简易治具,贴UP面右边Label治具,目标物,Sheet,FALSE
+目标物,,,WWAN卡,指纹排线,Sensor（感应）小板,TP 横条,,KB麦拉,静电袋,FPR组装定位治具,贴UP面左边Label治具,目标物,Sheet,FALSE
+目标物,,,SIM卡,KB排线,Function（功能）小板,TP铁件,,导电布,防撞泡棉,插电池排线治具,贴UP面指纹label治具,目标物,Sheet,FALSE
+目标物,,,,背光排线,,HDD铁件,,散热泥,纸胶带,二合一治具,,目标物,Sheet,FALSE
+目标物,,,,导光排线,,左LCD支架,,Rear cap（后盖）,PE膜,锁SSD治具,,目标物,Sheet,FALSE
+目标物,,,,3D摄像头排线,,右LCD支架,,WLAN Label(网卡标签),电源,HDD支架锁附治具,,目标物,Sheet,FALSE
+目标物,,,,Sensor排线,,左Hinge(转轴),,跑马灯管,电源线,HDD锁附治具,,目标物,Sheet,FALSE
+目标物,,,,IR 摄像头排线,,右Hinge(转轴),,醋酸胶布,说明书,rear cap 理线治具,,目标物,Sheet,FALSE
+目标物,,,,摄像头排线,,SSD支撑铁件,,网卡水晶盖,干燥剂,锁Rear cap螺丝治具,,目标物,Sheet,FALSE
+目标物,,,,黑色天线,,Type_C 铁件,,MCU麦拉,,斜面锁Lower螺丝简易治具,,目标物,Sheet,FALSE
+目标物,,,,白色天线,,EDP铁件,,电池麦拉,,K/B(键盘)热熔治具,,目标物,Sheet,FALSE
+目标物,,,,,,IO铁件,,导电泡棉,,LCD&Bezel  压合治具,,目标物,Sheet,FALSE
+目标物,,,,,,USB铁件,,Hinge Cap L(左转轴耳朵）,,SIM卡剪切治具,,目标物,Sheet,FALSE
+目标物,,,,,,网卡铁件,,Hinge Cap R(右转轴耳朵）,,TP BRK 组装治具,,目标物,Sheet,FALSE
+目标物,,,,,,摄像头铁件,,摄像头挡片,,TP Frame定位治具,,目标物,Sheet,FALSE
+目标物,,,,,,LCD铁件,,螺丝,,TP Mylar & UP CCD 自动贴合组装压合治具,,目标物,Sheet,FALSE
+目标物,,,,,,LCD塑胶件,,风扇,,TP Support bracket 与touch pad 定位压合治具（L 型）,,目标物,Sheet,FALSE
+目标物,,,,,,电池左铁件,,panel 铜箔,,TP压合治具,,目标物,Sheet,FALSE
+目标物,,,,,,电池右铁件,,导热管保护盖,,TP&K/B压合治具,,目标物,Sheet,FALSE
+目标物,Docking,,,,,,,,,TP压合热熔二合一治具,,目标物,Sheet,FALSE
+目标物,半成品&成品,四大件,高单价,排线,板,铁件,Rubber,其它,包材&配件,TP定位贴合气动治具,,目标物,Sheet,FALSE
+目标物,小板模组,大cover,WLAN(网卡),天线,小板,Type_C 铁件,脚垫rubber,麦拉,PE袋,开机键锁附治具,,目标物,Sheet,FALSE
+目标物,机台,小cover,,cable线,大板,大板铁件,电源rubber,风扇,包装盒,锁电池盖板治具,,目标物,Sheet,FALSE
+目标物,,底盖,,风扇排线,,小板散热铁片,,cable线盖,纸箱隔板,贴lower面Korea warning label治具,,目标物,Sheet,FALSE
+目标物,,,,,,网卡铁件,,,保利龙,包PE膜治具,,目标物,Sheet,FALSE
+目标物,,,,,,,,,说明书,TP Support bracket 与touch pad 定位治具,,目标物,Sheet,FALSE
+目标物,,,,,,,,,电源,吸盘治具,,目标物,Sheet,FALSE
+目标物,,,,,,,,,电源线,bezel&panel bonding 治具,,目标物,Sheet,FALSE
+目标物,,,,,,,,,干燥剂,panel to cover CCD bonding 治具,,目标物,Sheet,FALSE
+目标物,,,,,,,,,,TP mylar简易贴合治具,,目标物,Sheet,FALSE
+目标物,,,,,,,,,,panel 辅助定位治具,,目标物,Sheet,FALSE
+目标物,,,,,,,,,,裹胶膜治具,,目标物,Sheet,FALSE
+目标物,,,,,,,,,,EMR film定位贴附压合治具,,目标物,Sheet,FALSE
+目标物,,,,,,,,,,,,目标物,Sheet,FALSE
+目标物,,,,,,,,,,,,目标物,Sheet,FALSE
+目标物,,,,,,,,,,,,目标物,Sheet,FALSE
+目标物,,,,,,,,,,,,目标物,Sheet,FALSE
+目标物,,,,,,,,,,,,目标物,Sheet,FALSE
+目标物,,,,,,,,,,,,目标物,Sheet,FALSE
+目标物,,,,,,,,,,,,目标物,Sheet,FALSE
+目标物,,,,,,,,,,,,目标物,Sheet,FALSE
+目标物,,,,,,,,,,,,目标物,Sheet,FALSE
+目标物,,,,,,,,,,,,目标物,Sheet,FALSE
+目标物,,,,,,,,,,,,目标物,Sheet,FALSE
+目标物,,,,,,,,,,,,目标物,Sheet,FALSE
+目标物,,,,,,,,,,,,目标物,Sheet,FALSE
+目标物,,,,,,,,,,,,目标物,Sheet,FALSE
+目标物,,,,,,,,,,,,目标物,Sheet,FALSE
+目标物,,,,,,,,,,,,目标物,Sheet,FALSE
+目标物,,,,,,,,,,,,目标物,Sheet,FALSE
+注意事項,制程,类别,索引条件1,索引条件2,,,,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,注意事项少于3个,,一般注意事项,1,所有作业人员必须按照MI标准作业，不可随意更改动作，及涂改MI,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,注意事项少于3个,,,2,作业过程中需将垃圾及时丢进垃圾盒或垃圾桶，不可随意丢到流水线或地面上,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,注意事项少于3个,,,3,手套每班次更换，特殊情况发现脏污破损及时更换,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,电动起子,,锁螺丝注意事项,1,禁止OP在螺丝未接触螺丝孔时就旋转状态去锁附螺丝,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,电动起子,,,2,"锁完螺丝后检查是否锁到位,确认OK后再进行下一动作",,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,电动起子,,,3,"电动起子,电动起子高度需距离机台 22~35cm,逆流水线锁螺丝",,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,电动起子,,,4,开线前需检查起子是否有磁环（双磁环），没有及时通知线外人员,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,电动起子,,,5,"要确保螺丝锁附到底,锁附完螺丝后听到""嗒""的一声响后再去完成下个动作",,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,电动起子,,,6,"一次只能拿取1颗螺丝,锁完螺丝在等待的时候,电动起子头上不能悬挂螺丝",,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,电动起子,,,7,起子头规格 Φ??? Φ???    ?#(???),,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,电动起子,,,8,"电动起子需有套筒,防止人员私自调节扭力",,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,电动起子,,,9,核对实物/供料器/MI上料号是否一致，机台内掉落螺丝需要及时清理,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,手套,,手套注意事项,1,此站别需戴全指手套和静电手环,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,手套,,,2,此站别需戴一隻全指手套&一隻半指手套(手握起子)和静电手环,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,手套,,,3,此站别需戴半指手套和静电手环,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,手套,,,4,手套2H 更换一次，特殊情况发现脏污破损及时更换 (ASSY),,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,治具,热熔治具list,热熔治具注意事项,1,热熔屏显治具温度范围：?????℃(铜板温度)；热熔治具铜柱温度范围—?????℃,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,治具,热熔治具list,,2,气压值：????? Mpa   热熔压合时间:????? S,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,治具,热熔治具list,,3,压强值/压强值范围：????? Kgf/cm² & ????? N/cm²,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,治具,热熔治具list,,4,K/B(键盘)热熔站作業員自检-热熔头是否OK,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,治具,热熔治具list,,5,"热熔治具下模内不可有異物,防止upper(掌托)外观面热熔时导致外观不良",,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,治具,热熔治具list,,6,注意KB排线不能靠近热熔点,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,治具,压合治具list,压合治具注意事项,1,设备工作压强值范围：????? Kgf/cm²或????? N/cm²  ，设备工作气压值：:????? Mpa（电动治具无气压值）  压合时间:????? S,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,离子风扇,,离子风扇注意事项,1,离子风扇需开至最大档位，吹拂角度需正对作业区域，(距離：???????公分),,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,电脑/刷枪,,kitting注意事项,1,"当站人员检料时若发现明显的材料不良,请将材料放至不良品暂放区,由线外人员统一处理",,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,电脑/刷枪,,,2,撿料人员不可以私自更换料架上材料的位置,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,电脑/刷枪,,,3,"如有缺料的情况,检料人员需停线,并告知线外上料人员,切记不可以取其他架位上的材料替代",,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,电脑/刷枪,,,4,"材料要轻拿轻放,不能一只手同时捡两颗料",,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,电脑/刷枪,,,5,"依KITTING料架的指示灯拣料(灯亮则需检料,不亮则无需检料)",,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,电脑/刷枪,,,6,材料必须背靠背摆放，避免撞刮伤,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,电脑/刷枪,,,7,拿取键盘需拿取中间部分，禁止单手拿取一边,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,电脑/刷枪,,,8,拿取LCD无PCB板端中间位置或两侧边中间位置，拿取寬度不得低於30mm,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,电脑/刷枪,,,9,百宝箱一格不可放多个材料,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,打印机,,打印Label注意事项,1,检查label是否有打印不良，如有不良需通知线外及相关人员处理,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,打印机,,,2,如有不能正常过站及不能打印label出来需通知线外及相关人员处理,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,治具,TP麦拉 CCD治具,TP麦拉 CCD治具注意事项,1,气压值：????? Mpa  压强值/压强值范围 ????? Kgf/cm² & ?????   N/cm²   压合时间：????? S,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,治具,TP麦拉 CCD治具,,2,压合完 TP Mylar 后需自检，确保压合OK(若有明显偏移现象，需叫当线线外处理),,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,治具,开机键锁附治具,开机键锁附治具注意事项,1,气压值：????? Mpa  ，压强值：????? N/cm²,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,治工具设备/XX料,治具,双工位治具list,一人一机双工位作业,1,UP放回原泡棉时不可放错，UP、工单、百宝箱要一一对应。,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,材料目标物,背胶,,裸露背胶材料注意事项,1,手指不可接触材料背胶胶面,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,材料目标物,背胶,,,2,休息或吃饭时间不得提前撕除背胶离型纸，如若撕除后必须进行下一工站的操作,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,材料目标物,排线,,排线注意事项,1,排线需自检是否插理到位,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,材料目标物,排线,,,2,注意自检排线接口是否有破损缺失，若有及时交由线外处理,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,材料目标物,bezel,卡合,卡合注意事项,1,卡完bezel/KB后需自检是否完全卡合到位,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,材料目标物,bezel,卡合,,2,卡合bezel时需一处一处的按压卡合，不可滑动卡合,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,材料目标物,WLAN Label,,WLAN Label贴附注意事项,1,检查label有无破损或损坏，如有损坏或破损交由线外处理,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,材料目标物,WLAN Label,,,2,label贴附不可有脏污、破损、贴歪、位置颠倒、褶皱、气泡等不良,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,材料目标物,散热泥,,散热泥注意,1,有散热泥一面需朝上，手不可直接触碰散热泥,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,材料目标物,散热泥,,,2,铁件散热泥不可超出铁件边缘，脱落重新贴附时不可贴偏，贴斜,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,材料目标物,铜箔,,铜箔注意,1,需貼附平整、不可漏贴、贴歪,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,材料目标物,RAM,,RAM注意,1,RAM（内存条）需45°插入，摇晃三下,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,材料目标物,RAM,,,2,单RAM优先插????槽,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,材料目标物,插金手指,,插金手指注意事项,1,黑色天线对应黑色三角，白色天线对应白色三角,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,材料目标物,插金手指,,,2,插理排线时，需确保排线完全插入，不可插歪及未插到位,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,材料目标物,拉拉胶,,拉拉胶注意事项,1,撕除表面离型纸后禁止触摸拉垃胶,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,材料目标物,拉拉胶,,,2,粘贴拉拉胶需贴附平整，不能有褶皱,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,材料目标物,拉拉胶,,,3,撕拉拉胶离型纸时用一只手按住拉带头，另一只手撕离型纸,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,材料目标物,喇叭,,喇叭,1,组装喇叭时喇叭胶圈必须平整，胶圈不可掉落,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,材料目标物,排线,,理线,1,排线需自检是否进入卡槽，不得跳线及爬墙,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,材料目标物,排线,,,2,不能使用有破损、尖锐或严重磨损的理线棒进行作业，如若发现需要告知线外人员及时更换,,,,,注意事項,Sheet,FALSE
+注意事項,ASSY,材料目标物,Thermal&MB,,组装Thermal 及MB 模组,1,拿取导热管&MB模组时需要拿模组中间位置，不能触碰风扇区域，包含扇叶,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,Label,,包装贴label站别,1,贴UP面label，如果基准线label不存在，则旁边label贴于基准线label位置，后续label依次平移,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,Label,,,2,label贴附不可有脏污、破损、贴歪、位置颠倒、褶皱、气泡等不良,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,托盘,,,,清理泡棉，确保泡棉干净，不可有残胶/胶带，不可在泡棉上乱涂乱画,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,垃圾盒/垃圾桶,,,,作业过程中需将垃圾及时丢进垃圾盒或垃圾桶，不可随意丢到流水在线或地面,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,手套,,,,此站需佩戴全指手套，更换频率1h/次,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,手套,label剥离机,,,有label剥离机此站需佩戴一只半指手套一只全指手套，更换频率1h/次,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,手套,label剥离机,,,无label剥离机此站需佩戴两只半指手套，更换频率1h/次,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,治具,,,,使用治具前，需确认治具名称正确，并无脏污、破损等不良,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,Label,,,,根据泡棉内刷的label贴附，没有则不用贴,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,治具,,,,选择治具必须根据机种名称选择，不可用错,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,Label,,,,发现label贴歪或与定义位置不符时.撕下后不可以留有残胶,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,打印机,,,,检视是否有打印不良，如有打印不良需重新打印,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,Label,,,,Label贴付以Lower上倒角定位，不可贴歪,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,Label,,,,Label贴附后需检查Label不可有丝毫褶皱，贴附不可歪斜,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,无尘布,,,,注意无尘布擦拭约1小时需更换一次，和无尘布太脏需随时更换,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,无尘布,,,,"擦拭LCD面需要从左往右,从上往下擦,不可胡乱擦拭",,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,无尘布,,,,禁止用任何液体直接倒在LCD Panel上 进行清洁,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,无尘布,,,,"擦拭LCD时,禁止将LCD打开180°",,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,手套,,,,"此站需佩戴全指手套，更换频率1h/次，如脏污,立即更换",,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,无尘布,,,,擦拭LCD时需用手扶着LCD,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,材料目标物,纸箱,,,,折纸箱前需检查DELL  Logo 、条码以及纸箱有无破损，或打印不良.如遇上述问题则交由线外处理,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,Label,,,,检查Label有无破损或损坏，如有损坏或破损交由线外处理,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,Label,,,,"依泡棉内的Label贴附,没有则不用贴",,,,,注意事項,Sheet,FALSE
+注意事項,PACK,材料目标物,机台,,,,产品需轻拿轻放，不可划伤、撞伤机台,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,手套,,,,"此站需佩戴全指手套，更换频率1h/次，如脏污,立即更换",,,,,注意事項,Sheet,FALSE
+注意事項,PACK,材料目标物,PE袋,,,,套PE袋人员在把机器装进袋子之前检查机器上是否有毛屑等其它不该有的东西，若有需清理完毕才可打包,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,材料目标物,PE袋,,,,在装PE袋时应检查PE袋有无破损，印刷不良，如遇上述情况，交由线外处理,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,手套,,,,此站拿取机台全指手套，粘胶带用半指手套，更换频率1h/次,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,材料目标物,机台,,,,机台放进外箱内时须检查包装袋完好无损且包装完整,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,材料目标物,说明书,,,,捡说明书等文件时需自检没有褶皱和破损,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,刷枪,,,,不带料，只需刷枪过站,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,材料目标物,包材/配件,,,,"捡出的材料必须放在泡棉上,掉落在地上的材料必须由线外人员去处理",,,,,注意事項,Sheet,FALSE
+注意事項,PACK,材料目标物,包材/配件,,,,捡料人员不可以私自更换料架上材料的位置,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,材料目标物,包材/配件,,,,装夹页/说明书于Carton时不可折叠放置,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,材料目标物,包材/配件,,,,在装夹页时，要正面放置，不可乱放,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,材料目标物,包材/配件,,,,检查材料有无破损、脏污，若有，则交由线外处理,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,材料目标物,包材/配件,,,,放配件时需检查外箱内是否有Pizza Box（隔板）,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,Label,,,,打印Label后，要看是否为良品，Label不可贴歪，不可有破损如遇上述情况交由线外处理,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,Service tag,,,,比对打印出来的Service tag与外箱上的Service tag值是否一致,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,Label,,,,"Label贴附要对正,如果贴上去后发现不良，需交给线外处理",,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,胶带,,,,胶带长度为：15CM~17CM,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,胶带,,,,检查胶带是否有打皱或没有封口，胶带长度是否不在固定尺寸内﹐如有需请线外人员重封,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,材料目标物,机台,,,,产品不可摆放于地面上,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,电子秤,,,,"秤重如有不符,需将机台交由线外处理",,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,电子秤,,,,称重范围依照QA系统维护的重量范围(+/50g),,,,,注意事項,Sheet,FALSE
+注意事項,PACK,材料目标物,机台,,,,机台需轻拿轻放，堆放整齐,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,无尘布,,擦拭LCD,1,擦拭LCD时需用手扶住Cover左上角,,,,,注意事項,Sheet,FALSE
+注意事項,PACK,治工具设备/XX料,手套,,,5,手套1H 更换一次，特殊情况发现脏污破损及时更换 (PACK),,,,,注意事項,Sheet,FALSE
+工作表5,,目標物,,,,,,,,,,工作表5,Sheet,FALSE
+工作表5,設備,K/B(键盘)热熔治具,,,,,,,,,,工作表5,Sheet,FALSE
+工作表5,設備,TP压合热熔二合一治具,,,,,,,,,,工作表5,Sheet,FALSE
+工作表5,設備,LCD&Bezel 压合治具,,,,,,,,,,工作表5,Sheet,FALSE
+工作表5,設備,TP Mylar & UP CCD 自动贴合组装压合治具,,,,,,,,,,工作表5,Sheet,FALSE
+工作表5,設備,TP&K/B压合治具,,,,,,,,,,工作表5,Sheet,FALSE
+工作表5,設備,TP压合治具,,,,,,,,,,工作表5,Sheet,FALSE
+工作表5,設備,TP BRK 组装治具,气压值：????? Mpa  ，压强值：????? N/cm²,,,,,,,,,工作表5,Sheet,FALSE
+工作表5,設備,TP Frame定位治具,气压值：????? Mpa  ，压强值：????? N/cm²,,,,,,,,,工作表5,Sheet,FALSE
+工作表5,設備,TP定位贴合气动治具,气压值：????? Mpa  ，压强值：????? N/cm²,,,,,,,,,工作表5,Sheet,FALSE
+工作表5,設備,开机键锁附治具,气压值：????? Mpa  ，压强值：????? N/cm²,,,,,,,,,工作表5,Sheet,FALSE
+工作表5,,,,,,,,,,,,工作表5,Sheet,FALSE
+工作表5,,,,,,,,,,,,工作表5,Sheet,FALSE
+工作表5,,,,,,,,,,,,工作表5,Sheet,FALSE
+工作表5,,,,,,,,,,,,工作表5,Sheet,FALSE
+工作表5,,,,,,,,,,,,工作表5,Sheet,FALSE
+工作表5,,,,,,,,,,,,工作表5,Sheet,FALSE
+工作表5,,,,,,,,,,,,工作表5,Sheet,FALSE
+注意事項review,制程,类别,索引条件1,索引条件2,,,,,,,,注意事項review,Sheet,FALSE
+注意事項review,PACK,治工具设备/XX料,Label,,1,贴UP面label，如果基准线label不存在，则旁边label贴于基准线label位置，后续label依次平移,,,,,,注意事項review,Sheet,FALSE
+注意事項review,PACK,治工具设备/XX料,Label,,2,label贴附不可有脏污、破损、贴歪、位置颠倒、褶皱、气泡等不良,,,,,,注意事項review,Sheet,FALSE
+注意事項review,PACK,治工具设备/XX料,Label,,,根据泡棉内刷的label贴附，没有则不用贴,,,,,,注意事項review,Sheet,FALSE
+注意事項review,PACK,治工具设备/XX料,Label,,,发现label贴歪或与定义位置不符时.撕下后不可以留有残胶,,,,,,注意事項review,Sheet,FALSE
+注意事項review,PACK,治工具设备/XX料,Label,,,Label贴付以Lower上倒角定位，不可贴歪,,,,,,注意事項review,Sheet,FALSE
+注意事項review,PACK,治工具设备/XX料,Label,,,Label贴附后需检查Label不可有丝毫褶皱，贴附不可歪斜,,,,,,注意事項review,Sheet,FALSE
+注意事項review,PACK,治工具设备/XX料,Label,,,检查Label有无破损或损坏，如有损坏或破损交由线外处理,,,,,,注意事項review,Sheet,FALSE
+注意事項review,PACK,治工具设备/XX料,Label,,,"依泡棉内的Label贴附,没有则不用贴",,,,,,注意事項review,Sheet,FALSE
+注意事項review,PACK,治工具设备/XX料,Label,,,打印Label后，要看是否为良品，Label不可贴歪，不可有破损如遇上述情况交由线外处理,,,,,,注意事項review,Sheet,FALSE
+注意事項review,PACK,治工具设备/XX料,Label,,,"Label贴附要对正,如果贴上去后发现不良，需交给线外处理",,,,,,注意事項review,Sheet,FALSE
+注意事項review,,,,,,,,,,,,注意事項review,Sheet,FALSE
+注意事項review,制程,类别,索引条件1,索引条件2,,,,,,,,注意事項review,Sheet,FALSE
+注意事項review,ASSY,治工具设备/XX料,手套,,1,此站别需戴全指手套和静电手环,,,,,,注意事項review,Sheet,FALSE
+注意事項review,ASSY,治工具设备/XX料,手套,,2,此站别需戴一隻全指手套&一隻半指手套(手握起子)和静电手环,,,,,,注意事項review,Sheet,FALSE
+注意事項review,ASSY,治工具设备/XX料,手套,,3,此站别需戴半指手套和静电手环,,,,,,注意事項review,Sheet,FALSE
+注意事項review,ASSY,治工具设备/XX料,手套,,4,手套2H 更换一次，特殊情况发现脏污破损及时更换 (ASSY),,,,,,注意事項review,Sheet,FALSE
+注意事項review,PACK,治工具设备/XX料,手套,,,此站需佩戴全指手套，更换频率1h/次,,,,,,注意事項review,Sheet,FALSE
+注意事項review,PACK,治工具设备/XX料,手套,label剥离机,,有label剥离机此站需佩戴一只半指手套一只全指手套，更换频率1h/次,,,,,,注意事項review,Sheet,FALSE
+注意事項review,PACK,治工具设备/XX料,手套,label剥离机,,无label剥离机此站需佩戴两只半指手套，更换频率1h/次,,,,,,注意事項review,Sheet,FALSE
+注意事項review,PACK,治工具设备/XX料,手套,,,"此站需佩戴全指手套，更换频率1h/次，如脏污,立即更换",,,,,,注意事項review,Sheet,FALSE
+注意事項review,PACK,治工具设备/XX料,手套,,,"此站需佩戴全指手套，更换频率1h/次，如脏污,立即更换",,,,,,注意事項review,Sheet,FALSE
+注意事項review,PACK,治工具设备/XX料,手套,,,此站拿取机台全指手套，粘胶带用半指手套，更换频率1h/次,,,,,,注意事項review,Sheet,FALSE
+注意事項review,PACK,治工具设备/XX料,手套,,5,手套1H 更换一次，特殊情况发现脏污破损及时更换 (PACK),,,,,,注意事項review,Sheet,FALSE
+注意事項review,,,,,,,,,,,,注意事項review,Sheet,FALSE
+注意事項review,制程,类别,索引条件1,索引条件2,,,,,,,,注意事項review,Sheet,FALSE
+注意事項review,PACK,治工具设备/XX料,无尘布,,,注意无尘布擦拭约1小时需更换一次，和无尘布太脏需随时更换,,,,,,注意事項review,Sheet,FALSE
+注意事項review,PACK,治工具设备/XX料,无尘布,,,"擦拭LCD面需要从左往右,从上往下擦,不可胡乱擦拭",,,,,,注意事項review,Sheet,FALSE
+注意事項review,PACK,治工具设备/XX料,无尘布,,,禁止用任何液体直接倒在LCD Panel上 进行清洁,,,,,,注意事項review,Sheet,FALSE
+注意事項review,PACK,治工具设备/XX料,无尘布,,,"擦拭LCD时,禁止将LCD打开180°",,,,,,注意事項review,Sheet,FALSE
+注意事項review,PACK,治工具设备/XX料,无尘布,,,擦拭LCD时需用手扶着LCD,,,,,,注意事項review,Sheet,FALSE
+注意事項review,PACK,治工具设备/XX料,无尘布,,1,擦拭LCD时需用手扶住Cover左上角,,,,,,注意事項review,Sheet,FALSE
+注意事項review,,,,,,,,,,,,注意事項review,Sheet,FALSE
+注意事項review,制程,类别,索引条件1,索引条件2,,,,,,,,注意事項review,Sheet,FALSE
+注意事項review,ASSY,治工具设备/XX料,打印机,,1,检查label是否有打印不良，如有不良需通知线外及相关人员处理,,,,,,注意事項review,Sheet,FALSE
+注意事項review,ASSY,治工具设备/XX料,打印机,,2,如有不能正常过站及不能打印label出来需通知线外及相关人员处理,,,,,,注意事項review,Sheet,FALSE
+注意事項review,PACK,治工具设备/XX料,打印机,,,检视是否有打印不良，如有打印不良需重新打印,,,,,,注意事項review,Sheet,FALSE
+注意事項review,,,,,,,,,,,,注意事項review,Sheet,FALSE
+注意事項review,ASSY,治工具设备/XX料,注意事项少于3个,,1,所有作业人员必须按照MI标准作业，不可随意更改动作，及涂改MI,,,,,,注意事項review,Sheet,FALSE
+注意事項review,ASSY,治工具设备/XX料,注意事项少于3个,,2,作业过程中需将垃圾及时丢进垃圾盒或垃圾桶，不可随意丢到流水线或地面上,,,,,,注意事項review,Sheet,FALSE
+注意事項review,ASSY,治工具设备/XX料,注意事项少于3个,,3,手套每班次更换，特殊情况发现脏污破损及时更换,,,,,,注意事項review,Sheet,FALSE
+員工技能匹配表,,,,,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,M,Skill_Name,Skill_No,,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,按,,,,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,理,FATP03,理線,ETC四大技能,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,穿,,,,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,滑出,,,,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,推,,,,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,拉,,,,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,贴附,FATP12,貼附,一般作业,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,去除,,,,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,撕除,,,,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,旋转,,,,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,旋转,,,,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,折,,,,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,擦拭,FATP13,擦拭,一般作业,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,手度,,,,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,脚步,,,,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,,,,,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,X,,,,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,压合,FATP08,壓合&熱熔,人机操作,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,热熔,FATP08,壓合&熱熔,人机操作,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,点胶,FATP10,點膠&Bonding,人机操作,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,锁附固定,FATP01,鎖螺絲,ETC四大技能,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,镭雕,FATP11,半自動/自動化設備操作,人机操作,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,扫描,FATP02,刷槍,ETC四大技能,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,,,,,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,,,,,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,P,,,,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,丢,,,,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,保持住,,,,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,放,,,,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,放,,,,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,放,,,,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,组,FATP07,裝配,一般作业,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,组,FATP07,裝配,一般作业,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,复选,,,,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,对准,,,,FATP05,插金手指,ETC四大技能,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,插入,√,FATP04,插線,,,ETC四大技能,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,卡合,FATP06,卡合,一般作业,,,ETC四大技能,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,較難處理 ,√,FATP04,插線,,,ETC四大技能,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,施加壓力,,,,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,,,,,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,I,,,,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,并检查,FATP26,目視,一般作业,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,并确认,FATP26,目視,一般作业,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,并对准,FATP26,目視,一般作业,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,并对齐,FATP26,目視,一般作业,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,并检查,FATP26,目視,一般作业,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,并确认,FATP26,目視,一般作业,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,并对准,FATP26,目視,一般作业,,,,,,,,員工技能匹配表,Sheet,FALSE
+員工技能匹配表,并对齐,FATP26,目視,一般作业,,,,,,,,員工技能匹配表,Sheet,FALSE
+從哪裡,从哪里,,,,,,,,,,,從哪裡,Sheet,FALSE
+從哪裡,捡料架,,,,,,,,,,,從哪裡,Sheet,FALSE
+從哪裡,捡料架亮灯位置处,,,,,,,,,,,從哪裡,Sheet,FALSE
+從哪裡,百宝箱,,,,,,,,,,,從哪裡,Sheet,FALSE
+從哪裡,托盘,,,,,,,,,,,從哪裡,Sheet,FALSE
+從哪裡,材料盒,,,,,,,,,,,從哪裡,Sheet,FALSE
+從哪裡,材料来料料盘,,,,,,,,,,,從哪裡,Sheet,FALSE
+從哪裡,螺丝供料器,,,,,,,,,,,從哪裡,Sheet,FALSE
+從哪裡,胶台,,,,,,,,,,,從哪裡,Sheet,FALSE
+從哪裡,Label剥离机,,,,,,,,,,,從哪裡,Sheet,FALSE
+從哪裡,栈板,,,,,,,,,,,從哪裡,Sheet,FALSE
+從哪裡,打印机,,,,,,,,,,,從哪裡,Sheet,FALSE
+從哪裡,线边桌,,,,,,,,,,,從哪裡,Sheet,FALSE
+從哪裡,台车,,,,,,,,,,,從哪裡,Sheet,FALSE
+從哪裡,回流线,,,,,,,,,,,從哪裡,Sheet,FALSE
+從哪裡,螺丝供料器,,,,,,,,,,,從哪裡,Sheet,FALSE
+從哪裡,治具,,,,,,,,,,,從哪裡,Sheet,FALSE
+從哪裡,Cover左上方,,,,,,,,,,,從哪裡,Sheet,FALSE
+從哪裡,Cover右上方,,,,,,,,,,,從哪裡,Sheet,FALSE
+從哪裡,Cover左下角,,,,,,,,,,,從哪裡,Sheet,FALSE
+從哪裡,Cover右下角,,,,,,,,,,,從哪裡,Sheet,FALSE
+從哪裡,Cover左上角,,,,,,,,,,,從哪裡,Sheet,FALSE
+從哪裡,Cover右上角,,,,,,,,,,,從哪裡,Sheet,FALSE
+從哪裡,流水线,,,,,,,,,,,從哪裡,Sheet,FALSE
+從哪裡,LCD（显示屏）,,,,,,,,,,,從哪裡,Sheet,FALSE
+哪裡,哪里,,,,,,,,,,,哪裡,Sheet,FALSE
+哪裡,MES电脑,,,,,,,,,,,哪裡,Sheet,FALSE
+哪裡,线槽,,,,,,,,,,,哪裡,Sheet,FALSE
+哪裡,mark线,,,,,,,,,,,哪裡,Sheet,FALSE
+哪裡,平行接口,,,,,,,,,,,哪裡,Sheet,FALSE
+哪裡,螺丝孔,,,,,,,,,,,哪裡,Sheet,FALSE
+哪裡,垃圾是否残留,,,,,,,,,,,哪裡,Sheet,FALSE
+哪裡,PPID,,,,,,,,,,,哪裡,Sheet,FALSE
+哪裡,定位框,,,,,,,,,,,哪裡,Sheet,FALSE
+哪裡,卡勾,,,,,,,,,,,哪裡,Sheet,FALSE
+哪裡,限位点,,,,,,,,,,,哪裡,Sheet,FALSE
+哪裡,限位线,,,,,,,,,,,哪裡,Sheet,FALSE
+哪裡,螺丝柱,,,,,,,,,,,哪裡,Sheet,FALSE
+哪裡,限位槽,,,,,,,,,,,哪裡,Sheet,FALSE
+哪裡,扣环,,,,,,,,,,,哪裡,Sheet,FALSE
+哪裡,转轴支架处,,,,,,,,,,,哪裡,Sheet,FALSE
+哪裡,工单二维码,,,,,,,,,,,哪裡,Sheet,FALSE
+哪裡,条形码,,,,,,,,,,,哪裡,Sheet,FALSE
+哪裡,左侧Rubber,,,,,,,,,,,哪裡,Sheet,FALSE
+哪裡,扣环,,,,,,,,,,,哪裡,Sheet,FALSE
+元件,元件,,,,,,,,,,,元件,Sheet,FALSE
+元件,导电布,,,,,,,,,,,元件,Sheet,FALSE
+元件,醋酸胶布,,,,,,,,,,,元件,Sheet,FALSE
+元件,背胶离型纸,,,,,,,,,,,元件,Sheet,FALSE
+元件,保护袋,,,,,,,,,,,元件,Sheet,FALSE
+元件,保护套,,,,,,,,,,,元件,Sheet,FALSE
+元件,保护膜,,,,,,,,,,,元件,Sheet,FALSE
+元件,铝箔,,,,,,,,,,,元件,Sheet,FALSE
+元件,小板,,,,,,,,,,,元件,Sheet,FALSE
+元件,离型纸,,,,,,,,,,,元件,Sheet,FALSE
+元件,二維碼,,,,,,,,,,,元件,Sheet,FALSE
+元件,mylar,,,,,,,,,,,元件,Sheet,FALSE
+元件,金手指,,,,,,,,,,,元件,Sheet,FALSE
+元件,MB端,,,,,,,,,,,元件,Sheet,FALSE
+元件,IO端,,,,,,,,,,,元件,Sheet,FALSE
+元件,TP端,,,,,,,,,,,元件,Sheet,FALSE
+元件,扣环,,,,,,,,,,,元件,Sheet,FALSE
+元件,小板背胶,,,,,,,,,,,元件,Sheet,FALSE
+元件,小板,,,,,,,,,,,元件,Sheet,FALSE
+元件,排线插头,,,,,,,,,,,元件,Sheet,FALSE
+元件,上侧,,,,,,,,,,,元件,Sheet,FALSE
+元件,下侧,,,,,,,,,,,元件,Sheet,FALSE
+元件,左上角,,,,,,,,,,,元件,Sheet,FALSE
+元件,左下角,,,,,,,,,,,元件,Sheet,FALSE
+元件,右上角,,,,,,,,,,,元件,Sheet,FALSE
+元件,右下角,,,,,,,,,,,元件,Sheet,FALSE
+元件,刷枪,,,,,,,,,,,元件,Sheet,FALSE
+元件,铝箔背胶离型纸,,,,,,,,,,,元件,Sheet,FALSE
+元件,pin口,,,,,,,,,,,元件,Sheet,FALSE
+元件,左边,,,,,,,,,,,元件,Sheet,FALSE
+元件,右边,,,,,,,,,,,元件,Sheet,FALSE
+元件,两边,,,,,,,,,,,元件,Sheet,FALSE
+元件,固定位置处,,,,,,,,,,,元件,Sheet,FALSE
+元件,上方边缘位置,,,,,,,,,,,元件,Sheet,FALSE
+元件,下方边缘位置,,,,,,,,,,,元件,Sheet,FALSE
+元件,自带透明背胶纸,,,,,,,,,,,元件,Sheet,FALSE
+元件,保护膜右下角,,,,,,,,,,,元件,Sheet,FALSE
+到哪裡,到哪里,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,MB,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,LCD,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,UP,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,Lower,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,Cover,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,PIN口,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,TP 小板,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,托盘,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,治具,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,排线,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,流水线,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,二维码位置,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,百宝箱固定位置,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,工单位置处,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,垃圾桶,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,Cover左上方,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,Cover右上方,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,Cover左下角,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,Cover右下角,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,Cover左上角,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,Cover右上角,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,卡槽,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,卡勾,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,Cover背面,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,Connector,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,预定位置处,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,左支架,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,右支架,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,排线接口出,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,Rubber,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,螺丝供料器,,,,,,,,,,,到哪裡,Sheet,FALSE
+到哪裡,Cover(上盖)下方卡勾内,,,,,,,,,,,到哪裡,Sheet,FALSE
+Level system 邏輯,Level System 教學檔案,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,甚麼是Level System? ,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,Level System是一種數位化組裝邏輯的表達方式，目的是為了解決組裝過程中所遇到的順序問題，而在過程中不會是單純的順序排列，要考慮當時組裝的機型的結構不同，或是自動化設備的操作、治具操作等等情況。而將這些邏輯利用數位化的方式表達後，系統才能夠對於此數據進行學習，並且找到最佳的組裝流程。,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,Level System的表達方式?,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,裡面主要的參數有七點：,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,1.動作描述：對於該動作的標準描述，此段描述要經過IE審核後，認定為標準描述即可使用。,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,2.動作時長：對於此動作所花費的時間，計算公式為標準時間*寬放係數。,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,3.分割限制名稱：限制有著相同名稱的動作在同一個站別的標籤，命名方式為”nb”+”數字”，ex: nb1、nb2。,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,4.分割限制數量：設定標籤的限制數量，輸入須為正整數。,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,5.歸屬名稱：與從屬名稱相同的限制，需要輸入功能字符，不同的字符表達的邏輯關係也不同，名稱不可重複，命名方式為” 功能字符”+”數字”，main不包含在裡面。ex: sub1、cub1。,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,6.歸屬層級：在此所限制的層級，該項目只能為正整數,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,7.從屬名稱：與歸屬名稱相同的限制，需要輸入功能字符，不同的字符表達的邏輯關係也不同，名稱不可重複，命名方式為” 功能字符”+”數字”， main不包含在裡面。ex: sub1、cub1。,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,何謂功能字符?,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,字符的功能為表達不同種類的動作群組，目前現有main、sub、cub、nb這四種。,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,1.main: 主要順序分層。在編輯層級中的主要層級，所有層級文件的最初分層必須使用main.,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,2.sub: 次要順序分層。層級深度到2以後所使用的順序編制.,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,3.cub: 次要固化分層。將動作固化成系統無法分割的動作區塊.,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,4.nb:  分割限制元素。可以限制擁有相同元素標籤的層級數量.,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,以下利用幾個簡單的例子來幫助理解Level System的描述方式：,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,1.我們今天有10個動作A~J，這10個動作需要依順序完成，動作之間沒有互相綁定的關係，意旨可以拆分到不同站別來完成，此時我們要怎麼表達。,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,Ans：首先我們會有一張空白的層級表，在確定過我們的需求後填入項對應的字符。,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,內容,原始秒數,系數,Second,Number,Number_Count,Ascription,Level,Countersignature,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,A,1,1,1,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,B,1,1,1,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,C,1,1,1,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,D,1,1,1,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,E,1,1,1,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,F,1,1,1,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,G,1,1,1,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,H,1,1,1,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,I,1,1,1,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,J,1,1,1,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,完成後的層級表格如下。,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,內容,原始秒數,系數,Second,Number,Number_Count,Ascription,Level,Countersignature,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,A,1,1,1,,,main,1,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,B,1,1,1,,,main,2,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,C,1,1,1,,,main,3,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,D,1,1,1,,,main,4,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,E,1,1,1,,,main,5,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,F,1,1,1,,,main,6,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,G,1,1,1,,,main,7,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,H,1,1,1,,,main,8,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,I,1,1,1,,,main,9,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,J,1,1,1,,,main,10,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,main為主要的層級分層字符，而動作的排列順序會依照所編列的數字1~10進行排序，而A~J的動作歸屬都是main，以下是我們的示意圖。,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,2.承接上題，這次A、B、C三個動作可以在前三步驟交換，剩下七個動作必須在這三個動作完成後再進行順序完成。,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,Ans：這時我們只需要將前三個層級的數字設為1即可達成此目的。,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,內容,原始秒數,系數,Second,Number,Number_Count,Ascription,Level,Countersignature,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,A,1,1,1,,,main,1,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,B,1,1,1,,,main,1,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,C,1,1,1,,,main,1,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,D,1,1,1,,,main,2,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,E,1,1,1,,,main,3,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,F,1,1,1,,,main,4,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,G,1,1,1,,,main,5,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,H,1,1,1,,,main,6,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,I,1,1,1,,,main,7,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,J,1,1,1,,,main,8,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,3.承接上題，此時D、E、F三個動作為獨立的順序動作，一旦開始做D，就必須將E、F做完才能進行其他動作，D、E、F群組動作可以和A、B、C三個動作做互換順序。,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,Ans：為了要讓D、E、F擁有獨立順序，必須要將此三個動作用sub功能標籤給另外設置。我們將這三個動作向後延伸一個深度，讓原先的main的層級1 後新增了一個附屬標籤sub1，再讓D、E、F三個動作的從屬變成sub1即可。,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,內容,原始秒數,系數,Second,Number,Number_Count,Ascription,Level,Countersignature,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,A,1,1,1,,,main,1,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,B,1,1,1,,,main,1,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,C,1,1,1,,,main,1,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,D,1,1,1,,,main,1,sub1,1,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,E,1,1,1,,,,,sub1,2,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,F,1,1,1,,,,,sub1,3,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,G,1,1,1,,,main,2,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,H,1,1,1,,,main,3,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,I,1,1,1,,,main,4,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,J,1,1,1,,,main,5,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,4.現在要將D、E、F三個連續動作設置程不可分站的動作，其餘條件不變。,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,Ans：這時只需要將功能標籤sub1改成cub1即可。,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,內容,原始秒數,系數,Second,Number,Number_Count,Ascription,Level,Countersignature,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,A,1,1,1,,,main,1,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,B,1,1,1,,,main,1,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,C,1,1,1,,,main,1,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,D,1,1,1,,,main,1,cub1,1,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,E,1,1,1,,,,,cub1,2,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,F,1,1,1,,,,,cub1,3,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,G,1,1,1,,,main,2,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,H,1,1,1,,,main,3,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,I,1,1,1,,,main,4,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,J,1,1,1,,,main,5,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,5.現在B、C動作需要設置成不可分割，D、E、F是獨立的連續動作，B、C動作結束後才可以接D的動作。A動作可以在B、C動作的前後皆可，亦可在D、E、F動作前後。G、H、I、J動作需要在A~F都做完後才可接續完成。,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,Ans：這時我們可以先完成B~F的動作層級，B、C的動作需要使用cub功能組合，並且將main的層級設置成1，接下來將D、E、F的動作用sub功能組合，並將main設置成2。然後依據動作要求A可以在此兩組動作間跳躍，因此我們這邊將用到變動層級符號“ ~ ”，將A動作的歸屬main層級設置成1~2即可，後續動作要在A~F動作都完成，所以將後續main層級從3開始依序遞增。,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,內容,原始秒數,系數,Second,Number,Number_Count,Ascription,Level,Countersignature,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,A,1,1,1,,,main,1~2,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,B,1,1,1,,,main,1,cub1,1,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,C,1,1,1,,,,,cub1,2,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,D,1,1,1,,,main,2,sub1,1,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,E,1,1,1,,,,,sub1,2,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,F,1,1,1,,,,,sub1,3,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,G,1,1,1,,,main,3,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,H,1,1,1,,,main,4,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,I,1,1,1,,,main,5,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,J,1,1,1,,,main,6,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,6.承接上題，動作G、H無法在同一站別。,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,Ans：這時需要用到nb功能標籤，需要在G、H的Number欄位設置一個nb標籤(nb1)，之後在Number_Count設定限制次數，而為了要將兩個動作設置在不同站別，此時需要將次數設置成1，意旨同一個站別內只能有一個擁有這種標籤的動作。,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,內容,原始秒數,系數,Second,Number,Number_Count,Ascription,Level,Countersignature,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,A,1,1,1,,,main,1~2,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,B,1,1,1,,,main,1,cub1,1,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,C,1,1,1,,,,,cub1,2,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,D,1,1,1,,,main,2,sub1,1,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,E,1,1,1,,,,,sub1,2,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,F,1,1,1,,,,,sub1,3,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,G,1,1,1,nb1,1,main,3,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,H,1,1,1,nb1,1,main,4,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,I,1,1,1,,,main,5,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,J,1,1,1,,,main,6,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,7.當開始動作A就必須將B、C、D、E也做完，而開始動作F就必須將G、H、I、J給做完，A群組和F群組可以互調，動作B->C和D->E不可拆分，且兩組動作不能在同一站，但兩組動作可以互相對調。動作G->H不可拆分，動作I->J需要等動作H做完以後才可以。,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,Ans：由動作要求可知A群組和B群組是同一層級，先將兩個開頭動作都設置成main歸屬的1。再來看動作B->C和D->E是要在A動作完成後才可進行互換的，所以我們將深度2的群組A新增sub1，將動作A層級設成1，B、D設成2。而B->C不可分割，深度3設置cub1。D->E也不可分割，深度3設置cub2。而群組B和D不可以在同一站要在Number標籤上設置nb1且限制數量設置1。依照動作需求，群組F的順序為F->G->H->I->J，將深度2設置sub2，而G、H動作不可分割，將動作G的深度3設置cub讓G->H組合。,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,常見錯誤,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,A,,,A,,A,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,B,*2,→,B,+,B,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,C,,,C,,C,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,時間邏輯/2---Follow 機器數的邏輯,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,LB的邏輯---需要增加重複的動作群組棒棒,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,如果增加以上則以此類推,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,1. 都一定產出一個LB+限制線,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,2.需要指出超過限制的列數,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,"3. ""或"" For main  1/3  動作可以在1或3被執行",,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,4. Level system 希望可以跳號填寫 (follow單機版則無問題),,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,5. Level system 前面加一欄行號，方便操作,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,6. most system 語句更動時，level system 不要清空 (需要區分上傳跟暫存),,,,,,,,,,Level system 邏輯,Sheet,FALSE
+Level system 邏輯,,7.某些限制邏輯需要教學,,,,,,,,,,Level system 邏輯,Sheet,FALSE
+三大目標里程碑,主軸,Step 1,Step2,Step3,,,,,,,,三大目標里程碑,Sheet,FALSE
+三大目標里程碑,,MOST System Web 化,串聯other系統,影片處理切割器,,,,,,,,三大目標里程碑,Sheet,FALSE
+三大目標里程碑,Value,"實現MI標準化-解決一人一種MI風格
+智能化排序：最佳化Line Balance-不依靠經驗法則","減少相同的資料重複性的上傳各個系統
+降低漏傳/資料錯誤等問題","協助修正標準作業時間
+人因工程研究
+EMI生成",,,,,,,,三大目標里程碑,Sheet,FALSE
+_xlnm._FilterDatabase,No.,Item.,Picture,Date,Status,,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,1,登入接口可以居中，并且Follow MES，记录用户账号,,45391,,优化项目，可以在下一阶段规划,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,2,距离标准化，未来可透过可视化图片点选直接带出距离,,45391,优化---未来,优化项目，可以在下一阶段规划,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,3,TMU的计算序列模型希望可呈现，以便Check是否漏掉or对比,,45391,OK,,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,4,"数据库搜寻模式：
+1.下拉式选单并搭配ABC拼音顺序排列
+2.增加关键词模糊搜寻",,45391,Open,不改会操作困难，希望现阶段可以修正,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,5,ABG/ABP & ABG/MXI 颜色区隔开来,,45391,,,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,6,资料暂存目前还未体现 (Level system返回MOST system需有数据),,45391,OK,,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,7,愿望：可从语句数据库搜寻标准语句，并让使用者可自行调整,,45391,优化,优化项目，可以在下一阶段规划,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,8,删除按钮点击一下就删除了，能否弹出确认框确认删除。防止误删，误删后能否找回,,45391,OK,,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,9,bug:  假设我需要新增一个动作，只需要在上一个基础上修改的时候，(B）和返回（A)下面不需要动作了，然后去点击“请选择”然后点击save changes没有反应,,45391,OK,,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,10,"第1、2、3句话组成一段话，选择V之后。第4句就没有了，需要点击编辑第四句话才出现。希望选择几个组成一段话，剩下还可以打V选择组成一段话新增到下面
+新增一栏：生成MI，使工程师可以分析多个动作，一次性点选",,45391,OK,,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,11,增加动作步骤的序号1、2、3、4，便于显示动作数量,,45391,OK,,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,12,取消编辑选项，希望可以直接按，就可清空所有动作,,45391,OK,,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,13,BUG：调换顺序的按钮没有作用,,45391,OK,,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,14,"新增命名方式：Follow MI 命名方式分页
+若是自动化的设备，希望呈现自动化设备List",,45391,,优化项目，可以在下一阶段规划,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,15,BUG：哪里、到哪里，摆反了 0.0,,45391,OK,,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,16,BUG：控制移动的I，少了加层级,,45391,OK,,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,17,"语句通顺，因MI会有I在M前面的情况，希望可以一个打勾，调换下语句顺序
+Before： A+B+从哪里+目标物+组件+M+到哪里+I+哪里+返回(A)
+After 新增这个一键变换成这个顺序的语句:A+B+从哪里+目标物+组件+I++哪里+M+到哪里+返回(A)",,45391,OK,,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,18,"若没有选择""手部""，生成MI则默认显示""然后""的转折语句",,45391,OK,,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,19,新增的维护界面PROPOSAL,,45391,OK,试用中,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,20,若是用A机种的序列模型，修改成B机种的，是否可以~?,,45391,OK,,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,21,新增动作CTQ选项勾选,,45400,OK,不改MI做不出来,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,22,将动作进行分类：有价值/无价值----统计时间,,45400,,优化项目，可以在下一阶段规划,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,23,控制移动逻辑更新----X---锁附固定，时间固定为0.216秒 (以L6螺丝的为标准),,45400,OK,,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,24,序列模型link技能--IE提供员工技能匹配表,,45400,优化,优化项目，可以在下一阶段规划,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,25,一般动作类型：P，当选错后，想让他变成空白值，无法直接恢复,,45407,OK,,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,27,"新增 ""组件"" 数据库",,45407,OK,,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,29,MI 标准文件名称--- HDL50_铝版_集中捡料_自动_ASSY_16_1.0,,45407,,优化项目，可以在下一阶段规划,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,32,全部使用简体字,,45407,OK,不改MI做不出来,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,33,删除下面的MI，不删除中间的，须独立删除，互不影响,,45407,OK,,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,34,"中间的动作，点选新增MI以后，则自动跳到下面，不保留；
+若下面点选修改编辑，则在返回到中间的部份",,45407,Open,不改会操作困难，希望现阶段可以修正,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,35,若完成以后，新增一个按钮，全返回至中间,,45407,优化,,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,36,"点错一般OR控制 动作，希望：
+ABG内容固定，可自由切换一般及控制序列，节省点选时间",,45407,Open,不改会操作困难，希望现阶段可以修正,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,37,目标物/哪里/去哪里/组件，尽量呈现所有内容，可以直接点选，减少点选次数,,45407,优化,优化项目，可以在下一阶段规划,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,38,"控制移动：
+没有选择 ""使用手""，但有选择 ""I""，则不需要 ""然后""的字样",,45407,OK,,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,39,"一般移动的G，新增 ""轻拍"" & ""抓取""",,45407,OK,,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,40,"一般移动的第二个A，若有选择手度，则需新增 ""翻转"" 字样+ ""目标物""",,45407,OK,,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,41,一般移动的P，程序逻辑错误，为可以复选并迭加层级，若只选择上面的则只SHOW上面的字样，若选择下面的，需迭加TMU，并且依照MOST系统逻辑的方式呈现字样,,45407,OK,第一目标~~~~~,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,42,一般移动&控制移动，最后的A，没有按照设定的逻辑变动TMU,,45407,OK,,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,43,"控制移动的G，新增 ""轻拍""＆　＂抓取＂",,45407,OK,,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,44,"控制移动的Ｍ，新增 ""按动按钮""、＂折＂、＂擦拭＂，及更改　＂滑出螺丝＂",,45407,OK,,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,45,控制移动的Ｘ，更新语法逻辑,,45407,OK,,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,46,类别增加筛选功能，并增加序列号,,45428,Open,不改会操作困难，希望现阶段可以修正,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,47,"MOST选项设定----可以让工程师自己创立类别卷标
+EXCEL 一键汇入所有选项",,45429,Open,不改会操作困难，希望现阶段可以修正,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,48,"新增 ""编辑MI"" & ""新增MI"" 的选项",,45429,OK,,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,49,生成MI 后，想同时修改第一句和第二句就没办法做到，只能修改当句的MI。,,45435,Open,不改会操作困难，希望现阶段可以修正,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,50,目标物选择了之后，没有办法取消不选择,,45435,Open,不改会操作困难，希望现阶段可以修正,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,51,新增MI后，如果忘记点上传机种MI或者电脑死机或误刷新页面，做的所有资料全部没有历史记录，需要重新做,,45435,Open,不改会操作困难，希望现阶段可以修正,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,52,"控制动作""M"" 增加 ""撕开""",,45435,OK,不改MI做不出来,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,53,上传后的MI不能同时多个或者全部选择后进行编辑,,45435,Open,不改会操作困难，希望现阶段可以修正,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,54,"当不勾选G且有目标物时产生""将""字样，变成""然后将喇叭放到百宝箱固定位置""",,45435,OK,不改MI做不出来,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,55,若已经编辑了10句，但突然发现下面的某一句合成以后有问题，这时候点选编辑，则上面的其他语句全部被覆盖，需全部重新处理,,45435,Open,不改会操作困难，希望现阶段可以修正,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase,56,"语句通顺问题：
+----------> M+目标物+组件
+Before： A+B+从哪里+G+目标物+组件+M+到哪里+X+I+哪里+返回(A)
+After： 打勾 I 的时---- A+B+从哪里+G+目标物+组件+I+哪里+M+到哪里+返回(A)
+After： 打勾 M 的时---- A+B+从哪里+G+M+目标物+组件+到哪里+X+I+哪里+返回(A)
+After： 打勾 I & M 的时---- A+B+从哪里+G+I+哪里+M+目标物+组件+到哪里+X+返回(A)",增加可倒装的勾勾,45435,OK,不改MI做不出来,,,,,,问题点!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,制程,类别,索引条件1,索引条件2,,,,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,注意事项少于3个,,一般注意事项,1,所有作业人员必须按照MI标准作业，不可随意更改动作，及涂改MI,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,注意事项少于3个,,,2,作业过程中需将垃圾及时丢进垃圾盒或垃圾桶，不可随意丢到流水线或地面上,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,注意事项少于3个,,,3,手套每班次更换，特殊情况发现脏污破损及时更换,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,电动起子,,锁螺丝注意事项,1,禁止OP在螺丝未接触螺丝孔时就旋转状态去锁附螺丝,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,电动起子,,,2,"锁完螺丝后检查是否锁到位,确认OK后再进行下一动作",,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,电动起子,,,3,"电动起子,电动起子高度需距离机台 22~35cm,逆流水线锁螺丝",,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,电动起子,,,4,开线前需检查起子是否有磁环（双磁环），没有及时通知线外人员,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,电动起子,,,5,"要确保螺丝锁附到底,锁附完螺丝后听到""嗒""的一声响后再去完成下个动作",,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,电动起子,,,6,"一次只能拿取1颗螺丝,锁完螺丝在等待的时候,电动起子头上不能悬挂螺丝",,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,电动起子,,,7,起子头规格 Φ??? Φ???    ?#(???),,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,电动起子,,,8,"电动起子需有套筒,防止人员私自调节扭力",,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,电动起子,,,9,核对实物/供料器/MI上料号是否一致，机台内掉落螺丝需要及时清理,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,手套,,手套注意事项,1,此站别需戴全指手套和静电手环,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,手套,,,2,此站别需戴一隻全指手套&一隻半指手套(手握起子)和静电手环,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,手套,,,3,此站别需戴半指手套和静电手环,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,手套,,,4,手套2H 更换一次，特殊情况发现脏污破损及时更换 (ASSY),,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,治具,热熔治具list,热熔治具注意事项,1,热熔屏显治具温度范围：?????℃(铜板温度)；热熔治具铜柱温度范围—?????℃,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,治具,热熔治具list,,2,气压值：????? Mpa   热熔压合时间:????? S,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,治具,热熔治具list,,3,压强值/压强值范围：????? Kgf/cm² & ????? N/cm²,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,治具,热熔治具list,,4,K/B(键盘)热熔站作業員自检-热熔头是否OK,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,治具,热熔治具list,,5,"热熔治具下模内不可有異物,防止upper(掌托)外观面热熔时导致外观不良",,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,治具,热熔治具list,,6,注意KB排线不能靠近热熔点,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,治具,压合治具list,压合治具注意事项,1,设备工作压强值范围：????? Kgf/cm²或????? N/cm²  ，设备工作气压值：:????? Mpa（电动治具无气压值）  压合时间:????? S,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,离子风扇,,离子风扇注意事项,1,离子风扇需开至最大档位，吹拂角度需正对作业区域，(距離：???????公分),,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,电脑/刷枪,,kitting注意事项,1,"当站人员检料时若发现明显的材料不良,请将材料放至不良品暂放区,由线外人员统一处理",,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,电脑/刷枪,,,2,撿料人员不可以私自更换料架上材料的位置,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,电脑/刷枪,,,3,"如有缺料的情况,检料人员需停线,并告知线外上料人员,切记不可以取其他架位上的材料替代",,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,电脑/刷枪,,,4,"材料要轻拿轻放,不能一只手同时捡两颗料",,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,电脑/刷枪,,,5,"依KITTING料架的指示灯拣料(灯亮则需检料,不亮则无需检料)",,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,电脑/刷枪,,,6,材料必须背靠背摆放，避免撞刮伤,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,电脑/刷枪,,,7,拿取键盘需拿取中间部分，禁止单手拿取一边,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,电脑/刷枪,,,8,拿取LCD无PCB板端中间位置或两侧边中间位置，拿取寬度不得低於30mm,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,电脑/刷枪,,,9,百宝箱一格不可放多个材料,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,打印机,,打印Label注意事项,1,检查label是否有打印不良，如有不良需通知线外及相关人员处理,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,打印机,,,2,如有不能正常过站及不能打印label出来需通知线外及相关人员处理,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,治具,TP麦拉 CCD治具,TP麦拉 CCD治具注意事项,1,气压值：????? Mpa  压强值/压强值范围 ????? Kgf/cm² & ?????   N/cm²   压合时间：????? S,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,治具,TP麦拉 CCD治具,,2,压合完 TP Mylar 后需自检，确保压合OK(若有明显偏移现象，需叫当线线外处理),,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,治具,开机键锁附治具,开机键锁附治具注意事项,1,气压值：????? Mpa  ，压强值：????? N/cm²,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,治工具设备/XX料,治具,双工位治具list,一人一机双工位作业,1,UP放回原泡棉时不可放错，UP、工单、百宝箱要一一对应。,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,材料目标物,背胶,,裸露背胶材料注意事项,1,手指不可接触材料背胶胶面,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,材料目标物,背胶,,,2,休息或吃饭时间不得提前撕除背胶离型纸，如若撕除后必须进行下一工站的操作,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,材料目标物,排线,,排线注意事项,1,排线需自检是否插理到位,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,材料目标物,排线,,,2,注意自检排线接口是否有破损缺失，若有及时交由线外处理,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,材料目标物,bezel,卡合,卡合注意事项,1,卡完bezel/KB后需自检是否完全卡合到位,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,材料目标物,bezel,卡合,,2,卡合bezel时需一处一处的按压卡合，不可滑动卡合,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,材料目标物,WLAN Label,,WLAN Label贴附注意事项,1,检查label有无破损或损坏，如有损坏或破损交由线外处理,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,材料目标物,WLAN Label,,,2,label贴附不可有脏污、破损、贴歪、位置颠倒、褶皱、气泡等不良,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,材料目标物,散热泥,,散热泥注意,1,有散热泥一面需朝上，手不可直接触碰散热泥,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,材料目标物,散热泥,,,2,铁件散热泥不可超出铁件边缘，脱落重新贴附时不可贴偏，贴斜,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,材料目标物,铜箔,,铜箔注意,1,需貼附平整、不可漏贴、贴歪,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,材料目标物,RAM,,RAM注意,1,RAM（内存条）需45°插入，摇晃三下,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,材料目标物,RAM,,,2,单RAM优先插????槽,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,材料目标物,插金手指,,插金手指注意事项,1,黑色天线对应黑色三角，白色天线对应白色三角,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,材料目标物,插金手指,,,2,插理排线时，需确保排线完全插入，不可插歪及未插到位,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,材料目标物,拉拉胶,,拉拉胶注意事项,1,撕除表面离型纸后禁止触摸拉垃胶,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,材料目标物,拉拉胶,,,2,粘贴拉拉胶需贴附平整，不能有褶皱,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,材料目标物,拉拉胶,,,3,撕拉拉胶离型纸时用一只手按住拉带头，另一只手撕离型纸,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,材料目标物,喇叭,,喇叭,1,组装喇叭时喇叭胶圈必须平整，胶圈不可掉落,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,材料目标物,排线,,理线,1,排线需自检是否进入卡槽，不得跳线及爬墙,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,材料目标物,排线,,,2,不能使用有破损、尖锐或严重磨损的理线棒进行作业，如若发现需要告知线外人员及时更换,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,ASSY,材料目标物,Thermal&MB,,组装Thermal 及MB 模组,1,拿取导热管&MB模组时需要拿模组中间位置，不能触碰风扇区域，包含扇叶,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,Label,,包装贴label站别,1,贴UP面label，如果基准线label不存在，则旁边label贴于基准线label位置，后续label依次平移,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,Label,,,2,label贴附不可有脏污、破损、贴歪、位置颠倒、褶皱、气泡等不良,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,托盘,,,,清理泡棉，确保泡棉干净，不可有残胶/胶带，不可在泡棉上乱涂乱画,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,垃圾盒/垃圾桶,,,,作业过程中需将垃圾及时丢进垃圾盒或垃圾桶，不可随意丢到流水在线或地面,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,手套,,,,此站需佩戴全指手套，更换频率1h/次,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,手套,label剥离机,,,有label剥离机此站需佩戴一只半指手套一只全指手套，更换频率1h/次,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,手套,label剥离机,,,无label剥离机此站需佩戴两只半指手套，更换频率1h/次,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,治具,,,,使用治具前，需确认治具名称正确，并无脏污、破损等不良,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,Label,,,,根据泡棉内刷的label贴附，没有则不用贴,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,治具,,,,选择治具必须根据机种名称选择，不可用错,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,Label,,,,发现label贴歪或与定义位置不符时.撕下后不可以留有残胶,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,打印机,,,,检视是否有打印不良，如有打印不良需重新打印,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,Label,,,,Label贴付以Lower上倒角定位，不可贴歪,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,Label,,,,Label贴附后需检查Label不可有丝毫褶皱，贴附不可歪斜,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,无尘布,,,,注意无尘布擦拭约1小时需更换一次，和无尘布太脏需随时更换,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,无尘布,,,,"擦拭LCD面需要从左往右,从上往下擦,不可胡乱擦拭",,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,无尘布,,,,禁止用任何液体直接倒在LCD Panel上 进行清洁,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,无尘布,,,,"擦拭LCD时,禁止将LCD打开180°",,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,手套,,,,"此站需佩戴全指手套，更换频率1h/次，如脏污,立即更换",,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,无尘布,,,,擦拭LCD时需用手扶着LCD,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,材料目标物,纸箱,,,,折纸箱前需检查DELL  Logo 、条码以及纸箱有无破损，或打印不良.如遇上述问题则交由线外处理,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,Label,,,,检查Label有无破损或损坏，如有损坏或破损交由线外处理,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,Label,,,,"依泡棉内的Label贴附,没有则不用贴",,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,材料目标物,机台,,,,产品需轻拿轻放，不可划伤、撞伤机台,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,手套,,,,"此站需佩戴全指手套，更换频率1h/次，如脏污,立即更换",,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,材料目标物,PE袋,,,,套PE袋人员在把机器装进袋子之前检查机器上是否有毛屑等其它不该有的东西，若有需清理完毕才可打包,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,材料目标物,PE袋,,,,在装PE袋时应检查PE袋有无破损，印刷不良，如遇上述情况，交由线外处理,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,手套,,,,此站拿取机台全指手套，粘胶带用半指手套，更换频率1h/次,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,材料目标物,机台,,,,机台放进外箱内时须检查包装袋完好无损且包装完整,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,材料目标物,说明书,,,,捡说明书等文件时需自检没有褶皱和破损,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,刷枪,,,,不带料，只需刷枪过站,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,材料目标物,包材/配件,,,,"捡出的材料必须放在泡棉上,掉落在地上的材料必须由线外人员去处理",,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,材料目标物,包材/配件,,,,捡料人员不可以私自更换料架上材料的位置,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,材料目标物,包材/配件,,,,装夹页/说明书于Carton时不可折叠放置,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,材料目标物,包材/配件,,,,在装夹页时，要正面放置，不可乱放,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,材料目标物,包材/配件,,,,检查材料有无破损、脏污，若有，则交由线外处理,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,材料目标物,包材/配件,,,,放配件时需检查外箱内是否有Pizza Box（隔板）,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,Label,,,,打印Label后，要看是否为良品，Label不可贴歪，不可有破损如遇上述情况交由线外处理,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,Service tag,,,,比对打印出来的Service tag与外箱上的Service tag值是否一致,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,Label,,,,"Label贴附要对正,如果贴上去后发现不良，需交给线外处理",,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,胶带,,,,胶带长度为：15CM~17CM,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,胶带,,,,检查胶带是否有打皱或没有封口，胶带长度是否不在固定尺寸内﹐如有需请线外人员重封,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,材料目标物,机台,,,,产品不可摆放于地面上,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,电子秤,,,,"秤重如有不符,需将机台交由线外处理",,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,电子秤,,,,称重范围依照QA系统维护的重量范围(+/50g),,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,材料目标物,机台,,,,机台需轻拿轻放，堆放整齐,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,无尘布,,擦拭LCD,1,擦拭LCD时需用手扶住Cover左上角,,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
+_xlnm._FilterDatabase1,PACK,治工具设备/XX料,手套,,,5,手套1H 更换一次，特殊情况发现脏污破损及时更换 (PACK),,,,,注意事項!_xlnm._FilterDatabase,DefinedName,TRUE
