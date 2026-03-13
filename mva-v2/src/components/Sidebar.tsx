@@ -3,7 +3,10 @@ import type { TabId } from '../domain/models';
 const tabs: Array<{ id: TabId; label: string; blurb: string }> = [
   { id: 'dashboard', label: 'Dashboard', blurb: 'KPIs and release status' },
   { id: 'simulation', label: 'Simulation', blurb: 'Demand, rates, BOM, process' },
-  { id: 'plant', label: 'Plant', blurb: 'Labor, overhead, equipment, space' },
+  { id: 'rates', label: 'Rates', blurb: 'Volume, yield, overhead categories' },
+  { id: 'equipment', label: 'Equipment', blurb: 'Line standards and delta equipment' },
+  { id: 'space', label: 'Space', blurb: 'Matrix allocation and 40/60 helper' },
+  { id: 'labor', label: 'Labor', blurb: 'DLOH, IDL, L10, and L6 estimation' },
   { id: 'product', label: 'Product', blurb: 'L10/L6 setup and standards' },
   { id: 'reports', label: 'Reports', blurb: 'Imports, exports, review gate' },
 ];

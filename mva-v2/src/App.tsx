@@ -383,7 +383,7 @@ export default function App() {
           </div>
         ) : null}
 
-        {activeTab === 'plant' ? (
+        {activeTab === 'rates' ? (
           <div className="stack-xl">
             <SectionCard title="Labor and Yield" description="The main cost drivers for direct and indirect labor.">
               <div className="form-grid cols-4">
@@ -484,10 +484,10 @@ export default function App() {
                   <h3>L10</h3>
                   <label><span>Project Name</span><input value={project.productL10.projectName} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, projectName: event.target.value } }))} /></label>
                   <label><span>Customer</span><input value={project.productL10.customer} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, customer: event.target.value } }))} /></label>
-                  <label><span>Handling Sec</span><input type="number" value={project.productL10.handlingSec} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, handlingSec: numberValue(event.target.value) } }))} /></label>
-                  <label><span>Function Sec</span><input type="number" value={project.productL10.functionSec} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, functionSec: numberValue(event.target.value) } }))} /></label>
-                  <label><span>Yield</span><input type="number" step="0.01" value={project.productL10.yield} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, yield: numberValue(event.target.value) } }))} /></label>
-                  <label><span>RFQ / Month</span><input type="number" value={project.productL10.rfqQtyPerMonth} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, rfqQtyPerMonth: numberValue(event.target.value) } }))} /></label>
+                  <label><span>Handling Sec</span><input type="number" value={project.productL10.testTime.handlingSec} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, testTime: { ...current.productL10.testTime, handlingSec: numberValue(event.target.value) } } }))} /></label>
+                  <label><span>Function Sec</span><input type="number" value={project.productL10.testTime.functionSec} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, testTime: { ...current.productL10.testTime, functionSec: numberValue(event.target.value) } } }))} /></label>
+                  <label><span>Yield</span><input type="number" step="0.01" value={project.productL10.yield ?? ''} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, yield: event.target.value === '' ? null : numberValue(event.target.value) } }))} /></label>
+                  <label><span>RFQ / Month</span><input type="number" value={project.productL10.rfqQtyPerMonth ?? ''} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, rfqQtyPerMonth: event.target.value === '' ? null : numberValue(event.target.value) } }))} /></label>
                 </div>
                 <div className="form-grid cols-2">
                   <h3>L6</h3>

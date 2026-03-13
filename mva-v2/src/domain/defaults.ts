@@ -1,11 +1,58 @@
-import type { ProjectState } from './models';
+import type {
+  L10Station,
+  L6Station,
+  Machine,
+  ProjectState,
+} from './models';
 
 export const lineStandardStorageKey = 'mva_v2_line_standards';
 export const projectStorageKey = 'mva_v2_project';
 export const lineStandardSelectionStorageKey = 'mva_v2_selected_line_standard';
 
+export const defaultMachines: Machine[] = [
+  { id: 'm1', group: 'Printer', description: 'Solder paste printer', rate: 120, type: 'fixed' },
+  { id: 'm2', group: 'SPI', description: 'Solder paste inspection', rate: 200, type: 'fixed' },
+  { id: 'm3', group: 'Placement_NXT_Chips', description: 'FUJI NXT M3 - chips', rate: 22000, type: 'placement' },
+  { id: 'm4', group: 'Placement_NXT_IC', description: 'FUJI NXT M6 - IC', rate: 10000, type: 'placement' },
+  { id: 'm5', group: 'Placement_NXT_BGA', description: 'FUJI NXT M6 - BGA/CSP', rate: 3500, type: 'placement' },
+  { id: 'm6', group: 'Placement_NPM_Chips', description: 'Panasonic NPM - chips', rate: 35000, type: 'placement' },
+  { id: 'm7', group: 'Placement_NPM_IC', description: 'Panasonic NPM - IC', rate: 10000, type: 'placement' },
+  { id: 'm8', group: 'Placement_NPM_BGA', description: 'Panasonic NPM - BGA/CSP', rate: 4000, type: 'placement' },
+  { id: 'm9', group: 'AOI', description: 'SMT AOI', rate: 189, type: 'fixed' },
+  { id: 'm10', group: 'Reflow', description: 'Reflow oven', rate: 120, type: 'fixed' },
+  { id: 'm11', group: 'THT/DIP', description: 'Manual insertion', rate: 120, type: 'fixed' },
+  { id: 'm12', group: 'WaveSolder', description: 'Wave solder', rate: 250, type: 'fixed' },
+  { id: 'm13', group: 'ICT', description: 'In-circuit test', rate: 90, type: 'fixed' },
+  { id: 'm14', group: 'FBT', description: 'Functional test', rate: 60, type: 'fixed' },
+  { id: 'm15', group: 'Visual', description: 'Manual inspection', rate: 144, type: 'fixed' },
+  { id: 'm16', group: 'Assembly', description: 'Final assembly', rate: 100, type: 'fixed' },
+  { id: 'm17', group: 'Packing', description: 'Pack and label', rate: 120, type: 'fixed' },
+  { id: 'm18', group: 'Loader', description: 'AYVL Loader', rate: 1200, type: 'fixed' },
+];
+
+export const baseMachineRateByGroup = Object.fromEntries(defaultMachines.map((item) => [item.group, item.rate]));
+
+const defaultL10Stations: L10Station[] = [
+  { id: 'l10-1', name: 'Kitting', laborHc: 3, parallelStations: 1, cycleTimeSec: 103, allowanceFactor: 1.15 },
+  { id: 'l10-2', name: 'MVS', laborHc: 2, parallelStations: 1, cycleTimeSec: 105, allowanceFactor: 1.15 },
+  { id: 'l10-3', name: 'Base Board Assembly', laborHc: 2, parallelStations: 2, cycleTimeSec: 201.5, allowanceFactor: 1.15 },
+  { id: 'l10-4', name: 'Port card and cable assembly', laborHc: 3, parallelStations: 1, cycleTimeSec: 119, allowanceFactor: 1.15 },
+  { id: 'l10-5', name: 'Chassis assembly', laborHc: 3, parallelStations: 1, cycleTimeSec: 106, allowanceFactor: 1.15 },
+  { id: 'l10-6', name: 'Test', laborHc: 4, parallelStations: 75, cycleTimeSec: 300, allowanceFactor: 1.15 },
+  { id: 'l10-7', name: 'Packing', laborHc: 2, parallelStations: 1, cycleTimeSec: 100, allowanceFactor: 1.15 },
+];
+
+const defaultL6Stations: L6Station[] = [
+  { id: 'l6-1', stationNo: 1, name: 'SMT B/A', laborHc: 2, parallelStations: 1, cycleTimeSec: 28, allowanceRate: 15, dlOnline: 2 },
+  { id: 'l6-2', stationNo: 2, name: 'AOI(Before PCA/Off Line）', laborHc: 1, parallelStations: 1, cycleTimeSec: 18, allowanceRate: 12, dlOnline: 1 },
+  { id: 'l6-3', stationNo: 3, name: 'HI', laborHc: 3, parallelStations: 1, cycleTimeSec: 42, allowanceRate: 18, dlOnline: 3 },
+  { id: 'l6-4', stationNo: 4, name: 'FBT', laborHc: 2, parallelStations: 1, cycleTimeSec: 65, allowanceRate: 15, dlOnline: 2 },
+  { id: 'l6-5', stationNo: 5, name: 'PK', laborHc: 2, parallelStations: 1, cycleTimeSec: 32, allowanceRate: 10, dlOnline: 2 },
+  { id: 'l6-total', name: 'Total', laborHc: 10, parallelStations: 5, cycleTimeSec: 185, allowanceRate: 14, dlOnline: 10, isTotal: true },
+];
+
 export const defaultProject: ProjectState = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   basicInfo: {
     modelName: '1395A3368201',
     workDays: 26,
@@ -17,34 +64,21 @@ export const defaultProject: ProjectState = {
     fpy: 0.96,
     vpy: 1,
     boardsPerPanel: 10,
+    hasTopSide: true,
+    hasBottomSide: true,
     lotSize: 1000,
     setupTimeMin: 60,
     oeePlacement: 0.7,
     oeeOthers: 0.8,
   },
-  machines: [
-    { id: 'm1', group: 'Printer', description: 'Solder paste printer', rate: 120, type: 'fixed' },
-    { id: 'm2', group: 'SPI', description: 'Solder paste inspection', rate: 200, type: 'fixed' },
-    { id: 'm3', group: 'Placement_NXT_Chips', description: 'FUJI NXT M3 - chips', rate: 22000, type: 'placement' },
-    { id: 'm4', group: 'Placement_NXT_IC', description: 'FUJI NXT M6 - IC', rate: 10000, type: 'placement' },
-    { id: 'm5', group: 'Placement_NXT_BGA', description: 'FUJI NXT M6 - BGA/CSP', rate: 3500, type: 'placement' },
-    { id: 'm6', group: 'AOI', description: 'SMT AOI', rate: 189, type: 'fixed' },
-    { id: 'm7', group: 'Reflow', description: 'Reflow oven', rate: 120, type: 'fixed' },
-    { id: 'm8', group: 'THT/DIP', description: 'Manual insertion', rate: 120, type: 'fixed' },
-    { id: 'm9', group: 'WaveSolder', description: 'Wave solder', rate: 250, type: 'fixed' },
-    { id: 'm10', group: 'ICT', description: 'In-circuit test', rate: 90, type: 'fixed' },
-    { id: 'm11', group: 'FBT', description: 'Functional test', rate: 60, type: 'fixed' },
-    { id: 'm12', group: 'Visual', description: 'Manual inspection', rate: 144, type: 'fixed' },
-    { id: 'm13', group: 'Assembly', description: 'Final assembly', rate: 100, type: 'fixed' },
-    { id: 'm14', group: 'Packing', description: 'Pack and label', rate: 120, type: 'fixed' }
-  ],
+  machines: defaultMachines,
   bomMap: [
     { id: 'b1', side: 'Top', bucket: '0402/0603 chips', count: 2385, machineGroup: 'Placement_NXT_Chips' },
     { id: 'b2', side: 'Top', bucket: 'SOP/QFP/QFN', count: 206, machineGroup: 'Placement_NXT_IC' },
     { id: 'b3', side: 'Top', bucket: 'BGA/CSP', count: 3, machineGroup: 'Placement_NXT_BGA' },
     { id: 'b4', side: 'Bottom', bucket: '0402/0603 chips', count: 2130, machineGroup: 'Placement_NXT_Chips' },
     { id: 'b5', side: 'Bottom', bucket: 'SOP/QFP/QFN', count: 26, machineGroup: 'Placement_NXT_IC' },
-    { id: 'b6', side: 'Bottom', bucket: 'BGA/CSP', count: 0, machineGroup: 'Placement_NXT_BGA' }
+    { id: 'b6', side: 'Bottom', bucket: 'BGA/CSP', count: 0, machineGroup: 'Placement_NXT_BGA' },
   ],
   processSteps: [
     { step: 1, process: 'Printer', side: 'Bottom' },
@@ -67,7 +101,7 @@ export const defaultProject: ProjectState = {
     { step: 18, process: 'FBT', side: 'N/A' },
     { step: 19, process: 'Visual', side: 'N/A' },
     { step: 20, process: 'Assembly', side: 'N/A' },
-    { step: 21, process: 'Packing', side: 'N/A' }
+    { step: 21, process: 'Packing', side: 'N/A' },
   ],
   plant: {
     processType: 'L10',
@@ -104,39 +138,64 @@ export const defaultProject: ProjectState = {
       strategy: 'ignore',
       fpy: 0.96,
       vpy: 1,
+      useL10Fpy: false,
     },
     directLaborRows: [
-      { id: 'dl-1', name: 'Offline', process: 'Support', headcount: 17, uphSource: 'line' },
+      { id: 'dl-1', name: 'Offline', process: 'offline', headcount: 17, uphSource: 'line' },
       { id: 'dl-2', name: 'Assembly', process: 'Assembly', headcount: 15, uphSource: 'line' },
       { id: 'dl-3', name: 'Kitting', process: 'Kitting', headcount: 3, uphSource: 'line' },
       { id: 'dl-4', name: 'Test', process: 'Test', headcount: 4, uphSource: 'line' },
       { id: 'dl-5', name: 'Packing', process: 'Packing', headcount: 10, uphSource: 'line' },
-      { id: 'dl-6', name: 'Shipping', process: 'Shipping', headcount: 1, uphSource: 'line' }
+      { id: 'dl-6', name: 'Shipping', process: 'Shipping', headcount: 1, uphSource: 'line' },
     ],
     indirectLaborRows: [
-      { id: 'idl-1', name: 'Site Mgr.', department: 'Management', role: 'Site Mgr.', headcount: 0.22, allocationPercent: 1, uphSource: 'line' },
-      { id: 'idl-2', name: 'FIS/MES', department: 'Systems', role: 'FIS/MES', headcount: 1.76, allocationPercent: 1, uphSource: 'line' },
-      { id: 'idl-3', name: 'IE/OM/Facility', department: 'IE', role: 'IE/OM/Facility', headcount: 2.376, allocationPercent: 1, uphSource: 'line' },
-      { id: 'idl-4', name: 'TE', department: 'Engineering', role: 'TE', headcount: 8.36, allocationPercent: 1, uphSource: 'line' },
-      { id: 'idl-5', name: 'QAI', department: 'Quality', role: 'QAI', headcount: 0.7128, allocationPercent: 1, uphSource: 'line' }
+      { id: 'idl-1', name: 'Site Mgr.', department: 'Management', role: 'Site Mgr.', headcount: 0.22, allocationPercent: 1, uphSource: 'line', rrNote: '' },
+      { id: 'idl-2', name: 'FIS/MES', department: 'Systems', role: 'FIS/MES', headcount: 1.76, allocationPercent: 1, uphSource: 'line', rrNote: '' },
+      { id: 'idl-3', name: 'IE/OM/Facility', department: 'IE', role: 'IE/OM/Facility', headcount: 2.376, allocationPercent: 1, uphSource: 'line', rrNote: '' },
+      { id: 'idl-4', name: 'TE', department: 'Engineering', role: 'TE', headcount: 8.36, allocationPercent: 1, uphSource: 'line', rrNote: '' },
+      { id: 'idl-5', name: 'QAI', department: 'Quality', role: 'QAI', headcount: 0.7128, allocationPercent: 1, uphSource: 'line', rrNote: '' },
+      { id: 'idl-6', name: 'SQE', department: 'Quality', role: 'SQE', headcount: 3.8016, allocationPercent: 1, uphSource: 'line', rrNote: '' },
+      { id: 'idl-7', name: 'HR', department: 'HR', role: 'HR', headcount: 5.5836, allocationPercent: 1, uphSource: 'line', rrNote: '' },
     ],
+    idlUiMode: 'auto',
+    idlRowsByMode: {
+      L10: [
+        { id: 'idl-l10-1', name: 'Management', department: 'Management', role: 'Site Mgr.', headcount: 0.22, allocationPercent: 1, uphSource: 'line', rrNote: '' },
+        { id: 'idl-l10-2', name: 'Engineering', department: 'Engineering', role: 'TE', headcount: 8.36, allocationPercent: 1, uphSource: 'line', rrNote: '' },
+      ],
+      L6: [
+        { id: 'idl-l6-1', name: 'IE / Facility', department: 'IE', role: 'Facility', headcount: 1.5, allocationPercent: 1, uphSource: 'line', rrNote: '' },
+        { id: 'idl-l6-2', name: 'QA / SQE', department: 'Quality', role: 'SQE', headcount: 2.3, allocationPercent: 1, uphSource: 'line', rrNote: '' },
+      ],
+    },
     equipmentList: [
-      { id: 'eq-1', process: 'SMT', item: 'Placement line', qty: 1, unitPrice: 540000, depreciationYears: 5 },
-      { id: 'eq-2', process: 'Test', item: 'Functional tester', qty: 2, unitPrice: 80000, depreciationYears: 4 }
+      { id: 'eq-1', process: 'SMT', item: 'Placement line', qty: 1, unitPrice: 540000, depreciationYears: 5, simMachineGroup: 'Placement_NXT_Chips', simParallelQty: 1 },
+      { id: 'eq-2', process: 'SMT', item: 'Printer', qty: 1, unitPrice: 85000, depreciationYears: 5, simMachineGroup: 'Printer', simParallelQty: 1 },
+      { id: 'eq-3', process: 'Test', item: 'Functional tester', qty: 2, unitPrice: 80000, depreciationYears: 4, simMachineGroup: 'FBT', simParallelQty: 2 },
     ],
     extraEquipmentList: [
-      { id: 'ex-1', process: 'Assembly', item: 'Custom fixture', qty: 1, unitPrice: 12000, depreciationYears: 2 }
+      { id: 'ex-1', process: 'Assembly', item: 'Custom fixture', qty: 1, unitPrice: 12000, depreciationYears: 2 },
     ],
+    useEquipmentListTotal: true,
+    useExtraEquipmentInTotal: true,
     spaceAllocation: [
       { id: 'sp-1', floor: 'F1', process: 'SMT', areaSqft: 1800, ratePerSqft: 8 },
       { id: 'sp-2', floor: 'F1', process: 'F/A', areaSqft: 2200, ratePerSqft: 8 },
-      { id: 'sp-3', floor: 'F2', process: 'FBT', areaSqft: 1200, ratePerSqft: 8 }
+      { id: 'sp-3', floor: 'F2', process: 'FBT', areaSqft: 1200, ratePerSqft: 8 },
     ],
     spaceSettings: {
       useSpaceAllocationTotal: true,
       spaceRatePerSqft: 8,
       spaceAreaMultiplier: 1,
       buildingAreaOverrideSqft: 0,
+      mode: 'manual',
+      lineLengthFt: 100,
+      lineWidthFt: 15,
+      floorAreas: { BF: 50000, F1: 50000, F2: 50000 },
+      processDistribution: { SMT: 40, 'F/A': 35, FBT: 25 },
+      split4060Enabled: false,
+      split4060TotalFloorSqft: 0,
+      split4060HiMode: 'FA_FBT',
     },
     materials: {
       bomCostPerUnit: 45,
@@ -156,25 +215,79 @@ export const defaultProject: ProjectState = {
       inventoryValuePerUnit: 20,
       iccRate: 0.03,
     },
+    showEquipmentSimMapping: false,
+    includeExtraEquipmentInSimMapping: false,
   },
   productL10: {
+    processType: 'L10',
     bu: 'Networking',
     customer: 'Internal',
     projectName: 'L10 Demo',
     modelName: '1395A3368201',
-    handlingSec: 90,
-    functionSec: 300,
+    sizeMm: '120 x 80 x 25',
+    weightKgPerTool: 0.6,
+    testTime: { handlingSec: 90, functionSec: 300, totalSec: 390 },
     yield: 0.96,
     rfqQtyPerMonth: 10000,
+    probeLifeCycle: 120000,
+    rfqQtyLifeCycle: 240000,
+    workDaysPerYear: 250,
+    workDaysPerMonth: 22,
+    workDaysPerWeek: 5,
+    shiftsPerDay: 2,
+    hoursPerShift: 11,
+    uph: null,
+    ctSec: null,
+    source: 'default',
   },
   productL6: {
+    processType: 'L6',
     bu: 'Networking',
     customer: 'Internal',
     pn: '1395A3368201',
+    sku: '1395T3505701',
+    modelName: '1395A3368201',
     rfqQtyPerMonth: 10000,
     boardsPerPanel: 10,
-    pcbSize: '120x80 mm',
-    stationPath: 'SMT > Test > Assembly > Packing',
+    pcbSize: '120 x 80 mm',
+    stationPath: 'SMT > ICT > FBT > F/A > PK',
+    side1PartsCount: 2594,
+    side2PartsCount: 2156,
+    offLineBlastingPartCount: 0,
+    dipPartsType: 'Mixed',
+    selectiveWs: 'No',
+    assemblyPart: 'Base Board',
+    routingTimesSec: { ICT: 45, FBT: 90 },
+    testTime: { handlingSec: 60, functionSec: 180 },
+    source: 'default',
+  },
+  laborTimeL10: {
+    meta: {
+      hoursPerShift: 11,
+      shiftsPerDay: 2,
+      workDaysPerWeek: 5,
+      workDaysPerMonth: 22,
+      fpy: 0.96,
+    },
+    stations: defaultL10Stations,
+    source: 'default',
+  },
+  laborTimeL6: {
+    header: {
+      category: 'Networking',
+      productionLine: 'L6 Demo',
+      annualDemand: 120000,
+      monthlyDemand: 10000,
+      multiPanelQty: 10,
+      lineCapabilityPerShift: 250,
+      exRateRmbUsd: 7.2,
+      serviceHourlyWage: 12.5,
+      manufacturingTimePerUnit: 3.08,
+      outputPerLinePerShift: 250,
+    },
+    segments: [{ id: 'seg-1', name: '1395T3505701', stations: defaultL6Stations }],
+    stations: defaultL6Stations,
+    source: 'default',
   },
   confirmation: {
     decision: 'OK',
@@ -187,10 +300,21 @@ export const defaultProject: ProjectState = {
       id: 'std-1',
       name: 'Default L10 Line',
       source: 'seed',
+      equipmentCostPerMonth: 11500,
       equipmentList: [
-        { id: 'std-eq-1', process: 'SMT', item: 'Placement line', qty: 1, unitPrice: 540000, depreciationYears: 5 },
-        { id: 'std-eq-2', process: 'Assembly', item: 'Torque fixture', qty: 2, unitPrice: 6000, depreciationYears: 3 }
+        { id: 'std-eq-1', process: 'SMT', item: 'Placement line', qty: 1, unitPrice: 540000, depreciationYears: 5, simMachineGroup: 'Placement_NXT_Chips', simParallelQty: 1 },
+        { id: 'std-eq-2', process: 'Assembly', item: 'Torque fixture', qty: 2, unitPrice: 6000, depreciationYears: 3 },
       ],
-    }
+    },
+    {
+      id: 'std-2',
+      name: 'Default L6 Line',
+      source: 'seed',
+      equipmentCostPerMonth: 8300,
+      equipmentList: [
+        { id: 'std-l6-1', process: 'SMT', item: 'Printer', qty: 1, unitPrice: 85000, depreciationYears: 5, simMachineGroup: 'Printer', simParallelQty: 1 },
+        { id: 'std-l6-2', process: 'FBT', item: 'Functional tester', qty: 1, unitPrice: 80000, depreciationYears: 4, simMachineGroup: 'FBT', simParallelQty: 1 },
+      ],
+    },
   ],
 };
