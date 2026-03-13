@@ -5,7 +5,7 @@ import { defaultProject } from '../../src/domain/defaults';
 describe('import validation', () => {
   it('rejects malformed project payloads', () => {
     expect(() => validateProjectPayload({ basicInfo: {} })).toThrow(/expected project structure/i);
-    expect(validateProjectPayload(defaultProject)).toMatchObject({ schemaVersion: 1 });
+    expect(validateProjectPayload(defaultProject)).toMatchObject({ schemaVersion: 2 });
   });
 
   it('rejects malformed line standard payloads', () => {

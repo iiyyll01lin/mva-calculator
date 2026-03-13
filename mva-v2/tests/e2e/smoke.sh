@@ -13,4 +13,5 @@ html=$(curl -fsSL http://127.0.0.1:4173)
 printf '%s' "$html" | grep -q '<div id="root"></div>'
 asset_path=$(printf '%s' "$html" | sed -n 's/.*src="\(\/assets\/[^\"]*\)".*/\1/p' | head -n 1)
 [ -n "$asset_path" ]
-curl -fsSL "http://127.0.0.1:4173${asset_path}" | grep -q 'StreamWeaver'
+asset_js=$(curl -fsSL "http://127.0.0.1:4173${asset_path}")
+printf '%s' "$asset_js" | grep -q 'StreamWeaver'
