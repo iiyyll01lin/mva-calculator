@@ -27,7 +27,16 @@ corepack pnpm install
 corepack pnpm run dev
 ```
 
-Open http://127.0.0.1:4173
+Open http://127.0.0.1:5173 for the Vite dev server.
+
+To verify the production bundle locally:
+```bash
+cd mva-v2
+corepack pnpm run build
+corepack pnpm run preview
+```
+
+Then open http://127.0.0.1:4173
 
 ## Build
 ```bash
