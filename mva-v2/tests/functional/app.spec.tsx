@@ -58,4 +58,28 @@ describe('App functional flow', () => {
     });
     container.remove();
   });
+
+  it('renders equipment workspace content from the sidebar', async () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    await act(async () => {
+      root.render(<App />);
+    });
+
+    const equipmentButton = Array.from(container.querySelectorAll('button')).find((button) => button.textContent?.includes('Equipment'));
+    expect(equipmentButton).toBeTruthy();
+    await act(async () => {
+      equipmentButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+
+    expect(container.textContent?.includes('Equipment Delta')).toBe(true);
+    expect(container.textContent?.includes('Space Strategy')).toBe(true);
+
+    await act(async () => {
+      root.unmount();
+    });
+    container.remove();
+  });
 });

@@ -2,10 +2,20 @@ import { startTransition, useEffect, useMemo, useState } from 'react';
 import { KpiCard } from './components/KpiCard';
 import { SectionCard } from './components/SectionCard';
 import { Sidebar } from './components/Sidebar';
-import { calculateMva, calculateSimulation } from './domain/calculations';
+import { calculateMva, calculateSimulation, computeEquipmentDelta } from './domain/calculations';
 import { parseCsv, toCsv } from './domain/csv';
 import { defaultProject } from './domain/defaults';
-import { buildProjectExport, buildSummaryCsv, downloadText } from './domain/exporters';
+import { buildL10StationsCsv, buildProjectExport, buildSummaryCsv, downloadText } from './domain/exporters';
+import {
+  parseDlohIdlSetupCsv,
+  parseEquipmentListSetupCsv,
+  parseL10LaborTimeEstimationCsv,
+  parseL10MpmSetupCsv,
+  parseL6LaborTimeEstimationCsv,
+  parseL6MpmSetupCsv,
+  parseMonthYearUpdateCsv,
+  parseSpaceSetupCsv,
+} from './domain/importers';
 import type { EquipmentItem, LaborRow, LineStandard, ProjectState, TabId } from './domain/models';
 import { loadSelectedLineStandardId, saveSelectedLineStandardId } from './domain/persistence';
 import { useProjectState } from './state/useProjectState';
@@ -63,6 +73,27 @@ function readJsonRecord(text: string): Record<string, unknown> {
     throw new Error('JSON payload must be an object.');
   }
   return parsed;
+}
+
+function syncL10TestTime(current: ProjectState['productL10']['testTime'], patch: Partial<ProjectState['productL10']['testTime']>) {
+  const handlingSec = patch.handlingSec ?? current.handlingSec;
+  const functionSec = patch.functionSec ?? current.functionSec;
+  return {
+    ...current,
+    ...patch,
+    handlingSec,
+    functionSec,
+    totalSec: handlingSec + functionSec,
+  };
+}
+
+function resolveIndirectLaborRows(
+  plant: ProjectState['plant'],
+  mode: ProjectState['plant']['idlUiMode'] = plant.idlUiMode,
+  processType: ProjectState['plant']['processType'] = plant.processType,
+): LaborRow[] {
+  const resolvedMode = mode === 'auto' ? processType : mode;
+  return (plant.idlRowsByMode[resolvedMode] ?? []).map((row) => ({ ...row }));
 }
 
 export function validateProjectPayload(payload: unknown): ProjectState {
@@ -175,6 +206,19 @@ export default function App() {
 
   const activeOverhead = project.plant.overheadByProcess[project.plant.processType];
   const summaryCsv = useMemo(() => buildSummaryCsv(project), [project]);
+  const selectedLineStandard = useMemo(
+    () => project.lineStandards.find((item) => item.id === selectedLineStandardId) ?? null,
+    [project.lineStandards, selectedLineStandardId],
+  );
+  const equipmentDelta = useMemo(
+    () => computeEquipmentDelta({
+      template: selectedLineStandard,
+      equipmentList: project.plant.equipmentList,
+      extraEquipmentList: project.plant.extraEquipmentList,
+    }),
+    [project.plant.equipmentList, project.plant.extraEquipmentList, selectedLineStandard],
+  );
+  const ratesWorkspaceVisible = activeTab === 'rates' || activeTab === 'equipment' || activeTab === 'space' || activeTab === 'labor';
 
   const importJsonProject = async (file: File | null) => {
     if (!file) return;
@@ -240,7 +284,196 @@ export default function App() {
 
   const exportProject = () => downloadText(`${project.basicInfo.modelName}_${formatTimestamp()}_project.json`, buildProjectExport(project), 'application/json');
   const exportSummary = () => downloadText(`${project.basicInfo.modelName}_${formatTimestamp()}_summary.csv`, summaryCsv, 'text/csv');
+  const exportL10Stations = () => downloadText(`${project.basicInfo.modelName}_${formatTimestamp()}_l10-stations.csv`, buildL10StationsCsv(project), 'text/csv');
   const exportLineStandards = () => downloadText(`line-standards_${formatTimestamp()}.json`, JSON.stringify(project.lineStandards, null, 2), 'application/json');
+
+  const importMonthYearUpdate = async (file: File | null) => {
+    if (!file) return;
+    try {
+      assertFileSize(file);
+      const parsed = parseMonthYearUpdateCsv(await file.text());
+      updateProject((current) => ({
+        ...current,
+        plant: {
+          ...current.plant,
+          mvaRates: {
+            ...current.plant.mvaRates,
+            directLaborHourlyRate: parsed.directLaborHourlyRate ?? current.plant.mvaRates.directLaborHourlyRate,
+            indirectLaborHourlyRate: parsed.indirectLaborHourlyRate ?? current.plant.mvaRates.indirectLaborHourlyRate,
+            efficiency: parsed.efficiency ?? current.plant.mvaRates.efficiency,
+          },
+          overheadByProcess: {
+            ...current.plant.overheadByProcess,
+            [current.plant.processType]: {
+              ...current.plant.overheadByProcess[current.plant.processType],
+              equipmentAverageUsefulLifeYears: parsed.equipmentAverageUsefulLifeYears ?? current.plant.overheadByProcess[current.plant.processType].equipmentAverageUsefulLifeYears,
+              equipmentMaintenanceRatio: parsed.equipmentMaintenanceRatio ?? current.plant.overheadByProcess[current.plant.processType].equipmentMaintenanceRatio,
+              powerCostPerUnit: parsed.powerCostPerUnit ?? current.plant.overheadByProcess[current.plant.processType].powerCostPerUnit,
+            },
+          },
+          spaceSettings: {
+            ...current.plant.spaceSettings,
+            spaceRatePerSqft: parsed.spaceRatePerSqft ?? current.plant.spaceSettings.spaceRatePerSqft,
+          },
+        },
+      }));
+      setStatusMessage(`Imported month/year update CSV: ${file.name}`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to import month/year update CSV.';
+      setStatusMessage(message);
+      console.error(error);
+    }
+  };
+
+  const importEquipmentSetup = async (file: File | null) => {
+    if (!file) return;
+    try {
+      assertFileSize(file);
+      const parsed = parseEquipmentListSetupCsv(await file.text());
+      updateProject((current) => ({
+        ...current,
+        plant: {
+          ...current.plant,
+          equipmentList: parsed.equipmentList,
+          overheadByProcess: {
+            ...current.plant.overheadByProcess,
+            [current.plant.processType]: {
+              ...current.plant.overheadByProcess[current.plant.processType],
+              equipmentDepreciationPerMonth: parsed.equipmentCostPerMonth ?? current.plant.overheadByProcess[current.plant.processType].equipmentDepreciationPerMonth,
+            },
+          },
+        },
+      }));
+      setStatusMessage(`Imported equipment setup CSV: ${file.name}`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to import equipment setup CSV.';
+      setStatusMessage(message);
+      console.error(error);
+    }
+  };
+
+  const importSpaceSetup = async (file: File | null) => {
+    if (!file) return;
+    try {
+      assertFileSize(file);
+      const parsed = parseSpaceSetupCsv(await file.text());
+      updateProject((current) => ({
+        ...current,
+        plant: {
+          ...current.plant,
+          spaceAllocation: parsed.allocations,
+          spaceSettings: {
+            ...current.plant.spaceSettings,
+            spaceAreaMultiplier: parsed.areaMultiplier ?? current.plant.spaceSettings.spaceAreaMultiplier,
+          },
+        },
+      }));
+      setStatusMessage(`Imported space setup CSV: ${file.name}`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to import space setup CSV.';
+      setStatusMessage(message);
+      console.error(error);
+    }
+  };
+
+  const importDlohIdlSetup = async (file: File | null) => {
+    if (!file) return;
+    try {
+      assertFileSize(file);
+      const parsed = parseDlohIdlSetupCsv(await file.text());
+      updateProject((current) => {
+        const nextPlant: ProjectState['plant'] = {
+          ...current.plant,
+          idlRowsByMode: {
+            ...current.plant.idlRowsByMode,
+            L10: parsed.idlL10,
+            L6: parsed.idlL6,
+          },
+        };
+        nextPlant.indirectLaborRows = resolveIndirectLaborRows(nextPlant);
+        return { ...current, plant: nextPlant };
+      });
+      setStatusMessage(`Imported DLOH/IDL setup CSV: ${file.name}`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to import DLOH/IDL setup CSV.';
+      setStatusMessage(message);
+      console.error(error);
+    }
+  };
+
+  const importL10MpmSetup = async (file: File | null) => {
+    if (!file) return;
+    try {
+      assertFileSize(file);
+      const parsed = parseL10MpmSetupCsv(await file.text());
+      updateProject((current) => ({
+        ...current,
+        productL10: {
+          ...current.productL10,
+          ...parsed,
+          testTime: syncL10TestTime(current.productL10.testTime, parsed.testTime ?? {}),
+        },
+      }));
+      setStatusMessage(`Imported L10 MPM setup CSV: ${file.name}`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to import L10 MPM setup CSV.';
+      setStatusMessage(message);
+      console.error(error);
+    }
+  };
+
+  const importL6MpmSetup = async (file: File | null) => {
+    if (!file) return;
+    try {
+      assertFileSize(file);
+      const parsed = parseL6MpmSetupCsv(await file.text());
+      updateProject((current) => ({
+        ...current,
+        productL6: {
+          ...current.productL6,
+          ...parsed,
+          routingTimesSec: parsed.routingTimesSec ?? current.productL6.routingTimesSec,
+          testTime: {
+            ...current.productL6.testTime,
+            ...parsed.testTime,
+          },
+        },
+      }));
+      setStatusMessage(`Imported L6 MPM setup CSV: ${file.name}`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to import L6 MPM setup CSV.';
+      setStatusMessage(message);
+      console.error(error);
+    }
+  };
+
+  const importL10LaborEstimation = async (file: File | null) => {
+    if (!file) return;
+    try {
+      assertFileSize(file);
+      const parsed = parseL10LaborTimeEstimationCsv(await file.text());
+      updateProject((current) => ({ ...current, laborTimeL10: parsed }));
+      setStatusMessage(`Imported L10 labor estimation CSV: ${file.name}`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to import L10 labor estimation CSV.';
+      setStatusMessage(message);
+      console.error(error);
+    }
+  };
+
+  const importL6LaborEstimation = async (file: File | null) => {
+    if (!file) return;
+    try {
+      assertFileSize(file);
+      const parsed = parseL6LaborTimeEstimationCsv(await file.text());
+      updateProject((current) => ({ ...current, laborTimeL6: parsed }));
+      setStatusMessage(`Imported L6 labor estimation CSV: ${file.name}`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to import L6 labor estimation CSV.';
+      setStatusMessage(message);
+      console.error(error);
+    }
+  };
 
   return (
     <div className="app-shell">
@@ -383,11 +616,24 @@ export default function App() {
           </div>
         ) : null}
 
-        {activeTab === 'rates' ? (
+        {ratesWorkspaceVisible ? (
           <div className="stack-xl">
             <SectionCard title="Labor and Yield" description="The main cost drivers for direct and indirect labor.">
               <div className="form-grid cols-4">
-                <label><span>Process Type</span><select value={project.plant.processType} onChange={(event) => updateProject((current) => ({ ...current, plant: { ...current.plant, processType: event.target.value as ProjectState['plant']['processType'] } }))}><option value="L6">L6</option><option value="L10">L10</option></select></label>
+                <label><span>Process Type</span><select value={project.plant.processType} onChange={(event) => updateProject((current) => {
+                  const processType = event.target.value as ProjectState['plant']['processType'];
+                  const plant: ProjectState['plant'] = { ...current.plant, processType };
+                  if (plant.idlUiMode === 'auto') {
+                    plant.indirectLaborRows = resolveIndirectLaborRows(plant, 'auto', processType);
+                  }
+                  return { ...current, plant };
+                })}><option value="L6">L6</option><option value="L10">L10</option></select></label>
+                <label><span>IDL Mode</span><select value={project.plant.idlUiMode} onChange={(event) => updateProject((current) => {
+                  const idlUiMode = event.target.value as ProjectState['plant']['idlUiMode'];
+                  const plant: ProjectState['plant'] = { ...current.plant, idlUiMode };
+                  plant.indirectLaborRows = resolveIndirectLaborRows(plant, idlUiMode);
+                  return { ...current, plant };
+                })}><option value="auto">auto</option><option value="L10">L10</option><option value="L6">L6</option></select></label>
                 <label><span>Direct Labor Rate</span><input type="number" step="0.01" value={project.plant.mvaRates.directLaborHourlyRate} onChange={(event) => updateProject((current) => ({ ...current, plant: { ...current.plant, mvaRates: { ...current.plant.mvaRates, directLaborHourlyRate: numberValue(event.target.value) } } }))} /></label>
                 <label><span>Indirect Labor Rate</span><input type="number" step="0.01" value={project.plant.mvaRates.indirectLaborHourlyRate} onChange={(event) => updateProject((current) => ({ ...current, plant: { ...current.plant, mvaRates: { ...current.plant.mvaRates, indirectLaborHourlyRate: numberValue(event.target.value) } } }))} /></label>
                 <label><span>Efficiency</span><input type="number" step="0.01" value={project.plant.mvaRates.efficiency} onChange={(event) => updateProject((current) => ({ ...current, plant: { ...current.plant, mvaRates: { ...current.plant.mvaRates, efficiency: numberValue(event.target.value) } } }))} /></label>
@@ -399,6 +645,19 @@ export default function App() {
                 <label><span>Equipment Depreciation / Month</span><input type="number" step="0.01" value={activeOverhead.equipmentDepreciationPerMonth} onChange={(event) => updateProject((current) => ({ ...current, plant: { ...current.plant, overheadByProcess: { ...current.plant.overheadByProcess, [current.plant.processType]: { ...current.plant.overheadByProcess[current.plant.processType], equipmentDepreciationPerMonth: numberValue(event.target.value) } } } }))} /></label>
                 <label><span>Space / Month</span><input type="number" step="0.01" value={activeOverhead.spaceMonthlyCost} onChange={(event) => updateProject((current) => ({ ...current, plant: { ...current.plant, overheadByProcess: { ...current.plant.overheadByProcess, [current.plant.processType]: { ...current.plant.overheadByProcess[current.plant.processType], spaceMonthlyCost: numberValue(event.target.value) } } } }))} /></label>
                 <label><span>Power / Unit</span><input type="number" step="0.01" value={activeOverhead.powerCostPerUnit} onChange={(event) => updateProject((current) => ({ ...current, plant: { ...current.plant, overheadByProcess: { ...current.plant.overheadByProcess, [current.plant.processType]: { ...current.plant.overheadByProcess[current.plant.processType], powerCostPerUnit: numberValue(event.target.value) } } } }))} /></label>
+              </div>
+            </SectionCard>
+
+            <SectionCard title="Space Strategy" description="Manual, matrix, and 40/60 split settings are available from the same project state.">
+              <div className="form-grid cols-4">
+                <label><span>Mode</span><select value={project.plant.spaceSettings.mode} onChange={(event) => updateProject((current) => ({ ...current, plant: { ...current.plant, spaceSettings: { ...current.plant.spaceSettings, mode: event.target.value as ProjectState['plant']['spaceSettings']['mode'] } } }))}><option value="manual">manual</option><option value="matrix">matrix</option></select></label>
+                <label><span>Space Rate / Sqft</span><input type="number" step="0.01" value={project.plant.spaceSettings.spaceRatePerSqft} onChange={(event) => updateProject((current) => ({ ...current, plant: { ...current.plant, spaceSettings: { ...current.plant.spaceSettings, spaceRatePerSqft: numberValue(event.target.value) } } }))} /></label>
+                <label><span>Line Length Ft</span><input type="number" value={project.plant.spaceSettings.lineLengthFt} onChange={(event) => updateProject((current) => ({ ...current, plant: { ...current.plant, spaceSettings: { ...current.plant.spaceSettings, lineLengthFt: numberValue(event.target.value) } } }))} /></label>
+                <label><span>Line Width Ft</span><input type="number" value={project.plant.spaceSettings.lineWidthFt} onChange={(event) => updateProject((current) => ({ ...current, plant: { ...current.plant, spaceSettings: { ...current.plant.spaceSettings, lineWidthFt: numberValue(event.target.value) } } }))} /></label>
+                <label><span>Area Multiplier</span><input type="number" step="0.01" value={project.plant.spaceSettings.spaceAreaMultiplier} onChange={(event) => updateProject((current) => ({ ...current, plant: { ...current.plant, spaceSettings: { ...current.plant.spaceSettings, spaceAreaMultiplier: numberValue(event.target.value) } } }))} /></label>
+                <label><span>Building Override Sqft</span><input type="number" value={project.plant.spaceSettings.buildingAreaOverrideSqft} onChange={(event) => updateProject((current) => ({ ...current, plant: { ...current.plant, spaceSettings: { ...current.plant.spaceSettings, buildingAreaOverrideSqft: numberValue(event.target.value) } } }))} /></label>
+                <label><span>40/60 Split</span><select value={project.plant.spaceSettings.split4060Enabled ? 'enabled' : 'disabled'} onChange={(event) => updateProject((current) => ({ ...current, plant: { ...current.plant, spaceSettings: { ...current.plant.spaceSettings, split4060Enabled: event.target.value === 'enabled' } } }))}><option value="disabled">disabled</option><option value="enabled">enabled</option></select></label>
+                <label><span>40/60 Total Floor</span><input type="number" value={project.plant.spaceSettings.split4060TotalFloorSqft} onChange={(event) => updateProject((current) => ({ ...current, plant: { ...current.plant, spaceSettings: { ...current.plant.spaceSettings, split4060TotalFloorSqft: numberValue(event.target.value) } } }))} /></label>
               </div>
             </SectionCard>
 
@@ -429,6 +688,53 @@ export default function App() {
                       </tbody>
                     </table>
                   </div>
+                </div>
+              </div>
+            </SectionCard>
+
+            <SectionCard title="Equipment Delta" description="Compares the selected line standard against baseline plus extra equipment.">
+              <div className="data-table-wrapper compact">
+                <table className="data-table">
+                  <thead>
+                    <tr><th>Process</th><th>Item</th><th>Template Cost / Mo</th><th>Total Cost / Mo</th><th>Delta / Mo</th></tr>
+                  </thead>
+                  <tbody>
+                    {equipmentDelta.rows.map((row) => (
+                      <tr key={`${row.process}-${row.item}`}>
+                        <td>{row.process}</td>
+                        <td>{row.item}</td>
+                        <td>{toMoney(row.templateCostPerMonth)}</td>
+                        <td>{toMoney(row.totalCostPerMonth)}</td>
+                        <td>{toMoney(row.deltaCostPerMonth)}</td>
+                      </tr>
+                    ))}
+                    <tr className="summary-row"><td colSpan={2}>Total</td><td>{toMoney(equipmentDelta.totals.templateCostPerMonth)}</td><td>{toMoney(equipmentDelta.totals.totalCostPerMonth)}</td><td>{toMoney(equipmentDelta.totals.deltaCostPerMonth)}</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </SectionCard>
+
+            <SectionCard title="Labor Estimation Snapshots" description="Imported labor-time estimation sheets are visible here for parity checks.">
+              <div className="two-column-grid">
+                <div className="data-table-wrapper compact">
+                  <table className="data-table">
+                    <thead><tr><th colSpan={4}>L10 Stations</th></tr><tr><th>Name</th><th>HC</th><th>UPH</th><th>Monthly Capa</th></tr></thead>
+                    <tbody>
+                      {project.laborTimeL10.stations.map((station) => (
+                        <tr key={station.id}><td>{station.name}</td><td>{station.laborHc}</td><td>{station.uph ?? 0}</td><td>{station.monthlyCapa ?? 0}</td></tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="data-table-wrapper compact">
+                  <table className="data-table">
+                    <thead><tr><th colSpan={4}>L6 Stations</th></tr><tr><th>Name</th><th>HC</th><th>UPH</th><th>Cycle Time</th></tr></thead>
+                    <tbody>
+                      {project.laborTimeL6.stations.map((station) => (
+                        <tr key={station.id}><td>{station.name}</td><td>{station.laborHc}</td><td>{station.uph ?? 0}</td><td>{station.cycleTimeSec ?? 0}</td></tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </SectionCard>
@@ -482,21 +788,42 @@ export default function App() {
               <div className="two-column-grid">
                 <div className="form-grid cols-2">
                   <h3>L10</h3>
+                  <label><span>BU</span><input value={project.productL10.bu} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, bu: event.target.value } }))} /></label>
                   <label><span>Project Name</span><input value={project.productL10.projectName} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, projectName: event.target.value } }))} /></label>
                   <label><span>Customer</span><input value={project.productL10.customer} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, customer: event.target.value } }))} /></label>
-                  <label><span>Handling Sec</span><input type="number" value={project.productL10.testTime.handlingSec} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, testTime: { ...current.productL10.testTime, handlingSec: numberValue(event.target.value) } } }))} /></label>
-                  <label><span>Function Sec</span><input type="number" value={project.productL10.testTime.functionSec} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, testTime: { ...current.productL10.testTime, functionSec: numberValue(event.target.value) } } }))} /></label>
+                  <label><span>Model Name</span><input value={project.productL10.modelName} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, modelName: event.target.value } }))} /></label>
+                  <label><span>Size mm</span><input value={project.productL10.sizeMm} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, sizeMm: event.target.value } }))} /></label>
+                  <label><span>Handling Sec</span><input type="number" value={project.productL10.testTime.handlingSec} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, testTime: syncL10TestTime(current.productL10.testTime, { handlingSec: numberValue(event.target.value) }) } }))} /></label>
+                  <label><span>Function Sec</span><input type="number" value={project.productL10.testTime.functionSec} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, testTime: syncL10TestTime(current.productL10.testTime, { functionSec: numberValue(event.target.value) }) } }))} /></label>
                   <label><span>Yield</span><input type="number" step="0.01" value={project.productL10.yield ?? ''} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, yield: event.target.value === '' ? null : numberValue(event.target.value) } }))} /></label>
                   <label><span>RFQ / Month</span><input type="number" value={project.productL10.rfqQtyPerMonth ?? ''} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, rfqQtyPerMonth: event.target.value === '' ? null : numberValue(event.target.value) } }))} /></label>
+                  <label><span>Shifts / Day</span><input type="number" value={project.productL10.shiftsPerDay ?? ''} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, shiftsPerDay: event.target.value === '' ? null : numberValue(event.target.value) } }))} /></label>
+                  <label><span>Hours / Shift</span><input type="number" value={project.productL10.hoursPerShift ?? ''} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, hoursPerShift: event.target.value === '' ? null : numberValue(event.target.value) } }))} /></label>
                 </div>
                 <div className="form-grid cols-2">
                   <h3>L6</h3>
+                  <label><span>BU</span><input value={project.productL6.bu} onChange={(event) => updateProject((current) => ({ ...current, productL6: { ...current.productL6, bu: event.target.value } }))} /></label>
                   <label><span>PN</span><input value={project.productL6.pn} onChange={(event) => updateProject((current) => ({ ...current, productL6: { ...current.productL6, pn: event.target.value } }))} /></label>
+                  <label><span>SKU</span><input value={project.productL6.sku ?? ''} onChange={(event) => updateProject((current) => ({ ...current, productL6: { ...current.productL6, sku: event.target.value } }))} /></label>
                   <label><span>Customer</span><input value={project.productL6.customer} onChange={(event) => updateProject((current) => ({ ...current, productL6: { ...current.productL6, customer: event.target.value } }))} /></label>
                   <label><span>Boards / Panel</span><input type="number" value={project.productL6.boardsPerPanel} onChange={(event) => updateProject((current) => ({ ...current, productL6: { ...current.productL6, boardsPerPanel: numberValue(event.target.value) } }))} /></label>
                   <label><span>PCB Size</span><input value={project.productL6.pcbSize} onChange={(event) => updateProject((current) => ({ ...current, productL6: { ...current.productL6, pcbSize: event.target.value } }))} /></label>
+                  <label><span>Side 1 Parts</span><input type="number" value={project.productL6.side1PartsCount ?? ''} onChange={(event) => updateProject((current) => ({ ...current, productL6: { ...current.productL6, side1PartsCount: event.target.value === '' ? null : numberValue(event.target.value) } }))} /></label>
+                  <label><span>Side 2 Parts</span><input type="number" value={project.productL6.side2PartsCount ?? ''} onChange={(event) => updateProject((current) => ({ ...current, productL6: { ...current.productL6, side2PartsCount: event.target.value === '' ? null : numberValue(event.target.value) } }))} /></label>
+                  <label><span>Handling Sec</span><input type="number" value={project.productL6.testTime.handlingSec} onChange={(event) => updateProject((current) => ({ ...current, productL6: { ...current.productL6, testTime: { ...current.productL6.testTime, handlingSec: numberValue(event.target.value) } } }))} /></label>
+                  <label><span>Function Sec</span><input type="number" value={project.productL6.testTime.functionSec} onChange={(event) => updateProject((current) => ({ ...current, productL6: { ...current.productL6, testTime: { ...current.productL6.testTime, functionSec: numberValue(event.target.value) } } }))} /></label>
                   <label className="full-span"><span>Station Path</span><input value={project.productL6.stationPath} onChange={(event) => updateProject((current) => ({ ...current, productL6: { ...current.productL6, stationPath: event.target.value } }))} /></label>
                 </div>
+              </div>
+            </SectionCard>
+
+            <SectionCard title="Structured Setup Imports" description="Legacy MPM and labor-estimation sheets now map directly into typed project state.">
+              <div className="action-grid">
+                <label className="upload-card"><span>Import Month/Year Update CSV</span><input type="file" accept=".csv,text/csv" onChange={(event) => void importMonthYearUpdate(event.target.files?.[0] ?? null)} /></label>
+                <label className="upload-card"><span>Import L10 MPM Setup CSV</span><input type="file" accept=".csv,text/csv" onChange={(event) => void importL10MpmSetup(event.target.files?.[0] ?? null)} /></label>
+                <label className="upload-card"><span>Import L6 MPM Setup CSV</span><input type="file" accept=".csv,text/csv" onChange={(event) => void importL6MpmSetup(event.target.files?.[0] ?? null)} /></label>
+                <label className="upload-card"><span>Import L10 Labor Estimation CSV</span><input type="file" accept=".csv,text/csv" onChange={(event) => void importL10LaborEstimation(event.target.files?.[0] ?? null)} /></label>
+                <label className="upload-card"><span>Import L6 Labor Estimation CSV</span><input type="file" accept=".csv,text/csv" onChange={(event) => void importL6LaborEstimation(event.target.files?.[0] ?? null)} /></label>
               </div>
             </SectionCard>
 
@@ -535,6 +862,7 @@ export default function App() {
             <SectionCard title="Imports and Exports" description="Structured file exchange replaces the legacy missing helper modules.">
               <div className="action-grid">
                 <label className="upload-card"><span>Import Project JSON</span><input type="file" accept="application/json" onChange={(event) => void importJsonProject(event.target.files?.[0] ?? null)} /></label>
+                <label className="upload-card"><span>Import Month/Year Update CSV</span><input type="file" accept=".csv,text/csv" onChange={(event) => void importMonthYearUpdate(event.target.files?.[0] ?? null)} /></label>
                 <label className="upload-card"><span>Import Equipment CSV</span><input type="file" accept=".csv,text/csv" onChange={async (event) => {
                   const file = event.target.files?.[0] ?? null;
                   if (!file) return;
@@ -549,6 +877,7 @@ export default function App() {
                     console.error(error);
                   }
                 }} /></label>
+                <label className="upload-card"><span>Import Equipment Setup CSV</span><input type="file" accept=".csv,text/csv" onChange={(event) => void importEquipmentSetup(event.target.files?.[0] ?? null)} /></label>
                 <label className="upload-card"><span>Import Space CSV</span><input type="file" accept=".csv,text/csv" onChange={async (event) => {
                   const file = event.target.files?.[0] ?? null;
                   if (!file) return;
@@ -563,6 +892,7 @@ export default function App() {
                     console.error(error);
                   }
                 }} /></label>
+                <label className="upload-card"><span>Import Space Setup CSV</span><input type="file" accept=".csv,text/csv" onChange={(event) => void importSpaceSetup(event.target.files?.[0] ?? null)} /></label>
                 <label className="upload-card"><span>Import Labor CSV</span><input type="file" accept=".csv,text/csv" onChange={async (event) => {
                   const file = event.target.files?.[0] ?? null;
                   if (!file) return;
@@ -577,7 +907,9 @@ export default function App() {
                     console.error(error);
                   }
                 }} /></label>
+                <label className="upload-card"><span>Import DLOH/IDL Setup CSV</span><input type="file" accept=".csv,text/csv" onChange={(event) => void importDlohIdlSetup(event.target.files?.[0] ?? null)} /></label>
                 <label className="upload-card"><span>Import Line Standards JSON</span><input type="file" accept="application/json" onChange={(event) => void importLineStandards(event.target.files?.[0] ?? null)} /></label>
+                <button type="button" className="button secondary tall" onClick={exportL10Stations}>Export L10 Stations CSV</button>
                 <button type="button" className="button secondary tall" onClick={exportLineStandards}>Export Line Standards JSON</button>
               </div>
             </SectionCard>
