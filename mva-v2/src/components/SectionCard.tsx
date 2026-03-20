@@ -11,7 +11,7 @@ export function SectionCard({ title, description, actions, children }: SectionCa
     <section className="section-card">
       <header className="section-header">
         <div>
-          <p className="eyebrow">Module</p>
+          <p className="eyebrow">Worksheet</p>
           <h2>{title}</h2>
           {description ? <p className="muted">{description}</p> : null}
         </div>

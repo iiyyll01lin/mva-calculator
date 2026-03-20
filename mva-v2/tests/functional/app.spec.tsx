@@ -69,7 +69,7 @@ describe('App functional flow', () => {
     });
 
     expect(container.textContent?.includes('Equipment Delta')).toBe(true);
-    expect(container.textContent?.includes('Equipment and Space')).toBe(true);
+    expect(container.textContent?.includes('Equipment List (F-MVA-14)')).toBe(true);
 
     await act(async () => {
       root.unmount();
