@@ -100,6 +100,7 @@ Current release-candidate scope preserves the core legacy workflow:
 
 ## Legacy Parity Notes
 - Detailed parity refactor notes, logic changes, and manual verification steps are documented in [docs/parity-refactor-notes.zh-TW.md](docs/parity-refactor-notes.zh-TW.md).
+- Remaining field-by-field differences versus the legacy HTML are tracked in [docs/legacy-gap-review.zh-TW.md](docs/legacy-gap-review.zh-TW.md).
 
 ## Known Next-Step Areas
 - deeper schema validation beyond structural checks

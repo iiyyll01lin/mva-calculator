@@ -61,9 +61,38 @@
 - 調整內容：新增 process-specific project helper，讓同一份 project state 可以分別生成 L10 與 L6 summary。
 - 原因：避免單純依賴目前 active processType，導致 Summary (L10) / Summary (L6) 無法各自穩定呈現。
 
+### 7. 將 Basic Information 改回 legacy 的 4 個輸入分組
+- 原本狀態：Basic Information 將所有欄位攤平成單一 grid，缺少 Production Planning 等明確分組。
+- 調整後：改回以下 4 張卡片分組。
+  - Production Planning
+  - Shift Configuration
+  - Efficiency and Quality
+  - Batch Settings
+- 原因：使用者明確指出 production planning 分類缺失；legacy 版本的輸入理解是靠分組，不是只靠欄位存在。
+
+### 8. 將 Model Process 改成 sequence table 形式
+- 原本狀態：Model Process 以簡化 editable list 呈現，雖然有 step，但缺少 legacy 的 sequence table 語意。
+- 調整後：改成表格式 Seq / Process / Side / Action，並加入 side badge 與 sticky header。
+- 原因：使用者要求 sequence 必須明確可見；legacy 版本是 sequence table，不是鬆散 list editor。
+
+### 9. 補回 Simulation Results 的 bottleneck alert 與 CT mountain chart
+- 原本狀態：只有 KPI 與簡化表格，缺少 bottleneck alert 與圖表。
+- 調整後：新增：
+  - bottleneck alert
+  - takt reference line
+  - CT / bottleneck mountain chart
+  - raw CT / loss / final CT / utilization detail table
+- 原因：legacy simulation page 的核心價值在於快速辨識 bottleneck，而不是只看數字表格。
+
+### 10. 將整體視覺收斂到較接近 legacy 的 light material 風格
+- 原本狀態：畫面使用深色玻璃風，且 hero header 留白偏大。
+- 調整後：改為淺色卡片、淡色側欄、較緊湊的 header、badge/progress/chart 色彩語意。
+- 原因：使用者明確指出 UI 風格與留白配置偏離 legacy；這次先把主視覺方向拉回 legacy 風格。
+
 ## 涉及檔案
 - [src/domain/models.ts](src/domain/models.ts)
 - [src/components/Sidebar.tsx](src/components/Sidebar.tsx)
+- [src/components/SectionCard.tsx](src/components/SectionCard.tsx)
 - [src/styles.css](src/styles.css)
 - [src/App.tsx](src/App.tsx)
 - [tests/functional/app.spec.tsx](tests/functional/app.spec.tsx)
@@ -77,13 +106,21 @@
 
 ### Basic Information
 1. 進入 Basic Information。
-2. 修改 Weekly Demand。
-3. 切到 Simulation Results，確認 KPI 有跟著變化。
+2. 確認畫面拆成 4 張卡：Production Planning、Shift Configuration、Efficiency and Quality、Batch Settings。
+3. 修改 Weekly Demand。
+4. 切到 Simulation Results，確認 KPI 有跟著變化。
 
 ### Model Process
 1. 進入 Model Process。
-2. 新增一列 step，輸入 process 與 side。
-3. 切到 Simulation Results，確認該 routing 被納入結果。
+2. 確認表頭為 Seq / Process / Side / Action，且捲動時表頭固定。
+3. 新增一列 step，輸入 process 與 side。
+4. 切到 Simulation Results，確認該 routing 被納入結果。
+
+### Simulation Results
+1. 進入 Simulation Results。
+2. 確認有 KPI、bottleneck alert、CT mountain chart、detail table。
+3. 調高 Weekly Demand 或修改某個 machine rate / process，使 bottleneck 改變。
+4. 確認 alert 內容、chart 高柱位置、detail table highlight row 會同步變化。
 
 ### DLOH-L / IDL Setup
 1. 進入 DLOH-L & IDL Setup。
@@ -113,5 +150,6 @@
 
 ## 目前仍值得持續精進的地方
 - 官方 Excel 樣板匯出仍未完全追平 legacy xlsx-populate 工作流。
-- Labor Time 頁面雖已獨立，但還沒完全覆蓋 legacy 的所有 station 欄位細節。
+- L10 / L6 labor time 頁面雖已獨立，但尚未完全覆蓋 legacy 的 matrix / header parity 細節。
+- Plant Inputs、MPM Setup、Summary 頁仍有部分欄位與版面可再逐頁對照 legacy 繼續收斂。
 - Equipment delta 目前以成本差異為主，還可再補齊更多 legacy 粒度欄位。
