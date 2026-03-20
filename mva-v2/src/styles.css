@@ -116,6 +116,31 @@ label > span {
   margin-top: 1.25rem;
 }
 
+.nav-group {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.nav-group + .nav-group {
+  margin-top: 0.5rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--line);
+}
+
+.nav-group-heading {
+  margin: 0;
+  padding: 0 0.3rem;
+  color: var(--accent);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.nav-group-list {
+  display: grid;
+  gap: 0.55rem;
+}
+
 .nav-button {
   display: grid;
   gap: 0.2rem;
@@ -288,7 +313,8 @@ label > span {
 
 .panel-list,
 .upload-card,
-.list-row {
+.list-row,
+.editor-grid {
   border: 1px solid var(--line);
   border-radius: 18px;
   background: var(--bg-panel-alt);
@@ -348,11 +374,37 @@ label > span {
   gap: 0.65rem;
 }
 
+.editor-grid {
+  display: grid;
+  gap: 0.65rem;
+  padding: 0.8rem;
+}
+
 .list-row {
   display: grid;
   grid-template-columns: 1.2fr 0.6fr 0.9fr;
   gap: 0.65rem;
   padding: 0.65rem;
+}
+
+.list-row.wide-4 {
+  grid-template-columns: 1.2fr 0.8fr 0.8fr 0.9fr;
+}
+
+.list-row.wide-5 {
+  grid-template-columns: 1.2fr 0.75fr 0.75fr 0.75fr 0.9fr;
+}
+
+.list-row.wide-6 {
+  grid-template-columns: 1fr 0.7fr 0.8fr 0.8fr 0.8fr 0.8fr;
+}
+
+.list-row.actions {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.subsection-title {
+  margin: 0 0 0.75rem;
 }
 
 .upload-card {

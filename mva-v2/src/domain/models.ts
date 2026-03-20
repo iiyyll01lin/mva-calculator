@@ -1,12 +1,20 @@
 export type TabId =
-  | 'dashboard'
-  | 'simulation'
-  | 'rates'
-  | 'equipment'
-  | 'space'
-  | 'labor'
-  | 'product'
-  | 'reports';
+  | 'basic'
+  | 'machine_rates'
+  | 'bom_map'
+  | 'model_process'
+  | 'simulation_results'
+  | 'mva_plant_rates'
+  | 'mva_plant_env'
+  | 'mva_plant_equipment'
+  | 'mva_plant_space'
+  | 'mva_plant_dloh_idl'
+  | 'mpm_l10'
+  | 'mpm_l6'
+  | 'mva_labor_l10'
+  | 'mva_labor_l6'
+  | 'mva_summary_l10'
+  | 'mva_summary_l6';
 
 export interface BasicInfo {
   modelName: string;
