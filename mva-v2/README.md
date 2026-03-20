@@ -98,6 +98,9 @@ Current release-candidate scope preserves the core legacy workflow:
 - line-standard template reuse
 - structured imports and exports
 
+## Legacy Parity Notes
+- Detailed parity refactor notes, logic changes, and manual verification steps are documented in [docs/parity-refactor-notes.zh-TW.md](docs/parity-refactor-notes.zh-TW.md).
+
 ## Known Next-Step Areas
 - deeper schema validation beyond structural checks
 - richer delete and edit controls for equipment and space lists

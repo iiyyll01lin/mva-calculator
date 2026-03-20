@@ -10,8 +10,8 @@ trap 'kill "$server_pid" >/dev/null 2>&1 || true' EXIT
 sleep 2
 
 html=$(curl -fsSL http://127.0.0.1:4173)
-printf '%s' "$html" | grep -q '<div id="root"></div>'
+grep -q '<div id="root"></div>' <<<"$html"
 asset_path=$(printf '%s' "$html" | sed -n 's/.*src="\(\/assets\/[^\"]*\)".*/\1/p' | head -n 1)
 [ -n "$asset_path" ]
 asset_js=$(curl -fsSL "http://127.0.0.1:4173${asset_path}")
-printf '%s' "$asset_js" | grep -q 'StreamWeaver'
+grep -q 'StreamWeaver' <<<"$asset_js"
