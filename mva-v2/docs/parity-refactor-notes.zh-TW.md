@@ -84,10 +84,36 @@
   - raw CT / loss / final CT / utilization detail table
 - 原因：legacy simulation page 的核心價值在於快速辨識 bottleneck，而不是只看數字表格。
 
-### 10. 將整體視覺收斂到較接近 legacy 的 light material 風格
-- 原本狀態：畫面使用深色玻璃風，且 hero header 留白偏大。
-- 調整後：改為淺色卡片、淡色側欄、較緊湊的 header、badge/progress/chart 色彩語意。
-- 原因：使用者明確指出 UI 風格與留白配置偏離 legacy；這次先把主視覺方向拉回 legacy 風格。
+### 10. 將整體視覺切回較接近 legacy 的黑色主題
+- 原本狀態：上一輪已收斂成淺色 material 方向，但與 legacy HTML 的深色工作台外觀不一致。
+- 調整後：改回深色背景、深色 sidebar、深色 worksheet card、深色表格、深色輸入框，並同步調整 KPI、badge、chart、decision button 的顏色。
+- 原因：使用者明確要求黑色主題要跟 legacy HTML 一致，且深色工作台是原始操作體驗的一部分。
+
+### 11. 補回 Equipment to Simulation Mapping 的完整工作流
+- 原本狀態：model 已有 simMachineGroup / simParallelQty / simRateOverride 欄位，但 simulation engine 沒有真正使用，UI 也沒有完整 preview 與寫回流程。
+- 調整後：
+  - Equipment baseline / extra tables 直接露出 sim mapping 欄位
+  - 新增 Equipment to Simulation Mapping 區塊，顯示 current rate、mapped parallel qty、derived rate、linked items
+  - simulation engine 在啟用 toggle 後會直接吃 equipment mapping
+  - 同時保留一鍵把 derived rate 寫回 Machine Rates 的顯式操作
+- 原因：使用者要求 equipment 與 simulation mapping 必須完整 parity，不能只有資料欄位存在但沒有真正驅動計算。
+
+### 12. 將 L6 Labor Time 改成真正的 segment matrix 版型
+- 原本狀態：L6 labor page 只是平面寬表格，雖然有 segments schema，但 UI 沒有真正以 segment 為中心。
+- 調整後：
+  - 以 segment 為主單位顯示多張 matrix
+  - 每個 segment 允許自訂名稱、增刪 station、刪除 segment
+  - station 以欄顯示，No / HC / Fixture / CT / Allowance / Std Man Hour / VPY / Shift Rate / DL Online 成為矩陣列
+  - 額外顯示 segment-level summary，例如 segment DL online 與 bottleneck UPH
+- 原因：使用者要求做成更接近 legacy 的真正 segment matrix 橫向版型，而不是延伸版 table。
+
+### 13. 收斂 MPM 與 Summary 的欄位順序與命名
+- 原本狀態：MPM / Summary 雖然功能完整，但 product profile、routing time、derived output、summary grouping 的順序與命名仍偏現代化。
+- 調整後：
+  - L10 MPM 改為 Product Information / Product Dimension / Test Time Setup / Volume and Lifecycle / Working Schedule
+  - L6 MPM 補 model name、offline blasting part、routing time 明細列
+  - Summary 加入 Product Profile 與 Calculation Result 區塊，並調整章節命名為更接近 legacy worksheet 語氣
+- 原因：使用者要求逐頁把 Summary 與 MPM 的欄位順序、命名、視覺細節再向 legacy 收斂。
 
 ## 涉及檔案
 - [src/domain/models.ts](src/domain/models.ts)
@@ -130,8 +156,15 @@
 ### Labor Time Estimation
 1. 進入 Labor Time (L10) 或 Labor Time (L6)。
 2. 修改 station 的 HC 或 cycle time。
-3. 確認 computed snapshot 有變化。
+3. 若在 L6 頁，確認 segment matrix 會即時顯示 Avg CT 與 UPH。
 4. 按 Apply to Direct Labor，回到 DLOH-L & IDL Setup，確認 direct labor rows 已同步。
+
+### Equipment Mapping
+1. 進入 Equipment List。
+2. 在 baseline 或 extra equipment row 中填入 Sim Group、Sim Parallel Qty、Sim Rate Override。
+3. 確認 Equipment to Simulation Mapping 區塊會顯示 derived rate 與 linked items。
+4. 勾選 Use equipment mapping to drive simulation rates，切到 Simulation Results，確認相關 machine group 的 cycle time 會改變。
+5. 按 Write Derived Rates to Machine Rates，切到 Machine Rates，確認 rate 已寫回。
 
 ### Summary
 1. 進入 Summary (L10) 與 Summary (L6)。
@@ -147,9 +180,11 @@
   - corepack pnpm exec vitest run tests/regression/summary.spec.ts --reporter=verbose
 - Smoke:
   - bash tests/e2e/smoke.sh
+- Full gate:
+  - corepack pnpm run test:all
 
 ## 目前仍值得持續精進的地方
 - 官方 Excel 樣板匯出仍未完全追平 legacy xlsx-populate 工作流。
-- L10 / L6 labor time 頁面雖已獨立，但尚未完全覆蓋 legacy 的 matrix / header parity 細節。
-- Plant Inputs、MPM Setup、Summary 頁仍有部分欄位與版面可再逐頁對照 legacy 繼續收斂。
-- Equipment delta 目前以成本差異為主，還可再補齊更多 legacy 粒度欄位。
+- 某些 summary 與 MPM 的欄位順序已明顯靠近 legacy，但仍未做到逐像素逐欄位完全一致。
+- L6 segment matrix 已回到正確方向，但多 segment 匯入規則仍可再做得更貼近 legacy 原始 CSV。
+- Export MVA / Excel template workflow 仍未完全追平 legacy xlsx-populate 輸出流程。

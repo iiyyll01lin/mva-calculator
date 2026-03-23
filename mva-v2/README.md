@@ -94,7 +94,9 @@ Current release-candidate scope preserves the core legacy workflow:
 - simulation planning and bottleneck analysis
 - labor and overhead costing
 - equipment and space itemization
+- equipment-to-simulation mapping with derived machine-rate preview
 - L10 and L6 product metadata
+- L6 segment-matrix labor estimation
 - line-standard template reuse
 - structured imports and exports
 
