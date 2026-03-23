@@ -115,6 +115,45 @@
   - Summary 加入 Product Profile 與 Calculation Result 區塊，並調整章節命名為更接近 legacy worksheet 語氣
 - 原因：使用者要求逐頁把 Summary 與 MPM 的欄位順序、命名、視覺細節再向 legacy 收斂。
 
+### 14. Summary 頁面完整 1:1 legacy 對齊（branch 202603-rc2）
+- 背景：Phase 2 gap review 確認 Summary 仍有以下差距：top card 多出一個完整 SectionCard、KPI strip 非 legacy 結構、DL/IDL 為兩張並排表、成本區塊命名與順序錯誤、Yield/Capacity section 為多餘欄位。
+- 調整內容：
+  - 移除最上方 "MVA Summary Sheet" SectionCard，改為純 summary-page-header（標題 + Export MVA 按鈕）
+  - 移除 KPI 卡片區段（非 legacy summary 結構）
+  - 移除 "Yield and Capacity" SectionCard（legacy 無此區段）
+  - 移除 "Cost Rollup" table（legacy 無此獨立表格）
+  - 移除底部重複的 renderReviewGate() 呼叫
+  - 將 Direct Labor + Indirect Labor 從兩張並排表改為單一組合表，兩個 thead section-header 行（對應 legacy "A. LABOR Cost"）
+  - 成本區塊改為兩欄版型：左側 D. Overhead（Equip Dep / Maint / Space / Power / Total）；右側上方 E. SG&A、右側下方 MVA Total Cost 大字
+  - Confirm 卡加入 Current Status readonly 欄位
+  - L6 Capacity Assumptions 的 Boards/Panel 與 PCB Size 欄位加入 summary-highlight 樣式
+  - 新增 CSS：summary-page-header、stack-md、summary-highlight、cost-total-display、th.section-header
+
+### 15. Space Setup 狀態機 UI（branch 202603-rc2）
+- 背景：Space Setup 頁所有子卡片（Building Area、Process Distribution、Add Row 按鈕、Import CSV）在 matrix 與 manual 兩種模式下都始終可見，不符合 legacy 行為。
+- 調整內容：
+  - Building Area by Floor、Line Specification (Line Length/Width)、Process Distribution 三個子卡片改為僅在 mode === 'matrix' 時渲染
+  - Add Row 按鈕與 Import Space Setup CSV 改為僅在 mode === 'manual' 時渲染（data-testid 對齊 legacy）
+  - Allocation table 所有欄位的 input / delete button 在 mode === 'matrix' 時設為 disabled
+  - SectionCard 標題隨模式顯示 "(Generated)" 或 "(Manual)"
+  - Mode Selection 說明文字更新以解釋兩種模式行為
+
+### 16. MPM L10 欄位順序修正（branch 202603-rc2）
+- 背景：L10 MPM 的 Product Information 子卡中包含 Model Name（legacy 無此欄）與 RFQ Qty/Month（legacy 應在 Volume and Lifecycle），欄位順序偏移。
+- 調整內容：
+  - 移除 Product Information 子卡的 Model Name 欄位（由 Project Name 衍生，UI 中不需獨立設定）
+  - 將 RFQ Qty / Month 移至 Volume and Lifecycle 子卡，置於第一欄
+  - Product Information 欄位順序改為：BU → Customer → Project Name → Yield (FPY)（與 legacy grid-4 一致）
+
+### 17. L6 Labor 多段落 CSV 識別（branch 202603-rc2）
+- 背景：`parseL6LaborTimeEstimationCsv` 原本只建立單一 segment，無法處理 legacy 標準格式中以 "total" 列作為段落終止符的多段落 CSV。
+- 調整內容：
+  - 在建立 stations 陣列後加入段落分割邏輯：遇到 `isTotal === true` 的行時推入一個 segment 並重置暫存列表
+  - 迴圈後若仍有未終止的暫存 stations（末段無 total 列），自動補入最後一個 segment
+  - 第一個 segment 使用 meta.segmentname（若存在）命名；後續 segment 自動命名為 "Segment N"
+  - 單段落 CSV（無 total 列）仍正常運作，退化為一個 segment
+  - 新增 4 個 unit test：單段落、雙段落分割、segmentname 命名、flat stations 完整性
+
 ## 涉及檔案
 - [src/domain/models.ts](src/domain/models.ts)
 - [src/components/Sidebar.tsx](src/components/Sidebar.tsx)
