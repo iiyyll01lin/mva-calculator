@@ -27,6 +27,37 @@ describe('calculation engine', () => {
     expect(mva.lineUphUsedForCapacity).toBeLessThan(simulation.uph);
   });
 
+  it('derives simulation rates from equipment mapping when enabled', () => {
+    const baseline = calculateSimulation(defaultProject);
+    const project = {
+      ...defaultProject,
+      plant: {
+        ...defaultProject.plant,
+        showEquipmentSimMapping: true as const,
+        includeExtraEquipmentInSimMapping: false as const,
+        equipmentList: [
+          ...defaultProject.plant.equipmentList,
+          {
+            id: 'eq-map-printer',
+            process: 'SMT',
+            item: 'Printer clone',
+            qty: 1,
+            unitPrice: 50000,
+            depreciationYears: 5,
+            simMachineGroup: 'Printer',
+            simParallelQty: 3,
+          },
+        ],
+      },
+    };
+    const mapped = calculateSimulation(project);
+    const baselinePrinter = baseline.steps.find((step) => step.process === 'Printer');
+    const mappedPrinter = mapped.steps.find((step) => step.process === 'Printer');
+    expect(baselinePrinter).toBeTruthy();
+    expect(mappedPrinter).toBeTruthy();
+    expect(mappedPrinter!.cycleTime).toBeLessThan(baselinePrinter!.cycleTime);
+  });
+
   it('builds a csv-ready summary matrix', () => {
     const rows = summarizeForCsv(defaultProject);
     expect(rows[0]).toEqual(['Section', 'Item', 'Value']);

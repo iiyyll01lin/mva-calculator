@@ -120,7 +120,16 @@ function laborBreakdown(
 }
 
 export function calculateSimulation(project: ProjectState): SimulationResults {
-  const { basicInfo, machines, bomMap, processSteps } = project;
+  const derivedMachines = project.plant.showEquipmentSimMapping
+    ? deriveMachineRatesFromEquipmentLinks({
+        baseMachines: project.machines,
+        equipmentList: project.plant.equipmentList,
+        extraEquipmentList: project.plant.extraEquipmentList,
+        includeExtra: project.plant.includeExtraEquipmentInSimMapping,
+      }).machines
+    : project.machines;
+  const { basicInfo, bomMap, processSteps } = project;
+  const machines = derivedMachines;
   const availableMinutesPerDay = basicInfo.shiftsPerDay * basicInfo.hoursPerShift * 60 - basicInfo.shiftsPerDay * basicInfo.breaksPerShiftMin;
   const availableSecondsPerWeek = availableMinutesPerDay * 60 * basicInfo.workDays;
   const taktTime = basicInfo.demandWeekly > 0 ? availableSecondsPerWeek / basicInfo.demandWeekly : 0;
@@ -438,7 +447,14 @@ export function deriveMachineRatesFromEquipmentLinks({
   includeExtra: boolean;
 }) {
   const sourceItems = includeExtra ? [...equipmentList, ...extraEquipmentList] : equipmentList;
-  const totals = new Map<string, number>();
+  const baseRateLookup = Object.fromEntries(baseMachines.map((machine) => [machine.group, Math.max(0, Number(machine.rate) || 0)]));
+  const totals = new Map<string, {
+    machineGroup: string;
+    currentRate: number;
+    linkedItems: string[];
+    totalParallelQty: number;
+    derivedRate: number;
+  }>();
   sourceItems.forEach((item) => {
     const group = String(item.simMachineGroup || '').trim();
     if (!group) return;
@@ -447,14 +463,32 @@ export function deriveMachineRatesFromEquipmentLinks({
     const baseRate = Math.max(0, Number(baseMachineRateByGroup[group]) || 0);
     const derivedRate = override > 0 ? override : baseRate * qty;
     if (derivedRate <= 0) return;
-    totals.set(group, round((totals.get(group) || 0) + derivedRate));
+    const current = totals.get(group) || {
+      machineGroup: group,
+      currentRate: baseRateLookup[group] ?? 0,
+      linkedItems: [],
+      totalParallelQty: 0,
+      derivedRate: 0,
+    };
+    current.totalParallelQty += qty;
+    current.derivedRate = round(current.derivedRate + derivedRate);
+    current.linkedItems.push(`${item.process || 'Unassigned'} / ${item.item || 'Unnamed'}`);
+    totals.set(group, current);
   });
+
+  const rows = Array.from(totals.values())
+    .map((row) => ({
+      ...row,
+      linkedItems: Array.from(new Set(row.linkedItems)),
+    }))
+    .sort((left, right) => left.machineGroup.localeCompare(right.machineGroup));
 
   return {
     machines: baseMachines.map((machine) => {
-      const derivedRate = totals.get(machine.group);
+      const derivedRate = totals.get(machine.group)?.derivedRate;
       return derivedRate && derivedRate > 0 ? { ...machine, rate: derivedRate } : machine;
     }),
+    rows,
   };
 }
 

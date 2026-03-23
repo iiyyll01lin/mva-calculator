@@ -76,4 +76,29 @@ describe('App functional flow', () => {
     });
     container.remove();
   });
+
+  it('renders the l6 segment matrix workspace', async () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    await act(async () => {
+      root.render(<App />);
+    });
+
+    const laborButton = Array.from(container.querySelectorAll('button')).find((button) => button.textContent?.includes('Labor Time (L6)'));
+    expect(laborButton).toBeTruthy();
+    await act(async () => {
+      laborButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+
+    expect(container.textContent?.includes('Labor Time Estimation (L6)')).toBe(true);
+    expect(container.textContent?.includes('Segment Name')).toBe(true);
+    expect(container.textContent?.includes('Bottleneck UPH')).toBe(true);
+
+    await act(async () => {
+      root.unmount();
+    });
+    container.remove();
+  });
 });

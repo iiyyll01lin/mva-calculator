@@ -2,7 +2,7 @@ import { startTransition, useEffect, useMemo, useState } from 'react';
 import { KpiCard } from './components/KpiCard';
 import { SectionCard } from './components/SectionCard';
 import { Sidebar } from './components/Sidebar';
-import { calculateMva, calculateSimulation, computeEquipmentDelta } from './domain/calculations';
+import { calculateMva, calculateSimulation, computeEquipmentDelta, deriveMachineRatesFromEquipmentLinks } from './domain/calculations';
 import { parseCsv, toCsv } from './domain/csv';
 import { defaultProject } from './domain/defaults';
 import { buildL10StationsCsv, buildProjectExport, buildSummaryCsv, downloadText } from './domain/exporters';
@@ -42,6 +42,29 @@ function formatTimestamp(): string {
   const now = new Date();
   const pad = (value: number) => String(value).padStart(2, '0');
   return `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+}
+
+function buildFallbackL6Segments(project: ProjectState): ProjectState['laborTimeL6']['segments'] {
+  if (project.laborTimeL6.segments.length > 0) {
+    return project.laborTimeL6.segments.map((segment, segmentIndex) => ({
+      ...segment,
+      id: segment.id || `seg-${segmentIndex + 1}`,
+      name: segment.name || project.productL6.sku || project.productL6.pn || `Segment ${segmentIndex + 1}`,
+      stations: segment.stations.map((station, stationIndex) => ({
+        ...station,
+        id: station.id || `${segment.id || `seg-${segmentIndex + 1}`}-station-${stationIndex + 1}`,
+      })),
+    }));
+  }
+
+  return [{
+    id: 'seg-1',
+    name: project.productL6.sku || project.productL6.pn || 'Segment 1',
+    stations: project.laborTimeL6.stations.map((station, stationIndex) => ({
+      ...station,
+      id: station.id || `seg-1-station-${stationIndex + 1}`,
+    })),
+  }];
 }
 
 function assertFileSize(file: File): void {
@@ -265,6 +288,15 @@ export default function App() {
     }, 0),
     [project.plant.extraEquipmentList],
   );
+  const equipmentSimulationMapping = useMemo(
+    () => deriveMachineRatesFromEquipmentLinks({
+      baseMachines: project.machines,
+      equipmentList: project.plant.equipmentList,
+      extraEquipmentList: project.plant.extraEquipmentList,
+      includeExtra: project.plant.includeExtraEquipmentInSimMapping,
+    }),
+    [project.machines, project.plant.equipmentList, project.plant.extraEquipmentList, project.plant.includeExtraEquipmentInSimMapping],
+  );
   const l10StationSnapshots = useMemo(() => project.laborTimeL10.stations.map((station) => {
     const parallelStations = Math.max(1, station.parallelStations || 1);
     const cycleTimeSec = station.cycleTimeSec ?? 0;
@@ -284,19 +316,40 @@ export default function App() {
       monthlyCapa: uph * hoursPerShift * shiftsPerDay * workDaysPerMonth,
     };
   }), [project.laborTimeL10.meta, project.laborTimeL10.stations]);
-  const l6StationSnapshots = useMemo(() => project.laborTimeL6.stations.map((station) => {
-    const parallelStations = Math.max(1, station.parallelStations || 1);
-    const allowanceRate = station.allowanceRate ?? 0;
-    const allowanceFactor = allowanceRate > 1 ? allowanceRate : 1 + allowanceRate / 100;
-    const cycleTimeSec = station.cycleTimeSec ?? 0;
-    const avgCycleTimeSec = cycleTimeSec > 0 ? (cycleTimeSec * allowanceFactor) / parallelStations : 0;
-    const uph = avgCycleTimeSec > 0 ? 3600 / avgCycleTimeSec : 0;
+  const l6SegmentSnapshots = useMemo(() => buildFallbackL6Segments(project).map((segment) => ({
+    ...segment,
+    stations: segment.stations.map((station) => {
+      const parallelStations = Math.max(1, station.parallelStations || 1);
+      const allowanceRate = station.allowanceRate ?? 0;
+      const allowanceFactor = allowanceRate > 1 ? 1 + allowanceRate / 100 : 1 + allowanceRate;
+      const cycleTimeSec = station.cycleTimeSec ?? 0;
+      const avgCycleTimeSec = cycleTimeSec > 0 ? (cycleTimeSec * allowanceFactor) / parallelStations : 0;
+      const uph = avgCycleTimeSec > 0 ? 3600 / avgCycleTimeSec : 0;
+      return {
+        ...station,
+        avgCycleTimeSec,
+        uph,
+      };
+    }),
+  })), [project]);
+  const l6StationSnapshots = useMemo(
+    () => l6SegmentSnapshots.flatMap((segment) => segment.stations),
+    [l6SegmentSnapshots],
+  );
+  const l6LaborSummary = useMemo(() => {
+    const activeStations = l6StationSnapshots.filter((station) => !station.isTotal);
     return {
-      ...station,
-      avgCycleTimeSec,
-      uph,
+      segments: l6SegmentSnapshots.length,
+      stations: activeStations.length,
+      totalHc: activeStations.reduce((sum, station) => sum + (station.dlOnline ?? station.laborHc ?? 0), 0),
+      bottleneckUph: activeStations.reduce((lowest, station) => {
+        const next = station.uph ?? 0;
+        if (lowest === 0) return next;
+        if (next === 0) return lowest;
+        return Math.min(lowest, next);
+      }, 0),
     };
-  }), [project.laborTimeL6.stations]);
+  }, [l6SegmentSnapshots, l6StationSnapshots]);
 
   const updateDirectLaborRow = (id: string, patch: Partial<LaborRow>) => {
     updateProject((current) => ({
@@ -544,34 +597,80 @@ export default function App() {
     }));
   };
 
-  const updateL6Station = (id: string, patch: Partial<ProjectState['laborTimeL6']['stations'][number]>) => {
-    updateProject((current) => ({
-      ...current,
-      laborTimeL6: {
-        ...current.laborTimeL6,
-        stations: current.laborTimeL6.stations.map((station) => (station.id === id ? { ...station, ...patch } : station)),
-      },
-    }));
+  const syncL6Segments = (
+    current: ProjectState,
+    segments: ProjectState['laborTimeL6']['segments'],
+    source: string = current.laborTimeL6.source,
+  ): ProjectState => ({
+    ...current,
+    laborTimeL6: {
+      ...current.laborTimeL6,
+      segments,
+      stations: segments.flatMap((segment) => segment.stations),
+      source,
+    },
+  });
+
+  const updateL6SegmentName = (segmentId: string, name: string) => {
+    updateProject((current) => syncL6Segments(
+      current,
+      buildFallbackL6Segments(current).map((segment) => (segment.id === segmentId ? { ...segment, name } : segment)),
+    ));
   };
 
-  const addL6Station = () => {
-    updateProject((current) => ({
-      ...current,
-      laborTimeL6: {
-        ...current.laborTimeL6,
-        stations: [...current.laborTimeL6.stations, { id: `l6-${Date.now()}`, name: '', laborHc: 0, parallelStations: 1, cycleTimeSec: 0, allowanceRate: 0 }],
-      },
-    }));
+  const addL6Segment = () => {
+    updateProject((current) => {
+      const baseSegments = buildFallbackL6Segments(current);
+      return syncL6Segments(current, [
+        ...baseSegments,
+        {
+          id: `seg-${Date.now()}`,
+          name: `Segment ${baseSegments.length + 1}`,
+          stations: [{ id: `l6-${Date.now()}`, name: 'New Process', laborHc: 0, parallelStations: 1, cycleTimeSec: 0, allowanceRate: 0 }],
+        },
+      ]);
+    });
   };
 
-  const deleteL6Station = (id: string) => {
-    updateProject((current) => ({
-      ...current,
-      laborTimeL6: {
-        ...current.laborTimeL6,
-        stations: current.laborTimeL6.stations.filter((station) => station.id !== id),
-      },
-    }));
+  const deleteL6Segment = (segmentId: string) => {
+    updateProject((current) => {
+      const baseSegments = buildFallbackL6Segments(current);
+      const nextSegments = baseSegments.filter((segment) => segment.id !== segmentId);
+      if (nextSegments.length === 0) {
+        return syncL6Segments(current, [{ id: 'seg-1', name: current.productL6.sku || current.productL6.pn || 'Segment 1', stations: [] }]);
+      }
+      return syncL6Segments(current, nextSegments);
+    });
+  };
+
+  const updateL6Station = (segmentId: string, id: string, patch: Partial<ProjectState['laborTimeL6']['stations'][number]>) => {
+    updateProject((current) => syncL6Segments(
+      current,
+      buildFallbackL6Segments(current).map((segment) => (segment.id === segmentId
+        ? { ...segment, stations: segment.stations.map((station) => (station.id === id ? { ...station, ...patch } : station)) }
+        : segment)),
+    ));
+  };
+
+  const addL6Station = (segmentId: string) => {
+    updateProject((current) => syncL6Segments(
+      current,
+      buildFallbackL6Segments(current).map((segment) => {
+        if (segment.id !== segmentId) return segment;
+        const maxStationNo = segment.stations.reduce((max, station) => Math.max(max, station.stationNo ?? 0), 0);
+        return {
+          ...segment,
+          stations: [...segment.stations, { id: `l6-${Date.now()}`, stationNo: maxStationNo + 1, name: 'New Process', laborHc: 0, parallelStations: 1, cycleTimeSec: 0, allowanceRate: 0 }],
+        };
+      }),
+    ));
+  };
+
+  const deleteL6Station = (segmentId: string, id: string) => {
+    updateProject((current) => syncL6Segments(
+      current,
+      buildFallbackL6Segments(current).map((segment) => (segment.id === segmentId ? { ...segment, stations: segment.stations.filter((station) => station.id !== id) } : segment)),
+    ));
   };
 
   const applyL10StationsToDirectLabor = () => {
@@ -595,7 +694,7 @@ export default function App() {
       ...current,
       plant: {
         ...current.plant,
-        directLaborRows: current.laborTimeL6.stations.filter((station) => !station.isTotal).map((station, index) => ({
+        directLaborRows: buildFallbackL6Segments(current).flatMap((segment) => segment.stations).filter((station) => !station.isTotal).map((station, index) => ({
           id: `l6-dl-${index}`,
           name: station.name,
           process: station.name,
@@ -604,6 +703,62 @@ export default function App() {
         })),
       },
     }));
+  };
+
+  const addL6RoutingTime = () => {
+    updateProject((current) => {
+      const nextKey = `Process ${Object.keys(current.productL6.routingTimesSec).length + 1}`;
+      return {
+        ...current,
+        productL6: {
+          ...current.productL6,
+          routingTimesSec: {
+            ...current.productL6.routingTimesSec,
+            [nextKey]: 0,
+          },
+        },
+      };
+    });
+  };
+
+  const updateL6RoutingTime = (key: string, patch: { nextKey?: string; value?: number }) => {
+    updateProject((current) => {
+      const entries = Object.entries(current.productL6.routingTimesSec);
+      const nextEntries = entries.map(([entryKey, entryValue]) => {
+        if (entryKey !== key) return [entryKey, entryValue] as const;
+        return [patch.nextKey ?? entryKey, patch.value ?? entryValue] as const;
+      });
+      return {
+        ...current,
+        productL6: {
+          ...current.productL6,
+          routingTimesSec: Object.fromEntries(nextEntries.filter(([entryKey]) => entryKey.trim().length > 0)),
+        },
+      };
+    });
+  };
+
+  const deleteL6RoutingTime = (key: string) => {
+    updateProject((current) => ({
+      ...current,
+      productL6: {
+        ...current.productL6,
+        routingTimesSec: Object.fromEntries(Object.entries(current.productL6.routingTimesSec).filter(([entryKey]) => entryKey !== key)),
+      },
+    }));
+  };
+
+  const applyEquipmentMappingToSimulation = () => {
+    updateProject((current) => ({
+      ...current,
+      machines: deriveMachineRatesFromEquipmentLinks({
+        baseMachines: current.machines,
+        equipmentList: current.plant.equipmentList,
+        extraEquipmentList: current.plant.extraEquipmentList,
+        includeExtra: current.plant.includeExtraEquipmentInSimMapping,
+      }).machines,
+    }));
+    setStatusMessage('Applied equipment-to-simulation mapping to Machine Rates.');
   };
 
   const importJsonProject = async (file: File | null) => {
@@ -904,6 +1059,46 @@ export default function App() {
     summaryText: string;
   }) => (
     <div className="stack-xl">
+      <SectionCard title={`MVA Summary Sheet (${processLabel})`} description="Legacy summary ordering: product profile, assumptions, labor, overhead, roll-up, and release decision.">
+        <div className="two-column-grid">
+          <div className="panel-list">
+            <h3>Product Profile</h3>
+            <ul className="plain-list">
+              {processLabel === 'L10' ? (
+                <>
+                  <li>BU: {project.productL10.bu || '-'}</li>
+                  <li>Customer: {project.productL10.customer || '-'}</li>
+                  <li>Project Name: {project.productL10.projectName || '-'}</li>
+                  <li>Model Name: {project.productL10.modelName || '-'}</li>
+                  <li>Product Size: {project.productL10.sizeMm || '-'}</li>
+                  <li>Weight / Tool: {project.productL10.weightKgPerTool ?? '-'}</li>
+                </>
+              ) : (
+                <>
+                  <li>BU: {project.productL6.bu || '-'}</li>
+                  <li>Customer: {project.productL6.customer || '-'}</li>
+                  <li>PN: {project.productL6.pn || '-'}</li>
+                  <li>SKU: {project.productL6.sku || '-'}</li>
+                  <li>PCB Size: {project.productL6.pcbSize || '-'}</li>
+                  <li>Station Path: {project.productL6.stationPath || '-'}</li>
+                </>
+              )}
+            </ul>
+          </div>
+          <div className="panel-list">
+            <h3>Calculation Result</h3>
+            <ul className="plain-list">
+              <li>Bottleneck: {summarySimulation.bottleneckProcess}</li>
+              <li>Line UPH Raw: {summaryMva.lineUphRaw.toFixed(4)}</li>
+              <li>Line UPH Used: {summaryMva.lineUphUsedForCapacity.toFixed(4)}</li>
+              <li>Monthly Volume: {summaryMva.monthlyVolume.toFixed(2)}</li>
+              <li>FPY: {summaryMva.yield.fpy.toFixed(4)}</li>
+              <li>VPY: {summaryMva.yield.vpy.toFixed(4)}</li>
+            </ul>
+          </div>
+        </div>
+      </SectionCard>
+
       <SectionCard title={`Confirm (${processLabel})`} description="Decision, reviewer, and comment are recorded before export.">
         <div className="three-column-grid">
           <div className="decision-group">
@@ -936,7 +1131,7 @@ export default function App() {
         </div>
       </SectionCard>
 
-      <SectionCard title={`Summary (${processLabel})`} description={`Dedicated ${processLabel} release summary matching the legacy output workflow.`}>
+      <SectionCard title={`Yield and Capacity (${processLabel})`} description={`Dedicated ${processLabel} summary assumptions matching the legacy release worksheet.`}>
         <div className="two-column-grid">
           <div className="panel-list">
             <h3>Simulation</h3>
@@ -959,7 +1154,7 @@ export default function App() {
         </div>
       </SectionCard>
 
-      <SectionCard title="Labor Breakdown" description="Direct and indirect labor match the legacy MVA summary categories.">
+      <SectionCard title="Labor Cost Breakdown" description="Direct and indirect labor match the legacy MVA summary categories and ordering.">
         <div className="two-column-grid">
           <div className="data-table-wrapper compact">
             <table className="data-table">
@@ -986,7 +1181,7 @@ export default function App() {
         </div>
       </SectionCard>
 
-      <SectionCard title="Overhead, Materials, and SGA" description="Legacy per-unit categories are exposed explicitly for audit and verification.">
+      <SectionCard title="OH / Materials / SG&A / Profit / ICC" description="Legacy per-unit categories are exposed explicitly for audit and verification.">
         <div className="three-column-grid">
           <div className="panel-list">
             <h3>Overhead</h3>
@@ -1480,23 +1675,61 @@ export default function App() {
               </div>
             </SectionCard>
 
+            <SectionCard title="Equipment to Simulation Mapping" description="Legacy parity mapping from equipment rows into machine-group rates, with preview and explicit sync to the simulation sheet." actions={<div className="inline-actions"><button type="button" className="button secondary" onClick={applyEquipmentMappingToSimulation}>Write Derived Rates to Machine Rates</button></div>}>
+              <div className="two-column-grid">
+                <section className="legacy-subcard">
+                  <div className="legacy-subcard-header"><h3>Mapping Control</h3><p className="muted">Enable linked-rate simulation and optionally include new-product extra fixtures.</p></div>
+                  <div className="form-grid cols-2">
+                    <label className="checkbox-field full-span"><input type="checkbox" checked={project.plant.showEquipmentSimMapping} onChange={(event) => updateProject((current) => ({ ...current, plant: { ...current.plant, showEquipmentSimMapping: event.target.checked } }))} /><span>Use equipment mapping to drive simulation rates</span></label>
+                    <label className="checkbox-field full-span"><input type="checkbox" checked={project.plant.includeExtraEquipmentInSimMapping} onChange={(event) => updateProject((current) => ({ ...current, plant: { ...current.plant, includeExtraEquipmentInSimMapping: event.target.checked } }))} /><span>Include extra equipment in mapping</span></label>
+                    <label><span>Mapped Machine Groups</span><input readOnly value={equipmentSimulationMapping.rows.length} /></label>
+                    <label><span>Simulation Mode</span><input readOnly value={project.plant.showEquipmentSimMapping ? 'derived from equipment' : 'manual machine sheet'} /></label>
+                  </div>
+                </section>
+                <section className="legacy-subcard">
+                  <div className="legacy-subcard-header"><h3>Derived Rate Preview</h3><p className="muted">Current rate vs mapped total rate before writing back to the simulation sheet.</p></div>
+                  <div className="data-table-wrapper compact">
+                    <table className="data-table">
+                      <thead><tr><th>Machine Group</th><th>Current Rate</th><th>Mapped Parallel Qty</th><th>Derived Rate</th><th>Linked Items</th></tr></thead>
+                      <tbody>
+                        {equipmentSimulationMapping.rows.length === 0 ? <tr><td colSpan={5}>No mapping links configured yet.</td></tr> : equipmentSimulationMapping.rows.map((row) => (
+                          <tr key={row.machineGroup}>
+                            <td>{row.machineGroup}</td>
+                            <td>{row.currentRate.toFixed(2)}</td>
+                            <td>{row.totalParallelQty.toFixed(2)}</td>
+                            <td>{row.derivedRate.toFixed(2)}</td>
+                            <td>{row.linkedItems.join(', ')}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+              </div>
+            </SectionCard>
+
             <SectionCard title="Equipment Delta" description="Compares the selected line standard against baseline plus extra equipment.">
               <div className="data-table-wrapper compact">
                 <table className="data-table">
                   <thead>
-                    <tr><th>Process</th><th>Item</th><th>Template Cost / Mo</th><th>Total Cost / Mo</th><th>Delta / Mo</th></tr>
+                    <tr><th>Process</th><th>Item</th><th>Template Qty</th><th>Baseline Qty</th><th>Extra Qty</th><th>Template Cost / Mo</th><th>Baseline Cost / Mo</th><th>Extra Cost / Mo</th><th>Total Cost / Mo</th><th>Delta / Mo</th></tr>
                   </thead>
                   <tbody>
                     {equipmentDelta.rows.map((row) => (
                       <tr key={`${row.process}-${row.item}`}>
                         <td>{row.process}</td>
                         <td>{row.item}</td>
+                        <td>{row.templateQty}</td>
+                        <td>{row.baselineQty}</td>
+                        <td>{row.extraQty}</td>
                         <td>{toMoney(row.templateCostPerMonth)}</td>
+                        <td>{toMoney(row.baselineCostPerMonth)}</td>
+                        <td>{toMoney(row.extraCostPerMonth)}</td>
                         <td>{toMoney(row.totalCostPerMonth)}</td>
                         <td>{toMoney(row.deltaCostPerMonth)}</td>
                       </tr>
                     ))}
-                    <tr className="summary-row"><td colSpan={2}>Total</td><td>{toMoney(equipmentDelta.totals.templateCostPerMonth)}</td><td>{toMoney(equipmentDelta.totals.totalCostPerMonth)}</td><td>{toMoney(equipmentDelta.totals.deltaCostPerMonth)}</td></tr>
+                    <tr className="summary-row"><td colSpan={5}>Total</td><td>{toMoney(equipmentDelta.totals.templateCostPerMonth)}</td><td>{toMoney(equipmentDelta.totals.baselineCostPerMonth)}</td><td>{toMoney(equipmentDelta.totals.extraCostPerMonth)}</td><td>{toMoney(equipmentDelta.totals.totalCostPerMonth)}</td><td>{toMoney(equipmentDelta.totals.deltaCostPerMonth)}</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -1508,7 +1741,7 @@ export default function App() {
                   <div className="inline-actions"><h3>Baseline equipment</h3><button type="button" className="button ghost" onClick={() => addEquipmentRow('equipmentList')}>Add</button></div>
                   <div className="data-table-wrapper compact">
                     <table className="data-table">
-                      <thead><tr><th>Process</th><th>Item</th><th>Qty</th><th>Unit Price</th><th>Years</th><th>Cost/Month</th><th>Used</th><th>Action</th></tr></thead>
+                      <thead><tr><th>Process</th><th>Item</th><th>Qty</th><th>Unit Price</th><th>Years</th><th>Cost/Month</th><th>Sim Group</th><th>Sim Parallel Qty</th><th>Sim Rate Override</th><th>Used</th><th>Action</th></tr></thead>
                       <tbody>
                         {project.plant.equipmentList.map((item) => {
                           const months = Math.max(1, item.depreciationYears * 12);
@@ -1521,6 +1754,9 @@ export default function App() {
                               <td><input type="number" value={item.unitPrice} onChange={(event) => updateEquipmentRow('equipmentList', item.id, { unitPrice: numberValue(event.target.value) })} /></td>
                               <td><input type="number" value={item.depreciationYears} onChange={(event) => updateEquipmentRow('equipmentList', item.id, { depreciationYears: Math.max(1, numberValue(event.target.value)) })} /></td>
                               <td><input type="number" value={item.costPerMonth ?? ''} onChange={(event) => updateEquipmentRow('equipmentList', item.id, { costPerMonth: event.target.value === '' ? null : numberValue(event.target.value) })} /></td>
+                              <td><input value={item.simMachineGroup ?? ''} onChange={(event) => updateEquipmentRow('equipmentList', item.id, { simMachineGroup: event.target.value })} /></td>
+                              <td><input type="number" value={item.simParallelQty ?? ''} onChange={(event) => updateEquipmentRow('equipmentList', item.id, { simParallelQty: event.target.value === '' ? null : numberValue(event.target.value) })} /></td>
+                              <td><input type="number" value={item.simRateOverride ?? ''} onChange={(event) => updateEquipmentRow('equipmentList', item.id, { simRateOverride: event.target.value === '' ? null : numberValue(event.target.value) })} /></td>
                               <td>{toMoney(item.costPerMonth ?? derived)}</td>
                               <td><button type="button" className="button ghost" onClick={() => deleteEquipmentRow('equipmentList', item.id)}>Delete</button></td>
                             </tr>
@@ -1536,7 +1772,7 @@ export default function App() {
                   <div className="inline-actions"><h3>Extra fixture / equipment</h3><button type="button" className="button ghost" onClick={() => addEquipmentRow('extraEquipmentList')}>Add</button></div>
                   <div className="data-table-wrapper compact">
                     <table className="data-table">
-                      <thead><tr><th>Process</th><th>Item</th><th>Qty</th><th>Unit Price</th><th>Years</th><th>Cost/Month</th><th>Action</th></tr></thead>
+                      <thead><tr><th>Process</th><th>Item</th><th>Qty</th><th>Unit Price</th><th>Years</th><th>Cost/Month</th><th>Sim Group</th><th>Sim Parallel Qty</th><th>Sim Rate Override</th><th>Action</th></tr></thead>
                       <tbody>
                         {project.plant.extraEquipmentList.map((item) => (
                           <tr key={item.id}>
@@ -1546,6 +1782,9 @@ export default function App() {
                             <td><input type="number" value={item.unitPrice} onChange={(event) => updateEquipmentRow('extraEquipmentList', item.id, { unitPrice: numberValue(event.target.value) })} /></td>
                             <td><input type="number" value={item.depreciationYears} onChange={(event) => updateEquipmentRow('extraEquipmentList', item.id, { depreciationYears: Math.max(1, numberValue(event.target.value)) })} /></td>
                             <td><input type="number" value={item.costPerMonth ?? ''} onChange={(event) => updateEquipmentRow('extraEquipmentList', item.id, { costPerMonth: event.target.value === '' ? null : numberValue(event.target.value) })} /></td>
+                            <td><input value={item.simMachineGroup ?? ''} onChange={(event) => updateEquipmentRow('extraEquipmentList', item.id, { simMachineGroup: event.target.value })} /></td>
+                            <td><input type="number" value={item.simParallelQty ?? ''} onChange={(event) => updateEquipmentRow('extraEquipmentList', item.id, { simParallelQty: event.target.value === '' ? null : numberValue(event.target.value) })} /></td>
+                            <td><input type="number" value={item.simRateOverride ?? ''} onChange={(event) => updateEquipmentRow('extraEquipmentList', item.id, { simRateOverride: event.target.value === '' ? null : numberValue(event.target.value) })} /></td>
                             <td><button type="button" className="button ghost" onClick={() => deleteEquipmentRow('extraEquipmentList', item.id)}>Delete</button></td>
                           </tr>
                         ))}
@@ -1730,26 +1969,32 @@ export default function App() {
 
         {activeTab === 'mpm_l10' ? (
           <div className="stack-xl">
-            <SectionCard title="MPM Setup (L10)" description="Legacy-aligned L10 product setup, volume, and yield strategy.">
+            <SectionCard title="MPM Report Setup (L10)" description="Legacy-aligned L10 product setup, schedule, test time, and volume assumptions.">
+              <div className="action-grid compact-actions">
+                <label className="upload-card"><span>Import L10 MPM Setup CSV</span><input type="file" accept=".csv,text/csv" onChange={(event) => void importL10MpmSetup(event.target.files?.[0] ?? null)} /></label>
+                <label className="upload-card"><span>Import L10 Labor Estimation CSV</span><input type="file" accept=".csv,text/csv" onChange={(event) => void importL10LaborEstimation(event.target.files?.[0] ?? null)} /></label>
+              </div>
               <div className="legacy-page-grid">
                 <section className="legacy-subcard">
-                  <div className="legacy-subcard-header"><h3>Basic Info</h3></div>
+                  <div className="legacy-subcard-header"><h3>Product Information</h3></div>
                   <div className="form-grid cols-2">
                     <label><span>BU</span><input value={project.productL10.bu} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, bu: event.target.value } }))} /></label>
                     <label><span>Customer</span><input value={project.productL10.customer} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, customer: event.target.value } }))} /></label>
                     <label><span>Project Name</span><input value={project.productL10.projectName} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, projectName: event.target.value } }))} /></label>
+                    <label><span>Model Name</span><input value={project.productL10.modelName} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, modelName: event.target.value } }))} /></label>
                     <label><span>Yield (FPY)</span><input type="number" step="0.01" value={project.productL10.yield ?? ''} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, yield: event.target.value === '' ? null : numberValue(event.target.value) } }))} /></label>
+                    <label><span>RFQ Qty / Month</span><input type="number" value={project.productL10.rfqQtyPerMonth ?? ''} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, rfqQtyPerMonth: event.target.value === '' ? null : numberValue(event.target.value) } }))} /></label>
                   </div>
                 </section>
                 <section className="legacy-subcard">
-                  <div className="legacy-subcard-header"><h3>Size and Weight</h3></div>
+                  <div className="legacy-subcard-header"><h3>Product Dimension</h3></div>
                   <div className="form-grid cols-2">
                     <label><span>Size</span><input value={project.productL10.sizeMm} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, sizeMm: event.target.value } }))} /></label>
                     <label><span>Weight (Kg/Tool)</span><input type="number" value={project.productL10.weightKgPerTool ?? ''} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, weightKgPerTool: event.target.value === '' ? null : numberValue(event.target.value) } }))} /></label>
                   </div>
                 </section>
                 <section className="legacy-subcard">
-                  <div className="legacy-subcard-header"><h3>Test Time</h3></div>
+                  <div className="legacy-subcard-header"><h3>Test Time Setup</h3></div>
                   <div className="form-grid cols-2">
                     <label><span>Handling (sec)</span><input type="number" value={project.productL10.testTime.handlingSec} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, testTime: syncL10TestTime(current.productL10.testTime, { handlingSec: numberValue(event.target.value) }) } }))} /></label>
                     <label><span>Function (sec)</span><input type="number" value={project.productL10.testTime.functionSec} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, testTime: syncL10TestTime(current.productL10.testTime, { functionSec: numberValue(event.target.value) }) } }))} /></label>
@@ -1759,7 +2004,6 @@ export default function App() {
                 <section className="legacy-subcard">
                   <div className="legacy-subcard-header"><h3>Volume and Lifecycle</h3></div>
                   <div className="form-grid cols-2">
-                    <label><span>RFQ Qty / Month</span><input type="number" value={project.productL10.rfqQtyPerMonth ?? ''} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, rfqQtyPerMonth: event.target.value === '' ? null : numberValue(event.target.value) } }))} /></label>
                     <label><span>Probe Life Cycle</span><input type="number" value={project.productL10.probeLifeCycle ?? ''} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, probeLifeCycle: event.target.value === '' ? null : numberValue(event.target.value) } }))} /></label>
                     <label className="full-span"><span>RFQ Qty / Life Cycle</span><input type="number" value={project.productL10.rfqQtyLifeCycle ?? ''} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, rfqQtyLifeCycle: event.target.value === '' ? null : numberValue(event.target.value) } }))} /></label>
                   </div>
@@ -1774,13 +2018,6 @@ export default function App() {
                     <label className="full-span"><span>Working Hour / Shift</span><input type="number" value={project.productL10.hoursPerShift ?? ''} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, hoursPerShift: event.target.value === '' ? null : numberValue(event.target.value) } }))} /></label>
                   </div>
                 </section>
-              </div>
-            </SectionCard>
-
-            <SectionCard title="Structured Setup Imports" description="Import the official L10 MPM setup and labor-estimation CSV files.">
-              <div className="action-grid">
-                <label className="upload-card"><span>Import L10 MPM Setup CSV</span><input type="file" accept=".csv,text/csv" onChange={(event) => void importL10MpmSetup(event.target.files?.[0] ?? null)} /></label>
-                <label className="upload-card"><span>Import L10 Labor Estimation CSV</span><input type="file" accept=".csv,text/csv" onChange={(event) => void importL10LaborEstimation(event.target.files?.[0] ?? null)} /></label>
               </div>
             </SectionCard>
 
@@ -1820,13 +2057,18 @@ export default function App() {
 
         {activeTab === 'mpm_l6' ? (
           <div className="stack-xl">
-            <SectionCard title="MPM Setup (L6)" description="Legacy-aligned L6 by-product, header, and routing inputs.">
+            <SectionCard title="MPM Report Setup (L6)" description="Legacy-aligned L6 by-product, header, routing, and test-time inputs.">
+              <div className="action-grid compact-actions">
+                <label className="upload-card"><span>Import L6 MPM Setup CSV</span><input type="file" accept=".csv,text/csv" onChange={(event) => void importL6MpmSetup(event.target.files?.[0] ?? null)} /></label>
+                <label className="upload-card"><span>Import L6 Labor Estimation CSV</span><input type="file" accept=".csv,text/csv" onChange={(event) => void importL6LaborEstimation(event.target.files?.[0] ?? null)} /></label>
+              </div>
               <div className="legacy-page-grid">
                 <section className="legacy-subcard">
                   <div className="legacy-subcard-header"><h3>By Product</h3></div>
                   <div className="form-grid cols-2">
                     <label><span>BU</span><input value={project.productL6.bu} onChange={(event) => updateProject((current) => ({ ...current, productL6: { ...current.productL6, bu: event.target.value } }))} /></label>
                     <label><span>Customer</span><input value={project.productL6.customer} onChange={(event) => updateProject((current) => ({ ...current, productL6: { ...current.productL6, customer: event.target.value } }))} /></label>
+                    <label><span>Model Name</span><input value={project.productL6.modelName ?? ''} onChange={(event) => updateProject((current) => ({ ...current, productL6: { ...current.productL6, modelName: event.target.value } }))} /></label>
                     <label><span>PN</span><input value={project.productL6.pn} onChange={(event) => updateProject((current) => ({ ...current, productL6: { ...current.productL6, pn: event.target.value } }))} /></label>
                     <label><span>SKU</span><input value={project.productL6.sku ?? ''} onChange={(event) => updateProject((current) => ({ ...current, productL6: { ...current.productL6, sku: event.target.value } }))} /></label>
                     <label><span>PCB Params / Size</span><input value={project.productL6.pcbSize} onChange={(event) => updateProject((current) => ({ ...current, productL6: { ...current.productL6, pcbSize: event.target.value } }))} /></label>
@@ -1854,6 +2096,7 @@ export default function App() {
                   <div className="form-grid cols-4">
                     <label><span>Side 1 Parts</span><input type="number" value={project.productL6.side1PartsCount ?? ''} onChange={(event) => updateProject((current) => ({ ...current, productL6: { ...current.productL6, side1PartsCount: event.target.value === '' ? null : numberValue(event.target.value) } }))} /></label>
                     <label><span>Side 2 Parts</span><input type="number" value={project.productL6.side2PartsCount ?? ''} onChange={(event) => updateProject((current) => ({ ...current, productL6: { ...current.productL6, side2PartsCount: event.target.value === '' ? null : numberValue(event.target.value) } }))} /></label>
+                    <label><span>Offline Blasting Part</span><input type="number" value={project.productL6.offLineBlastingPartCount ?? ''} onChange={(event) => updateProject((current) => ({ ...current, productL6: { ...current.productL6, offLineBlastingPartCount: event.target.value === '' ? null : numberValue(event.target.value) } }))} /></label>
                     <label><span>DIP Parts Type</span><input value={project.productL6.dipPartsType} onChange={(event) => updateProject((current) => ({ ...current, productL6: { ...current.productL6, dipPartsType: event.target.value } }))} /></label>
                     <label><span>Selective WS</span><input value={project.productL6.selectiveWs} onChange={(event) => updateProject((current) => ({ ...current, productL6: { ...current.productL6, selectiveWs: event.target.value } }))} /></label>
                     <label><span>Assembly Part</span><input value={project.productL6.assemblyPart} onChange={(event) => updateProject((current) => ({ ...current, productL6: { ...current.productL6, assemblyPart: event.target.value } }))} /></label>
@@ -1863,13 +2106,20 @@ export default function App() {
                     <label className="full-span"><span>Station Path</span><input value={project.productL6.stationPath} onChange={(event) => updateProject((current) => ({ ...current, productL6: { ...current.productL6, stationPath: event.target.value } }))} /></label>
                   </div>
                 </section>
-              </div>
-            </SectionCard>
-
-            <SectionCard title="Structured Setup Imports" description="Import the official L6 MPM setup and labor-estimation CSV files.">
-              <div className="action-grid">
-                <label className="upload-card"><span>Import L6 MPM Setup CSV</span><input type="file" accept=".csv,text/csv" onChange={(event) => void importL6MpmSetup(event.target.files?.[0] ?? null)} /></label>
-                <label className="upload-card"><span>Import L6 Labor Estimation CSV</span><input type="file" accept=".csv,text/csv" onChange={(event) => void importL6LaborEstimation(event.target.files?.[0] ?? null)} /></label>
+                <section className="legacy-subcard full-span-card">
+                  <div className="legacy-subcard-header"><h3>Routing Time (sec)</h3><p className="muted">Per-station routing inputs shown explicitly like the legacy template.</p></div>
+                  <div className="editable-list">
+                    {Object.entries(project.productL6.routingTimesSec).map(([key, value]) => (
+                      <div className="list-row wide-4" key={key}>
+                        <input value={key} onChange={(event) => updateL6RoutingTime(key, { nextKey: event.target.value, value })} placeholder="Routing Station" />
+                        <input type="number" value={value} onChange={(event) => updateL6RoutingTime(key, { value: numberValue(event.target.value) })} placeholder="Seconds" />
+                        <div className="matrix-readonly-cell">{value > 0 ? `${(value / 60).toFixed(2)} min` : '0.00 min'}</div>
+                        <button type="button" className="button ghost" onClick={() => deleteL6RoutingTime(key)}>Delete</button>
+                      </div>
+                    ))}
+                    <button type="button" className="button secondary" onClick={addL6RoutingTime}>Add Routing Time Row</button>
+                  </div>
+                </section>
               </div>
             </SectionCard>
           </div>
@@ -1900,7 +2150,7 @@ export default function App() {
                 </section>
               </div>
               <div className="data-table-wrapper sticky-header tall-table mt-md">
-                <table className="data-table">
+                <table className="data-table matrix-table">
                   <thead><tr><th>Station</th><th>HC</th><th>Mach/Para</th><th>CT(s)</th><th>Allow</th><th>Avg CT</th><th>UPH</th><th>Shift Capa</th><th>Day Capa</th><th>Wk Capa</th><th>Mo Capa</th><th>Touch(min)</th><th>Handling(s)</th><th>1-Man-N-MC</th><th>Time(min)/cyc</th><th>Run/Day</th><th>Action</th></tr></thead>
                   <tbody>
                     {l10StationSnapshots.map((station) => (
@@ -1928,14 +2178,15 @@ export default function App() {
 
         {activeTab === 'mva_labor_l6' ? (
           <div className="stack-xl">
-            <SectionCard title="Labor Time (L6)" description="Legacy-style L6 header parity and station matrix." actions={<div className="inline-actions"><button type="button" className="button ghost" onClick={addL6Station}>Add Station</button><button type="button" className="button secondary" onClick={applyL6StationsToDirectLabor}>Apply to Direct Labor</button></div>}>
+            <SectionCard title="Labor Time Estimation (L6)" description="Legacy-style L6 segment matrix with per-segment station columns and derived CT / UPH outputs." actions={<div className="inline-actions"><button type="button" className="button ghost" onClick={addL6Segment}>Add Segment</button><button type="button" className="button secondary" onClick={applyL6StationsToDirectLabor}>Apply to Direct Labor</button></div>}>
               <div className="legacy-page-grid">
                 <section className="legacy-subcard">
-                  <div className="legacy-subcard-header"><h3>Import</h3></div>
+                  <div className="legacy-subcard-header"><h3>Import Mini-MOST Time Estimation Data</h3></div>
                   <div className="form-grid cols-2">
                     <label className="full-span"><span>Import L6 labor time estimation CSV</span><input type="file" accept=".csv,text/csv" onChange={(event) => void importL6LaborEstimation(event.target.files?.[0] ?? null)} /></label>
                     <label><span>Source</span><input readOnly value={project.laborTimeL6.source} /></label>
-                    <label><span>Parsed Stations</span><input readOnly value={project.laborTimeL6.stations.length} /></label>
+                    <label><span>Parsed Segments</span><input readOnly value={l6LaborSummary.segments} /></label>
+                    <label><span>Parsed Stations</span><input readOnly value={l6LaborSummary.stations} /></label>
                   </div>
                 </section>
                 <section className="legacy-subcard">
@@ -1943,32 +2194,107 @@ export default function App() {
                   <div className="form-grid cols-2">
                     <label><span>Mfg Time / Unit</span><input type="number" value={project.laborTimeL6.header.manufacturingTimePerUnit ?? ''} onChange={(event) => updateProject((current) => ({ ...current, laborTimeL6: { ...current.laborTimeL6, header: { ...current.laborTimeL6.header, manufacturingTimePerUnit: event.target.value === '' ? undefined : numberValue(event.target.value) } } }))} /></label>
                     <label><span>Output / Line / Shift</span><input type="number" value={project.laborTimeL6.header.outputPerLinePerShift ?? ''} onChange={(event) => updateProject((current) => ({ ...current, laborTimeL6: { ...current.laborTimeL6, header: { ...current.laborTimeL6.header, outputPerLinePerShift: event.target.value === '' ? undefined : numberValue(event.target.value) } } }))} /></label>
+                    <label><span>Total DL Online</span><input readOnly value={l6LaborSummary.totalHc.toFixed(2)} /></label>
+                    <label><span>Bottleneck UPH</span><input readOnly value={l6LaborSummary.bottleneckUph.toFixed(2)} /></label>
                   </div>
                 </section>
               </div>
-              <div className="data-table-wrapper sticky-header tall-table mt-md">
-                <table className="data-table">
-                  <thead><tr><th>Station</th><th>No</th><th>HC</th><th>Fixture</th><th>Cycle Time</th><th>Allowance Rate</th><th>Std Man Hour</th><th>VPY</th><th>Shift Rate</th><th>DL Online</th><th>Avg CT</th><th>UPH</th><th>Action</th></tr></thead>
-                  <tbody>
-                    {l6StationSnapshots.map((station) => (
-                      <tr key={station.id}>
-                        <td><input value={station.name} onChange={(event) => updateL6Station(station.id, { name: event.target.value })} /></td>
-                        <td><input type="number" value={station.stationNo ?? ''} onChange={(event) => updateL6Station(station.id, { stationNo: event.target.value === '' ? undefined : numberValue(event.target.value) })} /></td>
-                        <td><input type="number" value={station.laborHc} onChange={(event) => updateL6Station(station.id, { laborHc: numberValue(event.target.value) })} /></td>
-                        <td><input type="number" value={station.parallelStations} onChange={(event) => updateL6Station(station.id, { parallelStations: numberValue(event.target.value) })} /></td>
-                        <td><input type="number" value={station.cycleTimeSec ?? 0} onChange={(event) => updateL6Station(station.id, { cycleTimeSec: numberValue(event.target.value) })} /></td>
-                        <td><input type="number" step="0.01" value={station.allowanceRate ?? ''} onChange={(event) => updateL6Station(station.id, { allowanceRate: event.target.value === '' ? null : numberValue(event.target.value) })} /></td>
-                        <td><input type="number" step="0.01" value={station.stdManHours ?? ''} onChange={(event) => updateL6Station(station.id, { stdManHours: event.target.value === '' ? null : numberValue(event.target.value) })} /></td>
-                        <td><input type="number" step="0.01" value={station.vpy ?? ''} onChange={(event) => updateL6Station(station.id, { vpy: event.target.value === '' ? null : numberValue(event.target.value) })} /></td>
-                        <td><input type="number" step="0.01" value={station.shiftRate ?? ''} onChange={(event) => updateL6Station(station.id, { shiftRate: event.target.value === '' ? null : numberValue(event.target.value) })} /></td>
-                        <td><input type="number" value={station.dlOnline ?? ''} onChange={(event) => updateL6Station(station.id, { dlOnline: event.target.value === '' ? null : numberValue(event.target.value) })} /></td>
-                        <td>{station.avgCycleTimeSec.toFixed(2)}</td>
-                        <td>{station.uph.toFixed(2)}</td>
-                        <td><button type="button" className="button ghost" onClick={() => deleteL6Station(station.id)}>Delete</button></td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="stack-xl mt-md">
+                {l6SegmentSnapshots.map((segment) => {
+                  const activeStations = segment.stations.filter((station) => !station.isTotal);
+                  const segmentTotalHc = activeStations.reduce((sum, station) => sum + (station.dlOnline ?? station.laborHc ?? 0), 0);
+                  const segmentBottleneck = activeStations.reduce((lowest, station) => {
+                    const next = station.uph ?? 0;
+                    if (lowest === 0) return next;
+                    if (next === 0) return lowest;
+                    return Math.min(lowest, next);
+                  }, 0);
+                  return (
+                    <section className="segment-matrix-card" key={segment.id}>
+                      <div className="segment-matrix-header">
+                        <label>
+                          <span>Segment Name</span>
+                          <input value={segment.name} onChange={(event) => updateL6SegmentName(segment.id, event.target.value)} />
+                        </label>
+                        <div className="inline-actions">
+                          <button type="button" className="button ghost" onClick={() => addL6Station(segment.id)}>Add Station</button>
+                          <button type="button" className="button ghost" onClick={() => deleteL6Segment(segment.id)} disabled={l6SegmentSnapshots.length === 1}>Delete Segment</button>
+                        </div>
+                      </div>
+                      <div className="data-table-wrapper sticky-header tall-table mt-md">
+                        <table className="data-table matrix-table">
+                          <thead>
+                            <tr>
+                              <th>Item</th>
+                              {segment.stations.map((station) => (
+                                <th key={station.id}>{station.name || `Station ${station.stationNo ?? ''}`}</th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <th>Station</th>
+                              {segment.stations.map((station) => <td key={`${station.id}-name`}><input value={station.name} onChange={(event) => updateL6Station(segment.id, station.id, { name: event.target.value })} /></td>)}
+                            </tr>
+                            <tr>
+                              <th>No</th>
+                              {segment.stations.map((station) => <td key={`${station.id}-no`}><input type="number" value={station.stationNo ?? ''} onChange={(event) => updateL6Station(segment.id, station.id, { stationNo: event.target.value === '' ? undefined : numberValue(event.target.value) })} /></td>)}
+                            </tr>
+                            <tr>
+                              <th>HC</th>
+                              {segment.stations.map((station) => <td key={`${station.id}-hc`}><input type="number" value={station.laborHc} onChange={(event) => updateL6Station(segment.id, station.id, { laborHc: numberValue(event.target.value) })} /></td>)}
+                            </tr>
+                            <tr>
+                              <th>Fixture</th>
+                              {segment.stations.map((station) => <td key={`${station.id}-fixture`}><input type="number" value={station.parallelStations} onChange={(event) => updateL6Station(segment.id, station.id, { parallelStations: numberValue(event.target.value) })} /></td>)}
+                            </tr>
+                            <tr>
+                              <th>Cycle Time</th>
+                              {segment.stations.map((station) => <td key={`${station.id}-ct`}><input type="number" value={station.cycleTimeSec ?? 0} onChange={(event) => updateL6Station(segment.id, station.id, { cycleTimeSec: numberValue(event.target.value) })} /></td>)}
+                            </tr>
+                            <tr>
+                              <th>Allowance Rate</th>
+                              {segment.stations.map((station) => <td key={`${station.id}-allow`}><input type="number" step="0.01" value={station.allowanceRate ?? ''} onChange={(event) => updateL6Station(segment.id, station.id, { allowanceRate: event.target.value === '' ? null : numberValue(event.target.value) })} /></td>)}
+                            </tr>
+                            <tr>
+                              <th>Std Man Hour</th>
+                              {segment.stations.map((station) => <td key={`${station.id}-std`}><input type="number" step="0.01" value={station.stdManHours ?? ''} onChange={(event) => updateL6Station(segment.id, station.id, { stdManHours: event.target.value === '' ? null : numberValue(event.target.value) })} /></td>)}
+                            </tr>
+                            <tr>
+                              <th>VPY</th>
+                              {segment.stations.map((station) => <td key={`${station.id}-vpy`}><input type="number" step="0.01" value={station.vpy ?? ''} onChange={(event) => updateL6Station(segment.id, station.id, { vpy: event.target.value === '' ? null : numberValue(event.target.value) })} /></td>)}
+                            </tr>
+                            <tr>
+                              <th>Shift Rate</th>
+                              {segment.stations.map((station) => <td key={`${station.id}-shift`}><input type="number" step="0.01" value={station.shiftRate ?? ''} onChange={(event) => updateL6Station(segment.id, station.id, { shiftRate: event.target.value === '' ? null : numberValue(event.target.value) })} /></td>)}
+                            </tr>
+                            <tr>
+                              <th>DL Online</th>
+                              {segment.stations.map((station) => <td key={`${station.id}-dl`}><input type="number" value={station.dlOnline ?? ''} onChange={(event) => updateL6Station(segment.id, station.id, { dlOnline: event.target.value === '' ? null : numberValue(event.target.value) })} /></td>)}
+                            </tr>
+                            <tr>
+                              <th>Avg CT</th>
+                              {segment.stations.map((station) => <td key={`${station.id}-avg`} className="matrix-readonly-cell">{(station.avgCycleTimeSec ?? 0).toFixed(2)}</td>)}
+                            </tr>
+                            <tr>
+                              <th>UPH</th>
+                              {segment.stations.map((station) => <td key={`${station.id}-uph`} className="matrix-readonly-cell">{(station.uph ?? 0).toFixed(2)}</td>)}
+                            </tr>
+                            <tr>
+                              <th>Action</th>
+                              {segment.stations.map((station) => <td key={`${station.id}-action`}><button type="button" className="button ghost" onClick={() => deleteL6Station(segment.id, station.id)}>Delete</button></td>)}
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div className="matrix-summary-strip">
+                        <div><span>Segment Stations</span><strong>{activeStations.length}</strong></div>
+                        <div><span>Segment DL Online</span><strong>{segmentTotalHc.toFixed(2)}</strong></div>
+                        <div><span>Segment Bottleneck UPH</span><strong>{segmentBottleneck.toFixed(2)}</strong></div>
+                      </div>
+                    </section>
+                  );
+                })}
               </div>
             </SectionCard>
           </div>
