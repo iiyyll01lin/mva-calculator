@@ -323,6 +323,46 @@ label > span {
   gap: 1.25rem;
 }
 
+.stack-md {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.summary-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0;
+}
+
+.summary-page-header h2 {
+  margin: 0 0 0.25rem;
+  font-size: 1.4rem;
+}
+
+.summary-highlight {
+  border-color: rgba(79, 140, 255, 0.45) !important;
+  background: linear-gradient(135deg, #0e1d35 0%, #121a26 100%) !important;
+}
+
+.cost-total-display {
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 1.25rem;
+  color: var(--accent, #4f8cff);
+}
+
+table.data-table th.section-header {
+  background: rgba(79, 140, 255, 0.10);
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: left;
+  padding: 0.45rem 0.75rem;
+}
+
 .mt-md {
   margin-top: 1rem;
 }

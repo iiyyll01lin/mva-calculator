@@ -1057,65 +1057,41 @@ export default function App() {
     summarySimulation: ReturnType<typeof calculateSimulation>;
     summaryMva: ReturnType<typeof calculateMva>;
     summaryText: string;
-  }) => (
-    <div className="stack-xl">
-      <SectionCard title={`MVA Summary Sheet (${processLabel})`} description="Legacy summary ordering: product profile, assumptions, labor, overhead, roll-up, and release decision.">
-        <div className="two-column-grid">
-          <div className="panel-list">
-            <h3>Product Profile</h3>
-            <ul className="plain-list">
-              {processLabel === 'L10' ? (
-                <>
-                  <li>BU: {project.productL10.bu || '-'}</li>
-                  <li>Customer: {project.productL10.customer || '-'}</li>
-                  <li>Project Name: {project.productL10.projectName || '-'}</li>
-                  <li>Model Name: {project.productL10.modelName || '-'}</li>
-                  <li>Product Size: {project.productL10.sizeMm || '-'}</li>
-                  <li>Weight / Tool: {project.productL10.weightKgPerTool ?? '-'}</li>
-                </>
-              ) : (
-                <>
-                  <li>BU: {project.productL6.bu || '-'}</li>
-                  <li>Customer: {project.productL6.customer || '-'}</li>
-                  <li>PN: {project.productL6.pn || '-'}</li>
-                  <li>SKU: {project.productL6.sku || '-'}</li>
-                  <li>PCB Size: {project.productL6.pcbSize || '-'}</li>
-                  <li>Station Path: {project.productL6.stationPath || '-'}</li>
-                </>
-              )}
-            </ul>
-          </div>
-          <div className="panel-list">
-            <h3>Calculation Result</h3>
-            <ul className="plain-list">
-              <li>Bottleneck: {summarySimulation.bottleneckProcess}</li>
-              <li>Line UPH Raw: {summaryMva.lineUphRaw.toFixed(4)}</li>
-              <li>Line UPH Used: {summaryMva.lineUphUsedForCapacity.toFixed(4)}</li>
-              <li>Monthly Volume: {summaryMva.monthlyVolume.toFixed(2)}</li>
-              <li>FPY: {summaryMva.yield.fpy.toFixed(4)}</li>
-              <li>VPY: {summaryMva.yield.vpy.toFixed(4)}</li>
-            </ul>
-          </div>
-        </div>
-      </SectionCard>
+  }) => {
+    const overheadPerUnit =
+      summaryMva.overhead.equipmentDepPerUnit +
+      summaryMva.overhead.equipmentMaintPerUnit +
+      summaryMva.overhead.spacePerUnit +
+      summaryMva.overhead.powerPerUnit;
 
-      <SectionCard title={`Confirm (${processLabel})`} description="Decision, reviewer, and comment are recorded before export.">
-        <div className="three-column-grid">
+    return (
+    <div className="stack-xl">
+      <div className="summary-page-header">
+        <div>
+          <h2>Summary — {processLabel}</h2>
+          <p className="muted">{project.basicInfo.modelName}</p>
+        </div>
+        <button
+          type="button"
+          className="button primary"
+          onClick={() => downloadText(`${project.basicInfo.modelName}_${formatTimestamp()}_${processLabel.toLowerCase()}_summary.csv`, summaryText, 'text/csv')}
+        >
+          Export MVA
+        </button>
+      </div>
+
+      <SectionCard title={`Confirm (${processLabel})`} description="Decision, reviewer, and comment recorded before release.">
+        <div className="form-grid cols-4">
           <div className="decision-group">
             <button type="button" className={project.confirmation.decision === 'OK' ? 'button decision-ok active' : 'button decision-ok'} onClick={() => updateProject((current) => ({ ...current, confirmation: { ...current.confirmation, decision: 'OK', decidedAt: new Date().toISOString() } }))}>OK</button>
             <button type="button" className={project.confirmation.decision === 'NG' ? 'button decision-ng active' : 'button decision-ng'} onClick={() => updateProject((current) => ({ ...current, confirmation: { ...current.confirmation, decision: 'NG', decidedAt: new Date().toISOString() } }))}>NG</button>
           </div>
+          <label><span>Current Status</span><input readOnly value={project.confirmation.decision ?? 'Unreviewed'} /></label>
           <label><span>Reviewer</span><input value={project.confirmation.reviewer} onChange={(event) => updateProject((current) => ({ ...current, confirmation: { ...current.confirmation, reviewer: event.target.value } }))} /></label>
           <label><span>Comment</span><input value={project.confirmation.comment} onChange={(event) => updateProject((current) => ({ ...current, confirmation: { ...current.confirmation, comment: event.target.value } }))} /></label>
         </div>
+        <p className="muted">Recorded at: {project.confirmation.decidedAt ?? 'Not recorded yet'}</p>
       </SectionCard>
-
-      <section className="kpi-grid" data-testid={`summary-${processLabel.toLowerCase()}-kpis`}>
-        <KpiCard label="UPH" value={summarySimulation.uph.toFixed(2)} />
-        <KpiCard label="Takt Time" value={`${summarySimulation.taktTime.toFixed(2)} sec`} />
-        <KpiCard label="Weekly Output" value={summarySimulation.weeklyOutput.toFixed(2)} tone={summarySimulation.weeklyOutput >= project.basicInfo.demandWeekly ? 'good' : 'warn'} />
-        <KpiCard label="Total Cost / Unit" value={toMoney(summaryMva.totalPerUnit)} />
-      </section>
 
       <SectionCard title="Capacity Assumptions" description="Legacy summary assumptions for demand, schedule, and UPH used in costing.">
         <div className="form-grid cols-4 capacity-grid">
@@ -1125,107 +1101,66 @@ export default function App() {
           <div className="summary-metric"><span>Hours / Shift</span><strong>{project.basicInfo.hoursPerShift}</strong></div>
           <div className="summary-metric"><span>Line UPH Raw</span><strong>{summaryMva.lineUphRaw.toFixed(2)}</strong></div>
           <div className="summary-metric"><span>Line UPH Used</span><strong>{summaryMva.lineUphUsedForCapacity.toFixed(2)}</strong></div>
-          {processLabel === 'L6' ? <div className="summary-metric"><span>Boards / Panel</span><strong>{project.productL6.boardsPerPanel}</strong></div> : null}
-          {processLabel === 'L6' ? <div className="summary-metric"><span>PCB Size</span><strong>{project.productL6.pcbSize || '-'}</strong></div> : null}
+          {processLabel === 'L6' ? <div className="summary-metric summary-highlight"><span>Boards / Panel</span><strong>{project.productL6.boardsPerPanel}</strong></div> : null}
+          {processLabel === 'L6' ? <div className="summary-metric summary-highlight"><span>PCB Size</span><strong>{project.productL6.pcbSize || '-'}</strong></div> : null}
           {processLabel === 'L6' ? <div className="summary-metric"><span>Parts (S1 / S2)</span><strong>{`${project.productL6.side1PartsCount ?? 0} / ${project.productL6.side2PartsCount ?? 0}`}</strong></div> : null}
         </div>
       </SectionCard>
 
-      <SectionCard title={`Yield and Capacity (${processLabel})`} description={`Dedicated ${processLabel} summary assumptions matching the legacy release worksheet.`}>
-        <div className="two-column-grid">
-          <div className="panel-list">
-            <h3>Simulation</h3>
-            <ul className="plain-list">
-              <li>Bottleneck: {summarySimulation.bottleneckProcess}</li>
-              <li>Line UPH Raw: {summaryMva.lineUphRaw.toFixed(4)}</li>
-              <li>Line UPH Used: {summaryMva.lineUphUsedForCapacity.toFixed(4)}</li>
-              <li>Monthly Volume: {summaryMva.monthlyVolume.toFixed(2)}</li>
-            </ul>
-          </div>
-          <div className="panel-list">
-            <h3>Yield</h3>
-            <ul className="plain-list">
-              <li>Strategy: {summaryMva.yield.strategy}</li>
-              <li>FPY: {summaryMva.yield.fpy.toFixed(4)}</li>
-              <li>VPY: {summaryMva.yield.vpy.toFixed(4)}</li>
-              <li>Yield Factor: {summaryMva.yield.yieldFactor.toFixed(4)}</li>
-            </ul>
-          </div>
-        </div>
-      </SectionCard>
-
-      <SectionCard title="Labor Cost Breakdown" description="Direct and indirect labor match the legacy MVA summary categories and ordering.">
-        <div className="two-column-grid">
-          <div className="data-table-wrapper compact">
-            <table className="data-table">
-              <thead><tr><th colSpan={4}>Direct Labor</th></tr><tr><th>Name</th><th>HC</th><th>Line UPH</th><th>Cost / Unit</th></tr></thead>
-              <tbody>
-                {summaryMva.directLabor.map((row) => (
-                  <tr key={row.id}><td>{row.name}</td><td>{row.effectiveHeadcount}</td><td>{row.uphUsed}</td><td>{toMoney(row.costPerUnit)}</td></tr>
-                ))}
-                <tr className="summary-row"><td>Total</td><td>{summaryMva.directLabor.reduce((sum, row) => sum + row.effectiveHeadcount, 0).toFixed(2)}</td><td>-</td><td>{toMoney(summaryMva.directLabor.reduce((sum, row) => sum + row.costPerUnit, 0))}</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div className="data-table-wrapper compact">
-            <table className="data-table">
-              <thead><tr><th colSpan={4}>Indirect Labor</th></tr><tr><th>Name</th><th>HC</th><th>Line UPH</th><th>Cost / Unit</th></tr></thead>
-              <tbody>
-                {summaryMva.indirectLabor.map((row) => (
-                  <tr key={row.id}><td>{row.name}</td><td>{row.effectiveHeadcount}</td><td>{row.uphUsed}</td><td>{toMoney(row.costPerUnit)}</td></tr>
-                ))}
-                <tr className="summary-row"><td>Total</td><td>{summaryMva.indirectLabor.reduce((sum, row) => sum + row.effectiveHeadcount, 0).toFixed(2)}</td><td>-</td><td>{toMoney(summaryMva.indirectLabor.reduce((sum, row) => sum + row.costPerUnit, 0))}</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </SectionCard>
-
-      <SectionCard title="OH / Materials / SG&A / Profit / ICC" description="Legacy per-unit categories are exposed explicitly for audit and verification.">
-        <div className="three-column-grid">
-          <div className="panel-list">
-            <h3>Overhead</h3>
-            <ul className="plain-list">
-              <li>Equipment Dep / Unit: {toMoney(summaryMva.overhead.equipmentDepPerUnit)}</li>
-              <li>Equipment Maint / Unit: {toMoney(summaryMva.overhead.equipmentMaintPerUnit)}</li>
-              <li>Space / Unit: {toMoney(summaryMva.overhead.spacePerUnit)}</li>
-              <li>Power / Unit: {toMoney(summaryMva.overhead.powerPerUnit)}</li>
-            </ul>
-          </div>
-          <div className="panel-list">
-            <h3>Materials</h3>
-            <ul className="plain-list">
-              <li>Material Attrition / Unit: {toMoney(summaryMva.materials.materialAttritionPerUnit)}</li>
-              <li>Consumables / Unit: {toMoney(summaryMva.materials.consumablesPerUnit)}</li>
-              <li>Profit / Unit: {toMoney(summaryMva.profit.profitPerUnit)}</li>
-              <li>ICC / Unit: {toMoney(summaryMva.icc.iccPerUnit)}</li>
-            </ul>
-          </div>
-          <div className="panel-list">
-            <h3>SGA</h3>
-            <ul className="plain-list">
-              <li>Corporate Burden / Unit: {toMoney(summaryMva.sga.corporateBurdenPerUnit)}</li>
-              <li>Site Maintenance / Unit: {toMoney(summaryMva.sga.siteMaintenancePerUnit)}</li>
-              <li>IT Security / Unit: {toMoney(summaryMva.sga.itSecurityPerUnit)}</li>
-              <li>Total SGA / Unit: {toMoney(summaryMva.sga.totalSgaPerUnit)}</li>
-            </ul>
-          </div>
-        </div>
-      </SectionCard>
-
-      <SectionCard title="Cost Rollup" description="Full per-unit cost rollup for the selected summary mode.">
+      <SectionCard title="A. LABOR Cost" description={`DL Rate: ${toMoney(project.plant.mvaRates.directLaborHourlyRate)}/hr  ·  IDL Rate: ${toMoney(project.plant.mvaRates.indirectLaborHourlyRate)}/hr  ·  Efficiency: ${(project.plant.mvaRates.efficiency * 100).toFixed(1)}%`}>
         <div className="data-table-wrapper">
-          <table className="data-table">
-            <thead><tr><th>Category</th><th>Value</th></tr></thead>
+          <table className="data-table" data-testid={`labor-table-${processLabel.toLowerCase()}`}>
+            <thead>
+              <tr><th colSpan={4} className="section-header">Direct Labor</th></tr>
+              <tr><th>Name</th><th>HC</th><th>Line UPH</th><th>Cost / Unit</th></tr>
+            </thead>
             <tbody>
-              {summaryMva.costLines.map((line) => (
-                <tr key={line.key}><td>{line.label}</td><td>{toMoney(line.value)}</td></tr>
+              {summaryMva.directLabor.map((row) => (
+                <tr key={row.id}><td>{row.name}</td><td>{row.effectiveHeadcount}</td><td>{row.uphUsed}</td><td>{toMoney(row.costPerUnit)}</td></tr>
               ))}
-              <tr className="summary-row"><td>Total</td><td>{toMoney(summaryMva.totalPerUnit)}</td></tr>
+              <tr className="summary-row">
+                <td>Total DL</td>
+                <td>{summaryMva.directLabor.reduce((sum, row) => sum + row.effectiveHeadcount, 0).toFixed(2)}</td>
+                <td>-</td>
+                <td>{toMoney(summaryMva.directLabor.reduce((sum, row) => sum + row.costPerUnit, 0))}</td>
+              </tr>
+              <tr><th colSpan={4} className="section-header">Indirect Labor</th></tr>
+              <tr><th>Name</th><th>HC</th><th>Line UPH</th><th>Cost / Unit</th></tr>
+              {summaryMva.indirectLabor.map((row) => (
+                <tr key={row.id}><td>{row.name}</td><td>{row.effectiveHeadcount}</td><td>{row.uphUsed}</td><td>{toMoney(row.costPerUnit)}</td></tr>
+              ))}
+              <tr className="summary-row">
+                <td>Total IDL</td>
+                <td>{summaryMva.indirectLabor.reduce((sum, row) => sum + row.effectiveHeadcount, 0).toFixed(2)}</td>
+                <td>-</td>
+                <td>{toMoney(summaryMva.indirectLabor.reduce((sum, row) => sum + row.costPerUnit, 0))}</td>
+              </tr>
             </tbody>
           </table>
         </div>
       </SectionCard>
+
+      <div className="two-column-grid">
+        <SectionCard title="D. Overhead" description="Equipment, space, and power costs per unit.">
+          <ul className="plain-list">
+            <li>Equip Dep / Unit: {toMoney(summaryMva.overhead.equipmentDepPerUnit)}</li>
+            <li>Equip Maint / Unit: {toMoney(summaryMva.overhead.equipmentMaintPerUnit)}</li>
+            <li>Space / Utility / Unit: {toMoney(summaryMva.overhead.spacePerUnit)}</li>
+            <li>Power / Unit: {toMoney(summaryMva.overhead.powerPerUnit)}</li>
+            <li><strong>Total Overhead / Unit: {toMoney(overheadPerUnit)}</strong></li>
+          </ul>
+        </SectionCard>
+        <div className="stack-md">
+          <SectionCard title="E. SG&A" description="Corporate, site, and IT security burden per unit.">
+            <p>Total SG&amp;A / Unit: <strong>{toMoney(summaryMva.sga.totalSgaPerUnit)}</strong></p>
+          </SectionCard>
+          <SectionCard title="MVA Total Cost / Unit" description="">
+            <div className="cost-total-display" data-testid={`total-cost-${processLabel.toLowerCase()}`}>
+              {toMoney(summaryMva.totalPerUnit)}
+            </div>
+          </SectionCard>
+        </div>
+      </div>
 
       <SectionCard title="Warnings" description="Release blockers are surfaced here before export.">
         <ul className="plain-list" data-testid={`warning-list-${processLabel.toLowerCase()}`}>
@@ -1233,14 +1168,14 @@ export default function App() {
         </ul>
       </SectionCard>
 
-      {renderReviewGate()}
       {renderImportsExports(summaryText, processLabel)}
 
       <SectionCard title="Summary Preview" description="CSV preview for regression and manual audit.">
         <textarea data-testid={`summary-preview-${processLabel.toLowerCase()}`} readOnly value={summaryText} rows={14} />
       </SectionCard>
     </div>
-  );
+    );
+  };
 
   const sideBadgeClass = (side: string) => {
     if (side === 'Top') return 'side-badge top';
@@ -1804,35 +1739,47 @@ export default function App() {
             <SectionCard title="Space Setup" description="Matrix mode, manual allocation, and 40/60 split controls aligned to the legacy worksheet.">
               <div className="legacy-page-grid">
                 <section className="legacy-subcard">
-                  <div className="legacy-subcard-header"><h3>Mode Selection</h3><p className="muted">Switch between matrix mode and manual allocation.</p></div>
+                  <div className="legacy-subcard-header"><h3>Mode Selection</h3><p className="muted">Matrix: configure building / distribution and generate allocation. Manual: edit rows directly.</p></div>
                   <div className="form-grid cols-2">
                 <label><span>Mode</span><select value={project.plant.spaceSettings.mode} onChange={(event) => updateProject((current) => ({ ...current, plant: { ...current.plant, spaceSettings: { ...current.plant.spaceSettings, mode: event.target.value as ProjectState['plant']['spaceSettings']['mode'] } } }))}><option value="manual">manual</option><option value="matrix">matrix</option></select></label>
-                <label><span>Line Length Ft</span><input type="number" value={project.plant.spaceSettings.lineLengthFt} onChange={(event) => updateProject((current) => ({ ...current, plant: { ...current.plant, spaceSettings: { ...current.plant.spaceSettings, lineLengthFt: numberValue(event.target.value) } } }))} /></label>
-                <label><span>Line Width Ft</span><input type="number" value={project.plant.spaceSettings.lineWidthFt} onChange={(event) => updateProject((current) => ({ ...current, plant: { ...current.plant, spaceSettings: { ...current.plant.spaceSettings, lineWidthFt: numberValue(event.target.value) } } }))} /></label>
                 <label><span>Space Rate / Sqft</span><input type="number" step="0.01" value={project.plant.spaceSettings.spaceRatePerSqft} onChange={(event) => updateProject((current) => ({ ...current, plant: { ...current.plant, spaceSettings: { ...current.plant.spaceSettings, spaceRatePerSqft: numberValue(event.target.value) } } }))} /></label>
                     <label><span>Area Multiplier</span><input type="number" step="0.01" value={project.plant.spaceSettings.spaceAreaMultiplier} onChange={(event) => updateProject((current) => ({ ...current, plant: { ...current.plant, spaceSettings: { ...current.plant.spaceSettings, spaceAreaMultiplier: numberValue(event.target.value) } } }))} /></label>
                     <label><span>Total Line Area</span><input readOnly value={matrixLineArea.toFixed(2)} /></label>
                   </div>
                 </section>
 
-                <section className="legacy-subcard">
-                  <div className="legacy-subcard-header"><h3>Building Area by Floor</h3><p className="muted">BF / F1 / F2 space pool used by matrix allocation.</p></div>
-                  <div className="form-grid cols-2">
-                    {Object.entries(project.plant.spaceSettings.floorAreas).map(([floor, area]) => (
-                      <label key={floor}><span>{floor}</span><input type="number" value={area} onChange={(event) => updateProject((current) => ({ ...current, plant: { ...current.plant, spaceSettings: { ...current.plant.spaceSettings, floorAreas: { ...current.plant.spaceSettings.floorAreas, [floor]: numberValue(event.target.value) } } } }))} /></label>
-                    ))}
-                  </div>
-                </section>
+                {project.plant.spaceSettings.mode === 'matrix' ? (
+                  <section className="legacy-subcard">
+                    <div className="legacy-subcard-header"><h3>2. Line Specification</h3><p className="muted">Line length and width used by matrix allocation.</p></div>
+                    <div className="form-grid cols-2">
+                      <label><span>Line Length Ft</span><input type="number" value={project.plant.spaceSettings.lineLengthFt} onChange={(event) => updateProject((current) => ({ ...current, plant: { ...current.plant, spaceSettings: { ...current.plant.spaceSettings, lineLengthFt: numberValue(event.target.value) } } }))} /></label>
+                      <label><span>Line Width Ft</span><input type="number" value={project.plant.spaceSettings.lineWidthFt} onChange={(event) => updateProject((current) => ({ ...current, plant: { ...current.plant, spaceSettings: { ...current.plant.spaceSettings, lineWidthFt: numberValue(event.target.value) } } }))} /></label>
+                    </div>
+                  </section>
+                ) : null}
 
-                <section className="legacy-subcard full-span-card">
-                  <div className="legacy-subcard-header"><h3>Process Distribution (%)</h3><p className="muted">Define SMT / HI / Test distribution and apply matrix calculation.</p></div>
-                  <div className="form-grid cols-4">
-                    {Object.entries(project.plant.spaceSettings.processDistribution).map(([process, percent]) => (
-                      <label key={process}><span>{process}</span><input type="number" step="0.1" value={percent} onChange={(event) => updateProject((current) => ({ ...current, plant: { ...current.plant, spaceSettings: { ...current.plant.spaceSettings, processDistribution: { ...current.plant.spaceSettings.processDistribution, [process]: numberValue(event.target.value) } } } }))} /></label>
-                    ))}
-                  </div>
-                  <div className="inline-actions mt-md"><button type="button" className="button primary" onClick={applyMatrixSpaceAllocation}>Apply Matrix Calculation</button></div>
-                </section>
+                {project.plant.spaceSettings.mode === 'matrix' ? (
+                  <section className="legacy-subcard">
+                    <div className="legacy-subcard-header"><h3>1. Building Area by Floor</h3><p className="muted">BF / F1 / F2 space pool used by matrix allocation.</p></div>
+                    <div className="form-grid cols-2">
+                      {Object.entries(project.plant.spaceSettings.floorAreas).map(([floor, area]) => (
+                        <label key={floor}><span>{floor}</span><input type="number" value={area} onChange={(event) => updateProject((current) => ({ ...current, plant: { ...current.plant, spaceSettings: { ...current.plant.spaceSettings, floorAreas: { ...current.plant.spaceSettings.floorAreas, [floor]: numberValue(event.target.value) } } } }))} /></label>
+                      ))}
+                    </div>
+                  </section>
+                ) : null}
+
+                {project.plant.spaceSettings.mode === 'matrix' ? (
+                  <section className="legacy-subcard full-span-card">
+                    <div className="legacy-subcard-header"><h3>3. Process Distribution (%)</h3><p className="muted">Define SMT / HI / Test distribution and apply matrix calculation.</p></div>
+                    <div className="form-grid cols-4">
+                      {Object.entries(project.plant.spaceSettings.processDistribution).map(([process, percent]) => (
+                        <label key={process}><span>{process}</span><input type="number" step="0.1" value={percent} onChange={(event) => updateProject((current) => ({ ...current, plant: { ...current.plant, spaceSettings: { ...current.plant.spaceSettings, processDistribution: { ...current.plant.spaceSettings.processDistribution, [process]: numberValue(event.target.value) } } } }))} /></label>
+                      ))}
+                    </div>
+                    <div className="inline-actions mt-md"><button type="button" className="button primary" onClick={applyMatrixSpaceAllocation}>Apply Matrix Calculation</button></div>
+                  </section>
+                ) : null}
 
                 <section className="legacy-subcard full-span-card">
                   <div className="legacy-subcard-header"><h3>40 / 60 Split</h3><p className="muted">Quick helper for SMT 40% and HI 60% allocation.</p></div>
@@ -1846,20 +1793,25 @@ export default function App() {
               </div>
             </SectionCard>
 
-            <SectionCard title="Space Allocation" description="Editable space rows with process, area, and rate.">
-              <div className="inline-actions"><button type="button" className="button ghost" onClick={addSpaceAllocationRow}>Add Row</button><label className="upload-inline"><span>Import Space Setup CSV</span><input type="file" accept=".csv,text/csv" onChange={(event) => void importSpaceSetup(event.target.files?.[0] ?? null)} /></label></div>
+            <SectionCard title={`Space Allocation${project.plant.spaceSettings.mode === 'matrix' ? ' (Generated)' : ' (Manual)'}`} description="Editable space rows with process, area, and rate.">
+              {project.plant.spaceSettings.mode === 'manual' ? (
+                <div className="inline-actions">
+                  <button type="button" className="button ghost" onClick={addSpaceAllocationRow} data-testid="mva-space-add">Add Row</button>
+                  <label className="upload-inline"><span>Import Space Setup CSV</span><input type="file" accept=".csv,text/csv" data-testid="mva-import-space-setup" onChange={(event) => void importSpaceSetup(event.target.files?.[0] ?? null)} /></label>
+                </div>
+              ) : null}
               <div className="data-table-wrapper compact mt-md">
                 <table className="data-table">
                   <thead><tr><th>Floor</th><th>Process</th><th>Area (sq.ft.)</th><th>Rate</th><th>Monthly Cost</th><th>Action</th></tr></thead>
                   <tbody>
                     {project.plant.spaceAllocation.map((row) => (
                       <tr key={row.id}>
-                        <td><input value={row.floor} onChange={(event) => updateSpaceAllocationRow(row.id, { floor: event.target.value })} /></td>
-                        <td><input value={row.process} onChange={(event) => updateSpaceAllocationRow(row.id, { process: event.target.value })} /></td>
-                        <td><input type="number" value={row.areaSqft} onChange={(event) => updateSpaceAllocationRow(row.id, { areaSqft: numberValue(event.target.value) })} /></td>
-                        <td><input type="number" value={row.ratePerSqft ?? 0} onChange={(event) => updateSpaceAllocationRow(row.id, { ratePerSqft: numberValue(event.target.value) })} /></td>
-                        <td><input type="number" value={row.monthlyCost ?? ''} onChange={(event) => updateSpaceAllocationRow(row.id, { monthlyCost: event.target.value === '' ? null : numberValue(event.target.value) })} /></td>
-                        <td><button type="button" className="button ghost" onClick={() => deleteSpaceAllocationRow(row.id)}>Delete</button></td>
+                        <td><input value={row.floor} disabled={project.plant.spaceSettings.mode === 'matrix'} onChange={(event) => updateSpaceAllocationRow(row.id, { floor: event.target.value })} /></td>
+                        <td><input value={row.process} disabled={project.plant.spaceSettings.mode === 'matrix'} onChange={(event) => updateSpaceAllocationRow(row.id, { process: event.target.value })} /></td>
+                        <td><input type="number" value={row.areaSqft} disabled={project.plant.spaceSettings.mode === 'matrix'} onChange={(event) => updateSpaceAllocationRow(row.id, { areaSqft: numberValue(event.target.value) })} /></td>
+                        <td><input type="number" value={row.ratePerSqft ?? 0} disabled={project.plant.spaceSettings.mode === 'matrix'} onChange={(event) => updateSpaceAllocationRow(row.id, { ratePerSqft: numberValue(event.target.value) })} /></td>
+                        <td><input type="number" value={row.monthlyCost ?? ''} disabled={project.plant.spaceSettings.mode === 'matrix'} onChange={(event) => updateSpaceAllocationRow(row.id, { monthlyCost: event.target.value === '' ? null : numberValue(event.target.value) })} /></td>
+                        <td><button type="button" className="button ghost" disabled={project.plant.spaceSettings.mode === 'matrix'} onClick={() => deleteSpaceAllocationRow(row.id)}>Delete</button></td>
                       </tr>
                     ))}
                   </tbody>
@@ -1981,9 +1933,7 @@ export default function App() {
                     <label><span>BU</span><input value={project.productL10.bu} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, bu: event.target.value } }))} /></label>
                     <label><span>Customer</span><input value={project.productL10.customer} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, customer: event.target.value } }))} /></label>
                     <label><span>Project Name</span><input value={project.productL10.projectName} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, projectName: event.target.value } }))} /></label>
-                    <label><span>Model Name</span><input value={project.productL10.modelName} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, modelName: event.target.value } }))} /></label>
                     <label><span>Yield (FPY)</span><input type="number" step="0.01" value={project.productL10.yield ?? ''} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, yield: event.target.value === '' ? null : numberValue(event.target.value) } }))} /></label>
-                    <label><span>RFQ Qty / Month</span><input type="number" value={project.productL10.rfqQtyPerMonth ?? ''} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, rfqQtyPerMonth: event.target.value === '' ? null : numberValue(event.target.value) } }))} /></label>
                   </div>
                 </section>
                 <section className="legacy-subcard">
@@ -2004,6 +1954,7 @@ export default function App() {
                 <section className="legacy-subcard">
                   <div className="legacy-subcard-header"><h3>Volume and Lifecycle</h3></div>
                   <div className="form-grid cols-2">
+                    <label><span>RFQ Qty / Month</span><input type="number" value={project.productL10.rfqQtyPerMonth ?? ''} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, rfqQtyPerMonth: event.target.value === '' ? null : numberValue(event.target.value) } }))} /></label>
                     <label><span>Probe Life Cycle</span><input type="number" value={project.productL10.probeLifeCycle ?? ''} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, probeLifeCycle: event.target.value === '' ? null : numberValue(event.target.value) } }))} /></label>
                     <label className="full-span"><span>RFQ Qty / Life Cycle</span><input type="number" value={project.productL10.rfqQtyLifeCycle ?? ''} onChange={(event) => updateProject((current) => ({ ...current, productL10: { ...current.productL10, rfqQtyLifeCycle: event.target.value === '' ? null : numberValue(event.target.value) } }))} /></label>
                   </div>
