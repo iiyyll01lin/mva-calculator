@@ -4,6 +4,7 @@ import type {
   EquipmentItem,
   L10LaborTimeEstimation,
   L10Station,
+  L6LaborSegment,
   L6LaborTimeEstimation,
   L6Station,
   LaborRow,
@@ -206,6 +207,31 @@ export function parseL6LaborTimeEstimationCsv(text: string): L6LaborTimeEstimati
       isTotal: normalizeHeader(getCell(row, lookup, 'name', 'process')) === 'total',
     }));
 
+  // Split flat station list into segments: a "total" row terminates a segment.
+  const segments: L6LaborSegment[] = [];
+  let currentStations: L6Station[] = [];
+  for (const station of stations) {
+    currentStations.push(station);
+    if (station.isTotal) {
+      const segIdx = segments.length + 1;
+      segments.push({
+        id: `seg-${segIdx}`,
+        name: segIdx === 1 ? (meta.segmentname || 'Segment 1') : `Segment ${segIdx}`,
+        stations: currentStations,
+      });
+      currentStations = [];
+    }
+  }
+  // Append any trailing stations that had no "total" terminator.
+  if (currentStations.length > 0) {
+    const segIdx = segments.length + 1;
+    segments.push({
+      id: `seg-${segIdx}`,
+      name: segIdx === 1 ? (meta.segmentname || 'Segment 1') : `Segment ${segIdx}`,
+      stations: currentStations,
+    });
+  }
+
   return {
     header: {
       category: meta.category,
@@ -217,7 +243,7 @@ export function parseL6LaborTimeEstimationCsv(text: string): L6LaborTimeEstimati
       exRateRmbUsd: asNumber(meta.exratermbusd) ?? undefined,
       serviceHourlyWage: asNumber(meta.servicehourlywage) ?? undefined,
     },
-    segments: [{ id: 'seg-import', name: meta.segmentname || 'Segment 1', stations }],
+    segments,
     stations,
     source: 'l6_labor_csv',
   };
