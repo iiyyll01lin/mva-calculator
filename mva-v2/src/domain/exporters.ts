@@ -220,7 +220,7 @@ export function downloadText(filename: string, content: string, mimeType: string
 }
 
 export function downloadBytes(filename: string, bytes: Uint8Array, mimeType: string): void {
-  const blob = new Blob([bytes], { type: mimeType });
+  const blob = new Blob([bytes.buffer as ArrayBuffer], { type: mimeType });
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement('a');
   anchor.href = url;
