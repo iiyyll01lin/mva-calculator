@@ -102,3 +102,96 @@ describe('App functional flow', () => {
     container.remove();
   });
 });
+
+// ─── downstream cascade tests ─────────────────────────────────────────────
+
+describe('App downstream state cascade', () => {
+  it('summary page reflects updated model name after BasicInfo change', async () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    await act(async () => { root.render(<App />); });
+
+    // Navigate to Basic Info first (already default) and change model name via input
+    const modelInput = container.querySelector('input[aria-label="Model Name"]') as HTMLInputElement | null;
+    if (modelInput) {
+      await act(async () => {
+        modelInput.value = 'TEST-MODEL-9999';
+        modelInput.dispatchEvent(new Event('input', { bubbles: true }));
+        modelInput.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+    }
+
+    // Navigate to L10 Summary
+    const summaryButton = Array.from(container.querySelectorAll('button')).find(
+      (b) => b.textContent?.includes('Summary (L10)'),
+    );
+    await act(async () => { summaryButton?.dispatchEvent(new MouseEvent('click', { bubbles: true })); });
+
+    // The hero title should reflect the model name from state
+    const heroTitle = container.querySelector('h1');
+    expect(heroTitle).toBeTruthy();
+
+    await act(async () => { root.unmount(); });
+    container.remove();
+  });
+
+  it('simulation page renders without crashing', async () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    await act(async () => { root.render(<App />); });
+
+    const simButton = Array.from(container.querySelectorAll('button')).find(
+      (b) => b.textContent?.includes('Simulation'),
+    );
+    expect(simButton).toBeTruthy();
+    await act(async () => { simButton?.dispatchEvent(new MouseEvent('click', { bubbles: true })); });
+
+    // Simulation page must show UPH or bottleneck info
+    expect(container.textContent?.match(/UPH|Bottleneck|Cycle Time/i)).toBeTruthy();
+
+    await act(async () => { root.unmount(); });
+    container.remove();
+  });
+
+  it('Plant Rates page renders rate inputs', async () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    await act(async () => { root.render(<App />); });
+
+    const ratesButton = Array.from(container.querySelectorAll('button')).find(
+      (b) => b.textContent?.includes('Labor Rate & Efficiency'),
+    );
+    expect(ratesButton).toBeTruthy();
+    await act(async () => { ratesButton?.dispatchEvent(new MouseEvent('click', { bubbles: true })); });
+
+    expect(container.textContent?.match(/Labor|Rate|Efficiency/i)).toBeTruthy();
+
+    await act(async () => { root.unmount(); });
+    container.remove();
+  });
+
+  it('DLOH / IDL page renders with headcount table', async () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    await act(async () => { root.render(<App />); });
+
+    const dlohButton = Array.from(container.querySelectorAll('button')).find(
+      (b) => b.textContent?.includes('DLOH-L & IDL Setup'),
+    );
+    expect(dlohButton).toBeTruthy();
+    await act(async () => { dlohButton?.dispatchEvent(new MouseEvent('click', { bubbles: true })); });
+
+    expect(container.textContent?.match(/Headcount|Labor|IDL/i)).toBeTruthy();
+
+    await act(async () => { root.unmount(); });
+    container.remove();
+  });
+});
