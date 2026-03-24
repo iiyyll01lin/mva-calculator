@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseEquipmentRows, parseLaborRows, validateLineStandardsPayload, validateProjectPayload } from '../../src/App';
+import { parseEquipmentRows, parseLaborRows, validateLineStandardsPayload, validateProjectPayload } from '../../src/domain/importers';
 import { parseL6LaborTimeEstimationCsv } from '../../src/domain/importers';
 import { defaultProject } from '../../src/domain/defaults';
 
