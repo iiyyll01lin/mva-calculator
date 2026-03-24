@@ -59,6 +59,11 @@ export default function App() {
       setSelectedLineStandardId(project.lineStandards[0]?.id ?? '');
     }
   }, [project.lineStandards, selectedLineStandardId]);
+  useEffect(() => {
+    if (!statusMessage) return;
+    const timer = setTimeout(() => setStatusMessage(''), 6000);
+    return () => clearTimeout(timer);
+  }, [statusMessage]);
 
   const {
     importJsonProject,
