@@ -192,6 +192,22 @@ label > span {
   border-color: rgba(79, 140, 255, 0.28);
 }
 
+.error-boundary-card {
+  margin: 2rem auto;
+  max-width: 520px;
+  padding: 2rem;
+  border: 1px solid rgba(255, 80, 80, 0.4);
+  border-radius: 12px;
+  background: var(--bg-panel);
+  text-align: center;
+}
+
+.error-boundary-card h2 {
+  color: #ff6060;
+  margin-bottom: 0.5rem;
+}
+
+
 .hero-panel {
   display: flex;
   justify-content: space-between;
