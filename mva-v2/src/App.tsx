@@ -709,7 +709,6 @@ export default function App() {
               summarySimulation={l10Simulation}
               summaryText={l10SummaryCsv}
               updateProject={updateProject}
-              reviewGateSlot={renderReviewGate()}
               importsExportsSlot={renderImportsExports(l10SummaryCsv, 'L10')}
             />
           ) : null}
@@ -722,7 +721,6 @@ export default function App() {
               summarySimulation={l6Simulation}
               summaryText={l6SummaryCsv}
               updateProject={updateProject}
-              reviewGateSlot={renderReviewGate()}
               importsExportsSlot={renderImportsExports(l6SummaryCsv, 'L6')}
             />
           ) : null}
