@@ -120,11 +120,9 @@ export function buildMvaSummaryXlsxRows(
   rows.push([]);
 
   // ── D. Overhead ───────────────────────────────────────────────────────────
-  const overheadTotal =
-    mva.overhead.equipmentDepPerUnit +
-    mva.overhead.equipmentMaintPerUnit +
-    mva.overhead.spacePerUnit +
-    mva.overhead.powerPerUnit;
+  // Use the pre-computed totalOverheadPerUnit rather than re-summing to ensure
+  // the export value is byte-for-byte consistent with the UI summary.
+  const overheadTotal = mva.overhead.totalOverheadPerUnit;
   rows.push(['D. Overhead', 'Item', 'Cost / Unit', '']);
   rows.push(['Overhead', 'Equip Depreciation', mva.overhead.equipmentDepPerUnit, '']);
   rows.push(['Overhead', 'Equip Maintenance', mva.overhead.equipmentMaintPerUnit, '']);
