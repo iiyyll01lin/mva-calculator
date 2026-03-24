@@ -598,3 +598,20 @@ export function summarizeForCsv(project: ProjectState, simulation = calculateSim
     ['Confirmation', 'Reviewer', project.confirmation.reviewer],
   ];
 }
+
+export function resolveIndirectLaborRows(
+  plant: ProjectState['plant'],
+  mode: ProjectState['plant']['idlUiMode'] = plant.idlUiMode,
+  processType: ProjectState['plant']['processType'] = plant.processType,
+): LaborRow[] {
+  const resolvedMode = mode === 'auto' ? processType : mode;
+  return (plant.idlRowsByMode[resolvedMode] ?? []).map((row) => ({ ...row }));
+}
+
+export function projectForProcess(project: ProjectState, processType: ProjectState['plant']['processType']): ProjectState {
+  const plant: ProjectState['plant'] = { ...project.plant, processType };
+  if (plant.idlUiMode === 'auto') {
+    plant.indirectLaborRows = resolveIndirectLaborRows(plant, 'auto', processType);
+  }
+  return { ...project, plant };
+}

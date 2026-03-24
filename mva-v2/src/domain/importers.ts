@@ -310,3 +310,104 @@ export function parseL6MpmSetupCsv(text: string): Partial<ProductSetupL6> {
     source: 'l6_mpm_setup_csv',
   };
 }
+// ---------------------------------------------------------------------------
+// App-level validation and parse helpers (moved here from App.tsx)
+// ---------------------------------------------------------------------------
+
+import { boundedNumber, numberValue } from '../utils/formatters';
+import type { EquipmentItem as EqItem, LineStandard, ProjectState } from './models';
+
+function assertHeaders(header: string[] | undefined, requiredHeaders: string[]): Record<string, number> {
+  if (!header || header.length === 0) {
+    throw new Error('CSV header row is missing.');
+  }
+  const lookup = Object.fromEntries(header.map((cell, index) => [cell.trim().toLowerCase(), index]));
+  const missing = requiredHeaders.filter((h) => !(h in lookup));
+  if (missing.length > 0) {
+    throw new Error(`CSV is missing required headers: ${missing.join(', ')}`);
+  }
+  return lookup;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+export function validateProjectPayload(payload: unknown): ProjectState {
+  if (!isRecord(payload)) {
+    throw new Error('Project JSON payload must be an object.');
+  }
+  if (!isRecord(payload.basicInfo) || !Array.isArray(payload.machines) || !Array.isArray(payload.processSteps) || !isRecord(payload.plant)) {
+    throw new Error('Project JSON does not match the expected project structure.');
+  }
+  return payload as unknown as ProjectState;
+}
+
+export function validateLineStandardsPayload(payload: unknown): LineStandard[] {
+  if (!Array.isArray(payload)) {
+    throw new Error('Line standards JSON must be an array.');
+  }
+  if (!payload.every((item) => isRecord(item) && typeof item.name === 'string' && Array.isArray(item.equipmentList))) {
+    throw new Error('One or more line standards are malformed.');
+  }
+  return payload as LineStandard[];
+}
+
+export function parseEquipmentRows(csvText: string): EqItem[] {
+  const [header, ...rows] = parseCsv(csvText);
+  const lookup = assertHeaders(header, ['process', 'item', 'qty', 'unitprice', 'depreciationyears']);
+  if (rows.length === 0) throw new Error('Equipment CSV contains no data rows.');
+  return rows.map((row, idx) => ({
+    id: row[lookup.id] || `import-eq-${idx}`,
+    process: row[lookup.process] || '',
+    item: row[lookup.item] || '',
+    qty: Math.max(0, numberValue(row[lookup.qty] || '0')),
+    unitPrice: Math.max(0, numberValue(row[lookup.unitprice] || '0')),
+    depreciationYears: Math.max(1, numberValue(row[lookup.depreciationyears] || '1')),
+    costPerMonth: lookup.costpermonth !== undefined && row[lookup.costpermonth] ? Math.max(0, numberValue(row[lookup.costpermonth])) : null,
+  }));
+}
+
+export function parseSpaceRows(csvText: string): ProjectState['plant']['spaceAllocation'] {
+  const [header, ...rows] = parseCsv(csvText);
+  const lookup = assertHeaders(header, ['floor', 'process', 'areasqft']);
+  if (rows.length === 0) throw new Error('Space CSV contains no data rows.');
+  return rows.map((row, idx) => ({
+    id: row[lookup.id] || `import-space-${idx}`,
+    floor: row[lookup.floor] || '',
+    process: row[lookup.process] || '',
+    areaSqft: Math.max(0, numberValue(row[lookup.areasqft] || '0')),
+    ratePerSqft: lookup.ratepersqft !== undefined && row[lookup.ratepersqft] ? Math.max(0, numberValue(row[lookup.ratepersqft])) : null,
+    monthlyCost: lookup.monthlycost !== undefined && row[lookup.monthlycost] ? Math.max(0, numberValue(row[lookup.monthlycost])) : null,
+  }));
+}
+
+export function parseLaborRows(csvText: string): { direct: LaborRow[]; indirect: LaborRow[] } {
+  const [header, ...rows] = parseCsv(csvText);
+  const lookup = assertHeaders(header, ['kind', 'name', 'headcount', 'uphsource']);
+  if (rows.length === 0) throw new Error('Labor CSV contains no data rows.');
+  const direct: LaborRow[] = [];
+  const indirect: LaborRow[] = [];
+  rows.forEach((row, idx) => {
+    const kind = (row[lookup.kind] || 'direct').toLowerCase();
+    const laborRow: LaborRow = {
+      id: row[lookup.id] || `import-labor-${idx}`,
+      name: row[lookup.name] || '',
+      process: row[lookup.process] || '',
+      department: row[lookup.department] || '',
+      role: row[lookup.role] || '',
+      headcount: Math.max(0, numberValue(row[lookup.headcount] || '0')),
+      allocationPercent: lookup.allocationpercent !== undefined && row[lookup.allocationpercent]
+        ? boundedNumber(row[lookup.allocationpercent], { min: 0, max: 1 })
+        : null,
+      uphSource: (row[lookup.uphsource] || 'line') === 'override' ? 'override' : 'line',
+      overrideUph: lookup.overrideuph !== undefined && row[lookup.overrideuph] ? Math.max(0, numberValue(row[lookup.overrideuph])) : null,
+    };
+    if (kind === 'indirect') {
+      indirect.push(laborRow);
+    } else {
+      direct.push(laborRow);
+    }
+  });
+  return { direct, indirect };
+}
