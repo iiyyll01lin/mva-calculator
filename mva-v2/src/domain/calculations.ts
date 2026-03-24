@@ -23,7 +23,15 @@ const clamp01 = (value: number, fallback = 0): number => {
   return Math.min(1, Math.max(0, safe));
 };
 
-const round = (value: number, digits = 4): number => Number(value.toFixed(digits));
+/**
+ * Epsilon-corrected half-up rounding. Returns 0 for NaN / ±Infinity so that
+ * floating-point noise never propagates into cost-rollup tables as NaN strings.
+ */
+const round = (value: number, digits = 4): number => {
+  if (!Number.isFinite(value)) return 0;
+  const factor = Math.pow(10, digits);
+  return Math.round((value + Number.EPSILON) * factor) / factor;
+};
 
 export function normalizeSpaceProcessName(raw: unknown): string {
   const value = String(raw ?? '').trim();
@@ -38,14 +46,16 @@ export function normalizeSpaceProcessName(raw: unknown): string {
 
 export function splitFloorSpace4060({ totalFloorSqft, hiMode }: { totalFloorSqft: number; hiMode: 'FA' | 'FBT' | 'FA_FBT' }) {
   const total = Math.max(0, Number(totalFloorSqft) || 0);
-  const smt = total * 0.4;
-  const hi = total * 0.6;
+  // Round at 2 decimal places to avoid floating-point noise in sqft values.
+  const smt = round(total * 0.4, 2);
+  const hi = round(total - smt, 2);
   if (hiMode === 'FA') return [{ process: 'SMT', areaSqft: smt }, { process: 'F/A', areaSqft: hi }];
   if (hiMode === 'FBT') return [{ process: 'SMT', areaSqft: smt }, { process: 'FBT', areaSqft: hi }];
+  const hiHalf = round(hi / 2, 2);
   return [
     { process: 'SMT', areaSqft: smt },
-    { process: 'F/A', areaSqft: hi / 2 },
-    { process: 'FBT', areaSqft: hi / 2 },
+    { process: 'F/A', areaSqft: hiHalf },
+    { process: 'FBT', areaSqft: round(hi - hiHalf, 2) },
   ];
 }
 
@@ -53,16 +63,15 @@ export function buildMatrixSpaceAllocation(project: ProjectState): SpaceAllocati
   const settings = project.plant.spaceSettings;
   const totalArea = Math.max(0, settings.lineLengthFt) * Math.max(0, settings.lineWidthFt);
   const distribution = settings.processDistribution ?? {};
-  return Object.entries(distribution)
-    .filter(([, percent]) => Number(percent) > 0)
-    .map(([process, percent], index) => ({
-      id: `matrix-${index}`,
-      floor: 'F1',
-      process: normalizeSpaceProcessName(process),
-      areaSqft: round(totalArea * (Number(percent) / 100), 2),
-      ratePerSqft: settings.spaceRatePerSqft,
-      monthlyCost: null,
-    }));
+  const entries = Object.entries(distribution).filter(([, percent]) => Number(percent) > 0);
+  return entries.map(([process, percent], index) => ({
+    id: `matrix-${index}`,
+    floor: 'F1',
+    process: normalizeSpaceProcessName(process),
+    areaSqft: round(totalArea * (Number(percent) / 100), 2),
+    ratePerSqft: settings.spaceRatePerSqft,
+    monthlyCost: null,
+  }));
 }
 
 export function equipmentMonthlyCost(item: EquipmentItem): number {
@@ -216,8 +225,13 @@ function resolveSpaceRows(project: ProjectState): SpaceAllocationRow[] {
 
 export function calculateMva(project: ProjectState, simulation = calculateSimulation(project)): MvaResults {
   const { plant, basicInfo, laborTimeL10 } = project;
-  const l10Fpy = Number(laborTimeL10.meta.fpy);
-  const fpyEffective = plant.yield.useL10Fpy && Number.isFinite(l10Fpy) ? clamp01(l10Fpy, 1) : clamp01(plant.yield.fpy, 1);
+  // Guard: meta.fpy may be null (not yet configured). Number(null) === 0 which is a valid
+  // yield value and would pass isFinite(), silently collapsing all capacity to zero.
+  const rawL10Fpy = laborTimeL10.meta.fpy;
+  const l10Fpy = (rawL10Fpy !== null && rawL10Fpy !== undefined) ? Number(rawL10Fpy) : NaN;
+  const fpyEffective = plant.yield.useL10Fpy && Number.isFinite(l10Fpy) && l10Fpy > 0
+    ? clamp01(l10Fpy, 1)
+    : clamp01(plant.yield.fpy, 1);
   const vpyEffective = clamp01(plant.yield.vpy, 1);
   const yieldFactor = round(fpyEffective * vpyEffective);
   const lineUphRaw = simulation.uph;
@@ -499,10 +513,12 @@ export function calcL10StationComputed(station: Partial<L10Station>, meta: L10St
   const avgCycleTimeSec = cycleTimeSec !== null && cycleTimeSec > 0 ? round((cycleTimeSec * allowanceFactor) / parallelStations) : null;
   const uph = avgCycleTimeSec !== null && avgCycleTimeSec > 0 ? round(3600 / avgCycleTimeSec) : null;
 
-  const hoursPerShift = Number.isFinite(Number(meta.hoursPerShift)) ? Number(meta.hoursPerShift) : null;
-  const shiftsPerDay = Number.isFinite(Number(meta.shiftsPerDay)) ? Number(meta.shiftsPerDay) : null;
-  const workDaysPerWeek = Number.isFinite(Number(meta.workDaysPerWeek)) ? Number(meta.workDaysPerWeek) : null;
-  const workDaysPerMonth = Number.isFinite(Number(meta.workDaysPerMonth)) ? Number(meta.workDaysPerMonth) : null;
+  // Guard: meta fields use number|null. Number(null)===0 passes isFinite(), which would
+  // silently treat "not configured" as zero and collapse all capacity fields to 0.
+  const hoursPerShift = (meta.hoursPerShift !== null && meta.hoursPerShift !== undefined) ? Number(meta.hoursPerShift) : null;
+  const shiftsPerDay = (meta.shiftsPerDay !== null && meta.shiftsPerDay !== undefined) ? Number(meta.shiftsPerDay) : null;
+  const workDaysPerWeek = (meta.workDaysPerWeek !== null && meta.workDaysPerWeek !== undefined) ? Number(meta.workDaysPerWeek) : null;
+  const workDaysPerMonth = (meta.workDaysPerMonth !== null && meta.workDaysPerMonth !== undefined) ? Number(meta.workDaysPerMonth) : null;
 
   const perShiftCapa = uph !== null && hoursPerShift !== null ? round(uph * hoursPerShift, 2) : null;
   const dailyCapa = perShiftCapa !== null && shiftsPerDay !== null ? round(perShiftCapa * shiftsPerDay, 2) : null;
