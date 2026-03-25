@@ -1,29 +1,39 @@
-import { startTransition, useEffect, useMemo, useState } from 'react';
+import { lazy, startTransition, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { SectionCard } from './components/SectionCard';
 import { Sidebar } from './components/Sidebar';
 import { SummaryPage } from './components/SummaryPage';
-import { calculateMva, calculateSimulation, projectForProcess } from './domain/calculations';
+import { calculateMva, calculateSimulation } from './domain/calculations';
 import { buildL10StationsCsv, buildProjectExport, buildSummaryCsv, downloadText } from './domain/exporters';
 import type { ProjectState, TabId } from './domain/models';
 import { loadSelectedLineStandardId, saveSelectedLineStandardId } from './domain/persistence';
 import { useProjectState } from './state/useProjectState';
-import { BasicInfoPage } from './features/BasicInfoPage';
-import { BomMapPage } from './features/BomMapPage';
-import { DlohIdlPage } from './features/DlohIdlPage';
-import { LaborTimeL10Page } from './features/LaborTimeL10Page';
-import { LaborTimeL6Page } from './features/LaborTimeL6Page';
-import { MachineRatesPage } from './features/MachineRatesPage';
-import { ModelProcessPage } from './features/ModelProcessPage';
-import { MpmL10Page } from './features/MpmL10Page';
-import { MpmL6Page } from './features/MpmL6Page';
-import { PlantEnvPage } from './features/PlantEnvPage';
-import { PlantEquipmentPage } from './features/PlantEquipmentPage';
-import { PlantRatesPage } from './features/PlantRatesPage';
-import { PlantSpacePage } from './features/PlantSpacePage';
-import { SimulationPage } from './features/SimulationPage';
 import { useProjectImports } from './hooks/useProjectImports';
+import { useProcessSummary } from './hooks/useProcessSummary';
 import { formatTimestamp } from './utils/formatters';
+
+/** Classifies an import/export feedback string into a banner severity level. */
+function classifyStatusType(msg: string): 'success' | 'error' | 'info' {
+  if (/^(Failed|Invalid|Error|Cannot|Missing|not\s+found)/i.test(msg)) return 'error';
+  if (/^(Imported|Applied|Saved)/i.test(msg)) return 'success';
+  return 'info';
+}
+
+// Code-split each feature page — only the active tab is ever parsed/executed.
+const BasicInfoPage = lazy(() => import('./features/BasicInfoPage').then((m) => ({ default: m.BasicInfoPage })));
+const BomMapPage = lazy(() => import('./features/BomMapPage').then((m) => ({ default: m.BomMapPage })));
+const DlohIdlPage = lazy(() => import('./features/DlohIdlPage').then((m) => ({ default: m.DlohIdlPage })));
+const LaborTimeL10Page = lazy(() => import('./features/LaborTimeL10Page').then((m) => ({ default: m.LaborTimeL10Page })));
+const LaborTimeL6Page = lazy(() => import('./features/LaborTimeL6Page').then((m) => ({ default: m.LaborTimeL6Page })));
+const MachineRatesPage = lazy(() => import('./features/MachineRatesPage').then((m) => ({ default: m.MachineRatesPage })));
+const ModelProcessPage = lazy(() => import('./features/ModelProcessPage').then((m) => ({ default: m.ModelProcessPage })));
+const MpmL10Page = lazy(() => import('./features/MpmL10Page').then((m) => ({ default: m.MpmL10Page })));
+const MpmL6Page = lazy(() => import('./features/MpmL6Page').then((m) => ({ default: m.MpmL6Page })));
+const PlantEnvPage = lazy(() => import('./features/PlantEnvPage').then((m) => ({ default: m.PlantEnvPage })));
+const PlantEquipmentPage = lazy(() => import('./features/PlantEquipmentPage').then((m) => ({ default: m.PlantEquipmentPage })));
+const PlantRatesPage = lazy(() => import('./features/PlantRatesPage').then((m) => ({ default: m.PlantRatesPage })));
+const PlantSpacePage = lazy(() => import('./features/PlantSpacePage').then((m) => ({ default: m.PlantSpacePage })));
+const SimulationPage = lazy(() => import('./features/SimulationPage').then((m) => ({ default: m.SimulationPage })));
 
 // Re-export domain helpers consumed by tests that previously imported from App
 export { validateProjectPayload, validateLineStandardsPayload } from './domain/importers';
@@ -39,19 +49,25 @@ export default function App() {
 
   const simulation = useMemo(() => calculateSimulation(project), [project]);
   const mva = useMemo(() => calculateMva(project, simulation), [project, simulation]);
-  const l10Project = useMemo(() => projectForProcess(project, 'L10'), [project]);
-  const l6Project = useMemo(() => projectForProcess(project, 'L6'), [project]);
-  const l10Simulation = useMemo(() => calculateSimulation(l10Project), [l10Project]);
-  const l6Simulation = useMemo(() => calculateSimulation(l6Project), [l6Project]);
-  const l10Mva = useMemo(() => calculateMva(l10Project, l10Simulation), [l10Project, l10Simulation]);
-  const l6Mva = useMemo(() => calculateMva(l6Project, l6Simulation), [l6Project, l6Simulation]);
-  const l10SummaryCsv = useMemo(() => buildSummaryCsv(l10Project), [l10Project]);
-  const l6SummaryCsv = useMemo(() => buildSummaryCsv(l6Project), [l6Project]);
+  // L10 and L6 process-scoped derivations encapsulated in useProcessSummary
+  // so App does not expose intermediate project snapshots as raw memos.
+  const { mva: l10Mva, simulation: l10Simulation, summaryCsv: l10SummaryCsv } = useProcessSummary(project, 'L10');
+  const { mva: l6Mva, simulation: l6Simulation, summaryCsv: l6SummaryCsv } = useProcessSummary(project, 'L6');
   const summaryCsv = useMemo(() => buildSummaryCsv(project), [project]);
 
-  const updateProject = (updater: (current: ProjectState) => ProjectState) => {
+  // Stable reference — feature pages wrapped in memo won't re-render just because
+  // App re-renders for unrelated state changes (e.g. activeTab, statusMessage).
+  const updateProject = useCallback((updater: (current: ProjectState) => ProjectState) => {
     startTransition(() => { setProject((current) => updater(current)); });
-  };
+  }, [setProject]);
+
+  // Dirty-state: true whenever the project has changed since the last export.
+  const [isDirty, setIsDirty] = useState(false);
+  const isFirstProjectMount = useRef(true);
+  useEffect(() => {
+    if (isFirstProjectMount.current) { isFirstProjectMount.current = false; return; }
+    setIsDirty(true);
+  }, [project]);
 
   useEffect(() => { saveSelectedLineStandardId(selectedLineStandardId); }, [selectedLineStandardId]);
   useEffect(() => {
@@ -75,10 +91,15 @@ export default function App() {
   } = useProjectImports({ updateProject, setSelectedLineStandardId, setStatusMessage });
 
   // ── Export helpers ──────────────────────────────────────────────────────────
-  const exportProject = () =>
+  const markClean = () => setIsDirty(false);
+  const exportProject = () => {
     downloadText(`${project.basicInfo.modelName}_${formatTimestamp()}_project.json`, buildProjectExport(project), 'application/json');
-  const exportSummary = () =>
+    markClean();
+  };
+  const exportSummary = () => {
     downloadText(`${project.basicInfo.modelName}_${formatTimestamp()}_summary.csv`, summaryCsv, 'text/csv');
+    markClean();
+  };
   const exportL10Stations = () =>
     downloadText(`${project.basicInfo.modelName}_${formatTimestamp()}_l10-stations.csv`, buildL10StationsCsv(project), 'text/csv');
   const exportLineStandards = () =>
@@ -143,11 +164,18 @@ export default function App() {
             <div className="hero-actions">
               <button type="button" className="button secondary" onClick={exportProject}>Export Project JSON</button>
               <button type="button" className="button primary" onClick={exportSummary}>Export Summary CSV</button>
+              {isDirty && <span className="dirty-badge" title="You have unsaved changes. Export Project JSON to persist them.">● Unsaved Changes</span>}
             </div>
           </header>
 
-          {statusMessage ? <div className="status-banner">{statusMessage}</div> : null}
+          {statusMessage && (
+            <div className={`status-banner ${classifyStatusType(statusMessage)}`} role="status" aria-live="polite">
+              <span aria-hidden="true">{classifyStatusType(statusMessage) === 'success' ? '✓' : classifyStatusType(statusMessage) === 'error' ? '✗' : 'ℹ'}</span>
+              {statusMessage}
+            </div>
+          )}
 
+          <Suspense fallback={<div className="page-loading" aria-busy="true"><span className="page-loading-spinner" />Loading…</div>}>
           {activeTab === 'basic' && <BasicInfoPage project={project} updateProject={updateProject} />}
           {activeTab === 'machine_rates' && <MachineRatesPage project={project} updateProject={updateProject} />}
           {activeTab === 'bom_map' && <BomMapPage project={project} updateProject={updateProject} />}
@@ -194,6 +222,7 @@ export default function App() {
               importsExportsSlot={renderImportsExports(l6SummaryCsv, 'L6')}
             />
           )}
+          </Suspense>
         </main>
       </ErrorBoundary>
     </div>
