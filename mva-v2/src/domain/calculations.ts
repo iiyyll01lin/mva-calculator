@@ -74,6 +74,15 @@ export function buildMatrixSpaceAllocation(project: ProjectState): SpaceAllocati
   }));
 }
 
+/**
+ * Computes monthly depreciation cost for a single equipment item.
+ *
+ * Priority order:
+ *  1. `costPerMonth` if explicitly set (e.g. lease / pre-negotiated value)
+ *  2. Straight-line depreciation: (qty × unitPrice) / (depreciationYears × 12)
+ *
+ * Returns 0 if the result is invalid or zero-length depreciation period.
+ */
 export function equipmentMonthlyCost(item: EquipmentItem): number {
   if (item.costPerMonth !== undefined && item.costPerMonth !== null && Number.isFinite(item.costPerMonth)) {
     return Math.max(0, Number(item.costPerMonth));
@@ -83,6 +92,16 @@ export function equipmentMonthlyCost(item: EquipmentItem): number {
   return round((Math.max(0, Number(item.qty) || 0) * Math.max(0, Number(item.unitPrice) || 0)) / (years * 12));
 }
 
+/**
+ * Computes the effective monthly floor-space cost for a single allocation row.
+ *
+ * Area is adjusted by the `spaceAreaMultiplier` (common-area loading factor):
+ * - When `buildingAreaOverrideSqft` is set, the multiplier is applied in *reverse*
+ *   (the override is already the gross building area, so we back out the net floor area).
+ * - Otherwise the multiplier inflates net area → gross billed area.
+ *
+ * Returns 0 if the result is invalid.
+ */
 export function spaceMonthlyCost(row: SpaceAllocationRow, project: ProjectState): number {
   if (row.monthlyCost !== undefined && row.monthlyCost !== null && Number.isFinite(row.monthlyCost)) {
     return Math.max(0, Number(row.monthlyCost));
@@ -105,6 +124,17 @@ function groupSumByField(rows: LaborBreakdownRow[], field: 'process' | 'departme
   return Array.from(grouped.entries()).map(([key, total]) => ({ key, total }));
 }
 
+/**
+ * Distributes a pool of labor rows into per-unit cost based on line UPH and efficiency.
+ *
+ * Formula per row:
+ *   costPerUnit = (hourlyRate × effectiveHeadcount) / (uphUsed × efficiency)
+ *
+ * where `effectiveHeadcount = headcount × allocationPercent` and `uphUsed` is
+ * optionally derated by the yield factor when strategy = 'apply_to_capacity'.
+ *
+ * An allocation percent of `null` is treated as 100 % (full charge to this line).
+ */
 function laborBreakdown(
   rows: LaborRow[],
   hourlyRate: number,
@@ -128,6 +158,20 @@ function laborBreakdown(
   });
 }
 
+/**
+ * Runs the SMT/FBT/F-A process simulation and returns capacity metrics.
+ *
+ * Key outputs:
+ * - `uph` (units per hour): 3600 / bottleneck cycle time
+ * - `taktTime`: available seconds per week ÷ weekly demand — the heartbeat of the line
+ * - `lineBalanceEfficiency`: ratio of sum(cycle times) to (bottleneck × #steps),
+ *    100 % means perfectly balanced; lower values indicate wasted parallel capacity
+ * - `weeklyOutput`: theoretical weekly throughput at target utilization
+ *
+ * Cycle time for placement machines is component-count driven
+ * (componentCount / rate × 3600), then divided by OEE and padded by setup loss.
+ * All other machine types use a direct rate-to-cycle conversion (3600 / rate).
+ */
 export function calculateSimulation(project: ProjectState): SimulationResults {
   const derivedMachines = project.plant.showEquipmentSimMapping
     ? deriveMachineRatesFromEquipmentLinks({
@@ -223,6 +267,32 @@ function resolveSpaceRows(project: ProjectState): SpaceAllocationRow[] {
   return project.plant.spaceAllocation;
 }
 
+/**
+ * Computes the full MVA cost breakdown for a given project + simulation run.
+ *
+ * Cost structure (all values are $/unit unless noted):
+ *
+ * | Line item           | Driver                                          |
+ * |---------------------|-------------------------------------------------|
+ * | Direct Labor        | laborBreakdown(directLaborRows, DL rate)        |
+ * | Indirect Labor      | laborBreakdown(indirectLaborRows, IDL rate)     |
+ * | Equipment Dep.      | equipmentDepPerMonth / monthlyVolume            |
+ * | Equipment Maint.    | equipmentDep × maintenanceRatio / volume        |
+ * | Space               | spaceMonthlyCost(rows) / monthlyVolume          |
+ * | Power               | direct per-unit constant from plant settings    |
+ * | Material Attrition  | bomCostPerUnit × attritionRate                  |
+ * | Consumables         | direct per-unit constant                        |
+ * | SG&A                | (corpBurden + siteMaint + itSecurity) / volume  |
+ * | Profit              | bcBomCostPerUnit × profitRate                   |
+ * | ICC                 | inventoryValuePerUnit × iccRate                 |
+ *
+ * Yield strategy options:
+ * - `apply_to_capacity` — reduces effective UPH, increasing labor cost/unit
+ * - `apply_to_volume`   — reduces output volume, increasing overhead cost/unit
+ *
+ * @param project - Full project state including plant, labor, and overhead settings
+ * @param simulation - Pre-computed simulation results (defaults to a fresh calculation)
+ */
 export function calculateMva(project: ProjectState, simulation = calculateSimulation(project)): MvaResults {
   const { plant, basicInfo, laborTimeL10 } = project;
   // Guard: meta.fpy may be null (not yet configured). Number(null) === 0 which is a valid
@@ -370,6 +440,20 @@ function equipmentKey(item: Pick<EquipmentItem, 'process' | 'item'>): string {
   return `${String(item.process || '').trim()}::${String(item.item || '').trim()}`;
 }
 
+/**
+ * Compares a line-standard equipment template against the current baseline and
+ * extra equipment lists, returning per-item delta rows and aggregate totals.
+ *
+ * Rows are keyed by `process::item` to enable cross-list matching. A negative
+ * `deltaCostPerMonth` means the current setup costs less than the template
+ * (favorable); positive means over-template spend.
+ *
+ * Typical use: Plant Equipment page → "vs Template" delta column.
+ *
+ * @param template - Reference line standard (null → all template values are 0)
+ * @param equipmentList - Current project baseline equipment
+ * @param extraEquipmentList - Additional equipment rows (future expansion)
+ */
 export function computeEquipmentDelta({
   template,
   equipmentList,
@@ -449,6 +533,25 @@ export function computeEquipmentDelta({
   };
 }
 
+/**
+ * Derives machine-rate overrides from equipment list `simMachineGroup` links.
+ *
+ * Each equipment item can optionally carry `simMachineGroup` (which group in
+ * the simulation it feeds) and `simParallelQty` (how many units run in
+ * parallel). The derived rate for a group is:
+ *
+ *   derivedRate = sum of (simRateOverride OR baseRate × simParallelQty)
+ *                 across all linked items in that group
+ *
+ * This allows the Plant Equipment setup to drive simulation capacity without
+ * manual duplication in the Machine Rates table.
+ *
+ * @param baseMachines - Fallback machine list when no item is linked to a group
+ * @param equipmentList - Baseline equipment with optional sim-linking fields
+ * @param extraEquipmentList - Additional equipment (included when `includeExtra` is true)
+ * @param includeExtra - Whether extra-equipment items contribute to derived rates
+ * @returns `{ machines, rows }` — updated machine array and derivation audit rows
+ */
 export function deriveMachineRatesFromEquipmentLinks({
   baseMachines = defaultMachines,
   equipmentList,
@@ -615,6 +718,18 @@ export function summarizeForCsv(project: ProjectState, simulation = calculateSim
   ];
 }
 
+/**
+ * Resolves the active indirect-labor row set for a given process type.
+ *
+ * When `mode` is `'auto'`, the process type from `plant.processType` is used
+ * to select the correct `idlRowsByMode` bucket. Explicit mode values (`'L10'`
+ * or `'L6'`) override the plant-wide process type, which is needed when
+ * computing process-specific summaries (e.g. the L10 / L6 MPM pages).
+ *
+ * @param plant - The plant sub-state containing `idlRowsByMode` and `idlUiMode`
+ * @param mode  - Override mode; defaults to `plant.idlUiMode`
+ * @param processType - Process type used when mode is `'auto'`
+ */
 export function resolveIndirectLaborRows(
   plant: ProjectState['plant'],
   mode: ProjectState['plant']['idlUiMode'] = plant.idlUiMode,
@@ -624,6 +739,22 @@ export function resolveIndirectLaborRows(
   return (plant.idlRowsByMode[resolvedMode] ?? []).map((row) => ({ ...row }));
 }
 
+/**
+ * Creates a shallow project snapshot scoped to a specific process type.
+ *
+ * This is the primary adapter between the single shared `ProjectState` and the
+ * per-process summary pages (L10 / L6). It overrides `plant.processType` and,
+ * when IDL mode is `'auto'`, backfills `plant.indirectLaborRows` so that any
+ * downstream consumer (e.g. `calculateMva`) sees the correct IDL rows without
+ * needing to know which process is active.
+ *
+ * Used by `useProcessSummary` to compute L10 and L6 summaries in parallel
+ * without mutating the canonical project state.
+ *
+ * @param project - The full canonical project state
+ * @param processType - The target process ('L10' | 'L6')
+ * @returns A new project reference with `plant.processType` set accordingly
+ */
 export function projectForProcess(project: ProjectState, processType: ProjectState['plant']['processType']): ProjectState {
   const plant: ProjectState['plant'] = { ...project.plant, processType };
   if (plant.idlUiMode === 'auto') {
