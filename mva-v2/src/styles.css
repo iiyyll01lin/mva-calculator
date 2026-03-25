@@ -10,7 +10,26 @@
   --accent-soft: rgba(79, 140, 255, 0.12);
   --good: #26b26b;
   --warn: #ef8a34;
+  --danger: #e05252;
+  --info: #3ec6f0;
+  --font-mono: 'Consolas', 'Menlo', 'Courier New', monospace;
   --shadow: 0 18px 44px rgba(0, 0, 0, 0.32);
+  /* Table density tokens — adjust once to affect all data tables */
+  --table-cell-py: 0.52rem;
+  --table-cell-px: 0.72rem;
+  --table-cell-py-dense: 0.35rem;
+  /* ── Design System Tokens ─────────────────────────────────────────────── */
+  /* Border radii — use these in new components instead of hardcoded values */
+  --radius-card: 20px;   /* hero-panel, section-card */
+  --radius-panel: 18px;  /* data-table-wrapper, editable-list, alert-card */
+  --radius-input: 12px;  /* inputs, select, textarea */
+  --radius-btn: 999px;   /* buttons, chips, badges */
+  /* Typography scale */
+  --font-xs: 0.73rem;    /* table column headers */
+  --font-sm: 0.78rem;    /* UI labels, eyebrows, hero-chips */
+  --font-meta: 0.82rem;  /* dense-table body, secondary copy */
+  /* Motion */
+  --transition-ui: 180ms ease;  /* nav-button hover, toggles */
 }
 
 * {
@@ -187,9 +206,38 @@ label > span {
 }
 
 .status-banner {
-  padding: 0.9rem 1.2rem;
+  padding: 0.75rem 1.1rem;
   color: var(--text);
   border-color: rgba(79, 140, 255, 0.28);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.88rem;
+}
+
+.status-banner.success {
+  border-color: rgba(38, 178, 107, 0.35);
+  background: rgba(38, 178, 107, 0.07);
+  color: #7de8b4;
+}
+
+.status-banner.error {
+  border-color: rgba(224, 82, 82, 0.38);
+  background: rgba(224, 82, 82, 0.07);
+  color: #f4a0a0;
+}
+
+/* info uses the default accent styling already defined on .status-banner */
+.status-banner.info {
+  border-color: rgba(79, 140, 255, 0.28);
+  background: rgba(79, 140, 255, 0.05);
+  color: #a8c8ff;
+}
+
+.status-banner span[aria-hidden] {
+  font-size: 1rem;
+  line-height: 1;
+  flex-shrink: 0;
 }
 
 .error-boundary-card {
@@ -485,7 +533,7 @@ table.data-table th.section-header {
 
 .data-table th,
 .data-table td {
-  padding: 0.85rem;
+  padding: var(--table-cell-py) var(--table-cell-px);
   border-bottom: 1px solid var(--line);
   text-align: left;
   vertical-align: middle;
@@ -494,8 +542,35 @@ table.data-table th.section-header {
 .data-table th {
   color: var(--muted);
   text-transform: uppercase;
-  font-size: 0.76rem;
+  font-size: 0.73rem;
   letter-spacing: 0.08em;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Zebra striping — aids row scanning in large matrices */
+.data-table tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.022);
+}
+
+.data-table tbody tr:hover {
+  background: rgba(79, 140, 255, 0.06);
+}
+
+/* Right-align numeric columns */
+.data-table td.num,
+.data-table th.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+/* Dense variant for large matrices (LaborTime, Equipment) */
+.data-table.dense th,
+.data-table.dense td {
+  padding: var(--table-cell-py-dense) var(--table-cell-px);
+  font-size: 0.82rem;
 }
 
 .highlight-row {
@@ -631,6 +706,54 @@ table.data-table th.section-header {
 .decision-ng.active {
   background: var(--warn);
   color: #fff;
+}
+
+/* ── Dirty-state badge ──────────────────────────────────────────────────── */
+.dirty-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.32rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(239, 138, 52, 0.14);
+  border: 1px solid rgba(239, 138, 52, 0.35);
+  color: var(--warn);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  animation: dirty-pulse 2.4s ease-in-out infinite;
+  white-space: nowrap;
+  cursor: default;
+}
+
+@keyframes dirty-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.6; }
+}
+
+/* ── Page lazy-load spinner ─────────────────────────────────────────────── */
+.page-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 200px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.page-loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--line-strong);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 .summary-metric {
