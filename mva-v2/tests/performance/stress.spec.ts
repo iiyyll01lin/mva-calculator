@@ -15,7 +15,7 @@
 import { describe, expect, it } from 'vitest';
 import { calculateMva, calculateSimulation } from '../../src/domain/calculations';
 import { defaultProject } from '../../src/domain/defaults';
-import type { BomRow, EquipmentItem, LaborRow, ProjectState } from '../../src/domain/models';
+import type { BomRow, EquipmentItem, L10Station, LaborRow, ProjectState } from '../../src/domain/models';
 
 // ─── Monster project factory ───────────────────────────────────────────────
 
@@ -127,5 +127,107 @@ describe('stress test — repeated computation stability', () => {
       expect(r.totalPerUnit).toBe(baseline.totalPerUnit);
       expect(r.overhead.totalEquipmentCostPerMonth).toBe(baseline.overhead.totalEquipmentCostPerMonth);
     }
+  });
+});
+
+// ─── 200-station L10 scenario ─────────────────────────────────────────────
+
+/**
+ * Simulates an enterprise L10 line with 200 manual stations — the kind of
+ * routing that triggers UI jank when rendered without virtualisation.
+ *
+ * This test validates that the domain layer handles the labour breakdown
+ * rollup for such a large station table within acceptable latency.
+ */
+function buildL10HeavyProject(): ProjectState {
+  const stations: L10Station[] = Array.from({ length: 200 }, (_, i) => ({
+    id: `l10-st-${i}`,
+    name: `Station_${i + 1}`,
+    laborHc: (i % 4) + 1,
+    parallelStations: (i % 3) + 1,
+    cycleTimeSec: 10 + (i % 60),
+    allowanceFactor: 1.1 + (i % 5) * 0.02,
+  }));
+
+  const directLaborRows: LaborRow[] = stations.map((s, i) => ({
+    id: `l10-dl-${i}`,
+    name: s.name,
+    process: 'L10',
+    headcount: s.laborHc,
+    allocationPercent: 1,
+    uphSource: 'line' as const,
+  }));
+
+  return {
+    ...defaultProject,
+    laborTimeL10: {
+      ...defaultProject.laborTimeL10,
+      stations,
+      meta: {
+        hoursPerShift: 8,
+        shiftsPerDay: 2,
+        workDaysPerWeek: 5,
+        workDaysPerMonth: 22,
+        fpy: 0.95,
+      },
+    },
+    plant: {
+      ...defaultProject.plant,
+      directLaborRows,
+    },
+  };
+}
+
+const l10HeavyProject = buildL10HeavyProject();
+
+describe('stress test — 200 L10 stations', () => {
+  it('calculateSimulation completes within 50 ms with 200-station L10 project', () => {
+    const ms = elapsed(() => calculateSimulation(l10HeavyProject));
+    expect(ms).toBeLessThan(50);
+  });
+
+  it('calculateMva completes within 200 ms with 200-station L10 project', () => {
+    const sim = calculateSimulation(l10HeavyProject);
+    const ms = elapsed(() => calculateMva(l10HeavyProject, sim));
+    expect(ms).toBeLessThan(200);
+  });
+
+  it('calculateMva produces finite totals for 200-station L10 project', () => {
+    const sim = calculateSimulation(l10HeavyProject);
+    const result = calculateMva(l10HeavyProject, sim);
+    expect(Number.isFinite(result.totalPerUnit)).toBe(true);
+    expect(Number.isFinite(result.dlPerUnit)).toBe(true);
+    for (const line of result.costLines) {
+      expect(Number.isFinite(line.value)).toBe(true);
+    }
+  });
+
+  it('snapshot: l10StationSnapshots derivation is O(N) and stays under 5 ms for 200 stations', () => {
+    // Mirrors the useMemo computation in LaborTimeL10Page so we can assert
+    // that the per-render snapshot derivation is non-blocking even without React.
+    const meta = l10HeavyProject.laborTimeL10.meta;
+    const hoursPerShift = meta.hoursPerShift ?? 0;
+    const shiftsPerDay = meta.shiftsPerDay ?? 0;
+    const workDaysPerWeek = meta.workDaysPerWeek ?? 0;
+    const workDaysPerMonth = meta.workDaysPerMonth ?? 0;
+
+    const ms = elapsed(() => {
+      l10HeavyProject.laborTimeL10.stations.map((station) => {
+        const parallelStations = Math.max(1, station.parallelStations || 1);
+        const cycleTimeSec = station.cycleTimeSec ?? 0;
+        const avgCycleTimeSec = cycleTimeSec > 0 ? (cycleTimeSec * station.allowanceFactor) / parallelStations : 0;
+        const uph = avgCycleTimeSec > 0 ? 3600 / avgCycleTimeSec : 0;
+        return {
+          ...station,
+          avgCycleTimeSec,
+          uph,
+          perShiftCapa: uph * hoursPerShift,
+          dailyCapa: uph * hoursPerShift * shiftsPerDay,
+          weeklyCapa: uph * hoursPerShift * shiftsPerDay * workDaysPerWeek,
+          monthlyCapa: uph * hoursPerShift * shiftsPerDay * workDaysPerMonth,
+        };
+      });
+    });
+    expect(ms).toBeLessThan(5);
   });
 });
