@@ -8,6 +8,10 @@ import type {
 export const lineStandardStorageKey = 'mva_v2_line_standards';
 export const projectStorageKey = 'mva_v2_project';
 export const lineStandardSelectionStorageKey = 'mva_v2_selected_line_standard';
+export const portfolioStorageKey = 'mva_v2_portfolio';
+export const activeProjectIdStorageKey = 'mva_v2_active_project_id';
+/** Stable project ID used for the auto-bootstrapped default project. */
+export const DEFAULT_PROJECT_ID = 'mva-default-project';
 
 export const defaultMachines: Machine[] = [
   { id: 'm1', group: 'Printer', description: 'Solder paste printer', rate: 120, type: 'fixed' },
@@ -52,6 +56,10 @@ const defaultL6Stations: L6Station[] = [
 ];
 
 export const defaultProject: ProjectState = {
+  projectId: DEFAULT_PROJECT_ID,
+  productLine: 'Server',
+  sku: '1U-Standard',
+  lastModified: '',
   schemaVersion: 2,
   basicInfo: {
     modelName: '1395A3368201',

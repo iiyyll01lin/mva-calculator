@@ -1,3 +1,12 @@
+/** Product line classification used by the portfolio management layer. */
+export type ProductLine = 'Server' | 'Switch' | 'Storage' | 'Other';
+
+/**
+ * Standardised SKU descriptor within a product line.
+ * The 'Custom' sentinel allows free-form entries from the dashboard form.
+ */
+export type SkuType = '1U-Standard' | '1U-HighEnd' | '2U-Standard' | '2U-HighEnd' | '4U-HighEnd' | 'Custom';
+
 export type TabId =
   | 'basic'
   | 'machine_rates'
@@ -333,6 +342,14 @@ export interface PlantInputs {
 }
 
 export interface ProjectState {
+  /** UUID assigned at project creation by the portfolio layer (Phase 8). */
+  projectId?: string;
+  /** Product line classification (Portfolio: Phase 8). */
+  productLine?: ProductLine;
+  /** SKU descriptor within the product line (Portfolio: Phase 8). */
+  sku?: SkuType | string;
+  /** ISO-8601 timestamp — updated on every portfolio save (Portfolio: Phase 8). */
+  lastModified?: string;
   schemaVersion: number;
   basicInfo: BasicInfo;
   machines: Machine[];

@@ -7,10 +7,11 @@ import { calculateMva, calculateSimulation } from './domain/calculations';
 import { buildL10StationsCsv, buildProjectExport, buildSummaryCsv, downloadText } from './domain/exporters';
 import type { ProjectState, TabId } from './domain/models';
 import { loadSelectedLineStandardId, saveSelectedLineStandardId } from './domain/persistence';
-import { useProjectState } from './state/useProjectState';
+import { usePortfolioState } from './state/useProjectState';
 import { useProjectImports } from './hooks/useProjectImports';
 import { useProcessSummary } from './hooks/useProcessSummary';
 import { formatTimestamp } from './utils/formatters';
+import { defaultProject } from './domain/defaults';
 
 /** Classifies an import/export feedback string into a banner severity level. */
 function classifyStatusType(msg: string): 'success' | 'error' | 'info' {
@@ -20,6 +21,7 @@ function classifyStatusType(msg: string): 'success' | 'error' | 'info' {
 }
 
 // Code-split each feature page — only the active tab is ever parsed/executed.
+const ProjectDashboardPage = lazy(() => import('./features/ProjectDashboardPage').then((m) => ({ default: m.ProjectDashboardPage })));
 const BasicInfoPage = lazy(() => import('./features/BasicInfoPage').then((m) => ({ default: m.BasicInfoPage })));
 const BomMapPage = lazy(() => import('./features/BomMapPage').then((m) => ({ default: m.BomMapPage })));
 const DlohIdlPage = lazy(() => import('./features/DlohIdlPage').then((m) => ({ default: m.DlohIdlPage })));
@@ -40,20 +42,36 @@ export { validateProjectPayload, validateLineStandardsPayload } from './domain/i
 export { parseEquipmentRows, parseSpaceRows, parseLaborRows } from './domain/importers';
 
 export default function App() {
-  const { project, setProject } = useProjectState();
+  const {
+    portfolio,
+    project,
+    setProject,
+    activeProjectId,
+    createProject,
+    deleteProject,
+    openProject,
+    goToDashboard,
+  } = usePortfolioState();
   const [activeTab, setActiveTab] = useState<TabId>('basic');
+
+  // When project is null (dashboard view), fall back to defaultProject so that
+  // all hooks below are called with a valid ProjectState on every render pass.
+  // Values computed from safeProject are only used in the orchestrator branch
+  // (rendered after the null-guard early return).
+  const safeProject = project ?? defaultProject;
+
   const [selectedLineStandardId, setSelectedLineStandardId] = useState<string>(
-    () => loadSelectedLineStandardId() || project.lineStandards[0]?.id || '',
+    () => loadSelectedLineStandardId() || safeProject.lineStandards[0]?.id || '',
   );
   const [statusMessage, setStatusMessage] = useState<string>('');
 
-  const simulation = useMemo(() => calculateSimulation(project), [project]);
-  const mva = useMemo(() => calculateMva(project, simulation), [project, simulation]);
+  const simulation = useMemo(() => calculateSimulation(safeProject), [safeProject]);
+  const mva = useMemo(() => calculateMva(safeProject, simulation), [safeProject, simulation]);
   // L10 and L6 process-scoped derivations encapsulated in useProcessSummary
   // so App does not expose intermediate project snapshots as raw memos.
-  const { mva: l10Mva, simulation: l10Simulation, summaryCsv: l10SummaryCsv } = useProcessSummary(project, 'L10');
-  const { mva: l6Mva, simulation: l6Simulation, summaryCsv: l6SummaryCsv } = useProcessSummary(project, 'L6');
-  const summaryCsv = useMemo(() => buildSummaryCsv(project), [project]);
+  const { mva: l10Mva, simulation: l10Simulation, summaryCsv: l10SummaryCsv } = useProcessSummary(safeProject, 'L10');
+  const { mva: l6Mva, simulation: l6Simulation, summaryCsv: l6SummaryCsv } = useProcessSummary(safeProject, 'L6');
+  const summaryCsv = useMemo(() => buildSummaryCsv(safeProject), [safeProject]);
 
   // Stable reference — feature pages wrapped in memo won't re-render just because
   // App re-renders for unrelated state changes (e.g. activeTab, statusMessage).
@@ -67,14 +85,14 @@ export default function App() {
   useEffect(() => {
     if (isFirstProjectMount.current) { isFirstProjectMount.current = false; return; }
     setIsDirty(true);
-  }, [project]);
+  }, [safeProject]);
 
   useEffect(() => { saveSelectedLineStandardId(selectedLineStandardId); }, [selectedLineStandardId]);
   useEffect(() => {
-    if (!project.lineStandards.some((item) => item.id === selectedLineStandardId)) {
-      setSelectedLineStandardId(project.lineStandards[0]?.id ?? '');
+    if (!safeProject.lineStandards.some((item) => item.id === selectedLineStandardId)) {
+      setSelectedLineStandardId(safeProject.lineStandards[0]?.id ?? '');
     }
-  }, [project.lineStandards, selectedLineStandardId]);
+  }, [safeProject.lineStandards, selectedLineStandardId]);
   useEffect(() => {
     if (!statusMessage) return;
     const timer = setTimeout(() => setStatusMessage(''), 6000);
@@ -89,6 +107,21 @@ export default function App() {
     importSpaceSetup,
     importDlohIdlSetup,
   } = useProjectImports({ updateProject, setSelectedLineStandardId, setStatusMessage });
+
+  // ── Portfolio dashboard (no active project) ─────────────────────────────────
+  // Render the project dashboard when no active project is selected.
+  if (activeProjectId === null || project === null) {
+    return (
+      <Suspense fallback={<div className="page-loading" aria-busy="true"><span className="page-loading-spinner" />Loading…</div>}>
+        <ProjectDashboardPage
+          portfolio={portfolio}
+          onOpen={openProject}
+          onCreateNew={createProject}
+          onDelete={deleteProject}
+        />
+      </Suspense>
+    );
+  }
 
   // ── Export helpers ──────────────────────────────────────────────────────────
   const markClean = () => setIsDirty(false);
@@ -162,6 +195,7 @@ export default function App() {
               <p className="muted">Legacy-aligned MVA workflow with typed state, import pipelines, and verification-friendly summaries.</p>
             </div>
             <div className="hero-actions">
+              <button type="button" className="button secondary" onClick={goToDashboard} title="Return to the project portfolio">← Portfolio</button>
               <button type="button" className="button secondary" onClick={exportProject}>Export Project JSON</button>
               <button type="button" className="button primary" onClick={exportSummary}>Export Summary CSV</button>
               {isDirty && <span className="dirty-badge" title="You have unsaved changes. Export Project JSON to persist them.">● Unsaved Changes</span>}

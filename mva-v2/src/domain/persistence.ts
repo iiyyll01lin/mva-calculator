@@ -1,7 +1,10 @@
 import {
+  activeProjectIdStorageKey,
+  DEFAULT_PROJECT_ID,
   defaultProject,
   lineStandardSelectionStorageKey,
   lineStandardStorageKey,
+  portfolioStorageKey,
   projectStorageKey,
 } from './defaults';
 import type { LineStandard, ProjectState } from './models';
@@ -105,4 +108,80 @@ export function loadSelectedLineStandardId(): string {
 
 export function saveSelectedLineStandardId(id: string): void {
   window.localStorage.setItem(lineStandardSelectionStorageKey, id);
+}
+
+// ── Portfolio persistence (Phase 8) ────────────────────────────────────────────
+
+/** Generates a unique project ID using the Web Crypto API with a safe fallback. */
+export function generateProjectId(): string {
+  return typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+    ? crypto.randomUUID()
+    : `proj-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+/**
+ * Loads the full project portfolio from localStorage.
+ *
+ * Migration path: if `mva_v2_portfolio` is absent but a legacy
+ * `mva_v2_project` entry exists, it is promoted into a single-item
+ * portfolio, saved under the new key, and the active project ID is set.
+ *
+ * Cold start (neither key): returns a bootstrap array containing the
+ * default project so the app can render immediately.
+ */
+export function loadPortfolio(): ProjectState[] {
+  try {
+    const raw = window.localStorage.getItem(portfolioStorageKey);
+    if (raw) {
+      const parsed = JSON.parse(raw) as ProjectState[];
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed.map((p) => mergeProject(p));
+      }
+    }
+  } catch { /* ignore parse/storage errors */ }
+
+  // Migration: lift legacy single-project into portfolio format
+  try {
+    const legacyRaw = window.localStorage.getItem(projectStorageKey);
+    if (legacyRaw) {
+      const parsed = JSON.parse(legacyRaw) as Partial<ProjectState>;
+      if (parsed && typeof parsed === 'object') {
+        const merged = mergeProject(parsed);
+        const migrated: ProjectState = {
+          ...merged,
+          projectId: merged.projectId ?? generateProjectId(),
+          productLine: merged.productLine ?? 'Server',
+          sku: merged.sku ?? 'Custom',
+          lastModified: merged.lastModified ?? new Date().toISOString(),
+        };
+        savePortfolio([migrated]);
+        saveActiveProjectId(migrated.projectId!);
+        return [migrated];
+      }
+    }
+  } catch { /* ignore migration errors */ }
+
+  // Cold start: bootstrap with the default project
+  return [{ ...defaultProject }];
+}
+
+export function savePortfolio(projects: ProjectState[]): void {
+  window.localStorage.setItem(portfolioStorageKey, JSON.stringify(projects));
+}
+
+/** Returns the saved active project ID, or `null` if none has been persisted. */
+export function loadActiveProjectId(): string | null {
+  try {
+    return window.localStorage.getItem(activeProjectIdStorageKey);
+  } catch {
+    return null;
+  }
+}
+
+export function saveActiveProjectId(id: string | null): void {
+  if (id === null) {
+    window.localStorage.removeItem(activeProjectIdStorageKey);
+  } else {
+    window.localStorage.setItem(activeProjectIdStorageKey, id);
+  }
 }
