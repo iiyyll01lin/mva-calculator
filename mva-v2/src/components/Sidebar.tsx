@@ -51,11 +51,12 @@ const tabGroups: Array<{
 interface SidebarProps {
   activeTab: TabId;
   onSelect: (tab: TabId) => void;
+  onOpenAiInsights: () => void;
 }
 
 const DISPLAY_NAME_FALLBACK = 'Avery, Yeh';
 
-export function Sidebar({ activeTab, onSelect }: SidebarProps) {
+export function Sidebar({ activeTab, onSelect, onOpenAiInsights }: SidebarProps) {
   const [sidebarWidth, setSidebarWidth] = useState(280);
   const isResizing = useRef(false);
   const displayName = sessionStorage.getItem('mva_display_name') ?? DISPLAY_NAME_FALLBACK;
@@ -125,6 +126,17 @@ export function Sidebar({ activeTab, onSelect }: SidebarProps) {
           </section>
         ))}
       </nav>
+      {/* AI Insights button */}
+      <button
+        type="button"
+        className="ai-insights-trigger"
+        onClick={onOpenAiInsights}
+        aria-label="Open AI Optimization Insights"
+      >
+        <span className="ai-insights-trigger-icon" aria-hidden="true">✨</span>
+        <span className="ai-insights-trigger-label">AI Insights</span>
+      </button>
+
       {/* User profile block */}
       <div className="user-profile-block">
         <div className="user-avatar" aria-hidden="true">{initials}</div>

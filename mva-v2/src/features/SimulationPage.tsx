@@ -1,6 +1,7 @@
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { KpiCard } from '../components/KpiCard';
 import { SectionCard } from '../components/SectionCard';
+import { applyMagicWandPreview, computeMagicWand } from '../domain/ai-agent';
 import type { SimulationResults } from '../domain/models';
 
 function sideBadgeClass(side: string) {
@@ -15,6 +16,8 @@ interface SimulationPageProps {
 }
 
 export const SimulationPage = memo(function SimulationPage({ demandWeekly, simulation }: SimulationPageProps) {
+  const [whatIfActive, setWhatIfActive] = useState(false);
+
   const bottleneckStep = useMemo(
     () => simulation.steps.find((step) => step.isBottleneck) ?? null,
     [simulation.steps],
@@ -22,6 +25,11 @@ export const SimulationPage = memo(function SimulationPage({ demandWeekly, simul
   const chartCeiling = useMemo(
     () => Math.max(...simulation.steps.map((step) => step.cycleTime), simulation.taktTime, 1),
     [simulation.steps, simulation.taktTime],
+  );
+  const magicWand = useMemo(() => computeMagicWand(simulation), [simulation]);
+  const whatIfSimulation = useMemo(
+    () => (whatIfActive && magicWand ? applyMagicWandPreview(simulation, magicWand) : null),
+    [whatIfActive, magicWand, simulation],
   );
 
   return (
@@ -100,6 +108,81 @@ export const SimulationPage = memo(function SimulationPage({ demandWeekly, simul
           </table>
         </div>
       </SectionCard>
+
+      {/* AI Recommended Adjustments ─────────────────────────────────── */}
+      {magicWand && (
+        <SectionCard
+          title="✨ AI Recommended Adjustments"
+          description="Automatically identified optimisation opportunity based on current bottleneck analysis."
+        >
+          <div className="ai-magic-wand-section">
+            <div className="alert-card warn ai-bottleneck-highlight">
+              <div>
+                <p className="eyebrow">Bottleneck Identified</p>
+                <strong>{magicWand.targetProcess} — Step {magicWand.targetStep}</strong>
+              </div>
+              <p>
+                CT <strong>{magicWand.currentCycleTime.toFixed(2)} s</strong> is the line constraint.
+                Adding 1 parallel station is projected to raise UPH by{' '}
+                <strong>+{magicWand.uphGainPercent}%</strong>{' '}
+                ({magicWand.currentUph.toFixed(2)} → {magicWand.projectedUph.toFixed(2)}).
+              </p>
+            </div>
+
+            <div className="ai-magic-wand-actions">
+              <button
+                type="button"
+                className={`button ${whatIfActive ? 'secondary' : 'primary'} ai-magic-wand-btn`}
+                onClick={() => setWhatIfActive((v) => !v)}
+                aria-pressed={whatIfActive}
+              >
+                {whatIfActive ? '↩ Reset Preview' : '✨ Magic Wand — Preview Impact'}
+              </button>
+              {whatIfActive && (
+                <span className="ai-magic-wand-hint">
+                  Showing projected results with 1× parallel station at{' '}
+                  <strong>{magicWand.targetProcess}</strong>.
+                </span>
+              )}
+            </div>
+
+            {whatIfActive && whatIfSimulation && (
+              <div className="ai-whatif-preview">
+                <p className="eyebrow" style={{ marginBottom: '0.75rem' }}>What-If Preview</p>
+                <div className="kpi-grid">
+                  <div className="ai-whatif-kpi">
+                    <span className="ai-whatif-label">UPH</span>
+                    <span className="ai-whatif-before">{simulation.uph.toFixed(2)}</span>
+                    <span className="ai-whatif-arrow" aria-hidden="true">→</span>
+                    <span className="ai-whatif-after">{whatIfSimulation.uph.toFixed(2)}</span>
+                    <span className="ai-gain-badge">+{magicWand.uphGainPercent}%</span>
+                  </div>
+                  <div className="ai-whatif-kpi">
+                    <span className="ai-whatif-label">Line Balance</span>
+                    <span className="ai-whatif-before">{simulation.lineBalanceEfficiency.toFixed(1)}%</span>
+                    <span className="ai-whatif-arrow" aria-hidden="true">→</span>
+                    <span className="ai-whatif-after">{whatIfSimulation.lineBalanceEfficiency.toFixed(1)}%</span>
+                  </div>
+                  <div className="ai-whatif-kpi">
+                    <span className="ai-whatif-label">New Bottleneck</span>
+                    <span className="ai-whatif-after">{whatIfSimulation.bottleneckProcess}</span>
+                  </div>
+                  <div className="ai-whatif-kpi">
+                    <span className="ai-whatif-label">Weekly Output</span>
+                    <span className="ai-whatif-before">{simulation.weeklyOutput.toFixed(0)}</span>
+                    <span className="ai-whatif-arrow" aria-hidden="true">→</span>
+                    <span className="ai-whatif-after">{whatIfSimulation.weeklyOutput.toFixed(0)}</span>
+                  </div>
+                </div>
+                <p className="muted" style={{ marginTop: '0.75rem', fontSize: '0.8rem' }}>
+                  To apply this change permanently, navigate to <strong>Machine Rates</strong> and
+                  double the rate for <strong>{magicWand.targetProcess}</strong>.
+                </p>
+              </div>
+            )}
+          </div>
+        </SectionCard>
+      )}
     </div>
   );
 });

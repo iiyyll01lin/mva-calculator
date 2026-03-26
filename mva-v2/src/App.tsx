@@ -13,6 +13,7 @@ import { useCalcWorker } from './hooks/useCalcWorker';
 import { formatTimestamp } from './utils/formatters';
 import { defaultProject } from './domain/defaults';
 import { LoginPage } from './features/LoginPage';
+import { AiInsightsPanel } from './features/AiInsightsPanel';
 
 /** Classifies an import/export feedback string into a banner severity level. */
 function classifyStatusType(msg: string): 'success' | 'error' | 'info' {
@@ -54,6 +55,7 @@ function AppOrchestrator() {
     goToDashboard,
   } = usePortfolioState();
   const [activeTab, setActiveTab] = useState<TabId>('basic');
+  const [isAiPanelOpen, setIsAiPanelOpen] = useState(false);
 
   // When project is null (dashboard view), fall back to defaultProject so that
   // all hooks below are called with a valid ProjectState on every render pass.
@@ -184,7 +186,7 @@ function AppOrchestrator() {
 
   return (
     <div className="app-shell">
-      <Sidebar activeTab={activeTab} onSelect={setActiveTab} />
+      <Sidebar activeTab={activeTab} onSelect={setActiveTab} onOpenAiInsights={() => setIsAiPanelOpen(true)} />
       <ErrorBoundary>
         <main className="content-shell">
           <header className="hero-panel">
@@ -268,6 +270,12 @@ function AppOrchestrator() {
           </Suspense>
         </main>
       </ErrorBoundary>
+      <AiInsightsPanel
+        isOpen={isAiPanelOpen}
+        onClose={() => setIsAiPanelOpen(false)}
+        project={safeProject}
+        simulation={simulation}
+      />
     </div>
   );
 }
