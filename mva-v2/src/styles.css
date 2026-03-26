@@ -97,11 +97,13 @@ label > span {
   flex: 0 0 var(--sidebar-width, 280px);
   width: var(--sidebar-width, 280px);
   position: relative;
+  display: flex;
+  flex-direction: column;
   padding: 1.5rem;
   border-right: 1px solid var(--line);
   background: linear-gradient(180deg, #0c121b 0%, #0f1621 100%);
   min-height: 0;
-  overflow-y: auto;
+  overflow: hidden;
   overflow-x: hidden;
   user-select: none;
 }
@@ -179,9 +181,16 @@ label > span {
 }
 
 .nav-stack {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   display: grid;
   gap: 0.75rem;
   margin-top: 1.25rem;
+}
+
+.nav-stack::-webkit-scrollbar {
+  display: none;
 }
 
 .nav-group {
@@ -1101,14 +1110,16 @@ table.data-table th.section-header {
 /* ── User Profile Block (Sidebar bottom) ────────────────────────────────── */
 
 .user-profile-block {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 0.75rem;
   margin-top: 1.25rem;
   padding: 0.85rem 1rem;
   border: 1px solid var(--line);
+  border-top: 1px solid var(--line-strong);
   border-radius: 16px;
-  background: rgba(13, 20, 31, 0.92);
+  background: #0c121b;
   overflow: hidden;
 }
 
