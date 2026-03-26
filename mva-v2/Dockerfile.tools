@@ -1,0 +1,46 @@
+# =============================================================================
+# MVA-v2  CI / Tools Image
+# =============================================================================
+# Extends the Node 22 Alpine build environment with Python 3 and bash so that
+# tests/e2e/smoke.sh can invoke `python3 -m http.server` to serve the
+# production bundle during the end-to-end smoke check.
+#
+# Used EXCLUSIVELY by docker-compose.tools.yml.
+# NOT part of the production image pipeline (see Dockerfile).
+# =============================================================================
+
+FROM node:22-alpine
+
+# ── Corporate proxy support (mirrors main Dockerfile) ────────────────────────
+ARG http_proxy
+ARG https_proxy
+ARG no_proxy
+
+ENV HTTP_PROXY=$http_proxy \
+    HTTPS_PROXY=$https_proxy \
+    http_proxy=$http_proxy \
+    https_proxy=$https_proxy \
+    NO_PROXY=$no_proxy \
+    no_proxy=$no_proxy
+
+# Install pnpm (same technique as the production Dockerfile so build args work).
+RUN npm config set proxy      "$http_proxy" && \
+    npm config set https-proxy "$https_proxy" && \
+    npm config set strict-ssl  false && \
+    npm install -g pnpm@latest && \
+    pnpm config set proxy       "$http_proxy" && \
+    pnpm config set https-proxy "$https_proxy" && \
+    pnpm config set strict-ssl  false
+
+# Python 3 is required by tests/e2e/smoke.sh (`python3 -m http.server`).
+# bash is required to execute the smoke script itself.
+RUN apk add --no-cache python3 bash
+
+WORKDIR /app
+
+# ── Dependency install layer (cached independently from source) ───────────────
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+
+# ── Full source tree (tests, src, configs) ────────────────────────────────────
+COPY . .

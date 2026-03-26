@@ -1,0 +1,61 @@
+# =============================================================================
+# MVA-v2  Ephemeral Developer Tools
+# =============================================================================
+# Services defined here belong to the "tools" Compose profile and are NEVER
+# started by `docker compose up -d`.  Invoke them individually with:
+#
+#   docker compose -f docker-compose.tools.yml run --rm <service> [args]
+#
+# Exit codes propagate to the calling shell, making these services CI-friendly.
+#
+# Both services build from Dockerfile.tools which extends the Node 22 builder
+# with Python 3 (required by the E2E smoke script).
+# =============================================================================
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # mva-test — Vitest full matrix
+  # ---------------------------------------------------------------------------
+  # Runs: unit + functional + regression + performance + e2e smoke
+  # All suites are triggered by `pnpm run test:all` (see package.json).
+  #
+  # To run a single suite, override the command:
+  #   docker compose -f docker-compose.tools.yml run --rm mva-test pnpm run test:unit
+  # ---------------------------------------------------------------------------
+  mva-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.tools
+      args:
+        http_proxy:  ${http_proxy:-}
+        https_proxy: ${https_proxy:-}
+        no_proxy:    ${no_proxy:-}
+    profiles: ["tools"]
+    working_dir: /app
+    environment:
+      CI: "true"
+      NODE_ENV: test
+    command: pnpm run test:all
+
+  # ---------------------------------------------------------------------------
+  # mva-smoke — E2E smoke test (build → serve → curl validate)
+  # ---------------------------------------------------------------------------
+  # Runs tests/e2e/smoke.sh inside the container:
+  #   1. pnpm run build  → compiles to dist/
+  #   2. python3 -m http.server 4173 -d dist  → serves bundle
+  #   3. curl + grep  → validates HTML shell and JS entry-point
+  #
+  # No host Node, pnpm, or Python required.
+  # ---------------------------------------------------------------------------
+  mva-smoke:
+    build:
+      context: .
+      dockerfile: Dockerfile.tools
+      args:
+        http_proxy:  ${http_proxy:-}
+        https_proxy: ${https_proxy:-}
+        no_proxy:    ${no_proxy:-}
+    profiles: ["tools"]
+    working_dir: /app
+    command: bash tests/e2e/smoke.sh
