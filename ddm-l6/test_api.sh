@@ -1,5 +1,8 @@
 #!/bin/bash
-BASE="http://localhost:8000/api/v1"
+# BASE URL can be overridden by the DDM_API_BASE environment variable.
+# This allows docker-compose.tools.yml to target the container-internal
+# hostname (ddm-backend:8000) instead of localhost.
+BASE="${DDM_API_BASE:-http://localhost:8000/api/v1}"
 
 echo "=== Health Check ==="
 curl -s $BASE/health | jq .

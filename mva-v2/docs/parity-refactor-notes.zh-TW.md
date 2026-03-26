@@ -1,0 +1,229 @@
+# Legacy Parity Refactor Notes
+
+## 目的
+- 將 mva-v2 的頁面階層改為與 legacy HTML 相同的工作流順序。
+- 將原本已存在於 domain layer 但未暴露到 UI 的能力補回畫面。
+- 讓測試與手動驗證都能直接對照原版頁面。
+
+## 這次調整的主要邏輯
+
+### 1. 導航階層改回 legacy 16-page workflow
+- 原本狀態：React 版只有 8 個平鋪 tabs。
+- 調整後：改成以下 16 個分頁，並按 legacy 分組展示。
+  - Basic Information
+  - Machine Rates
+  - BOM Mapping
+  - Model Process
+  - Simulation Results
+  - Labor Rate & Efficiency
+  - Environment & Equipment Rate
+  - Equipment List
+  - Space Setup
+  - DLOH-L & IDL Setup
+  - MPM Setup (L10)
+  - MPM Setup (L6)
+  - Labor Time (L10)
+  - Labor Time (L6)
+  - Summary (L10)
+  - Summary (L6)
+- 原因：使用者要求 UI 每個階層關係必須跟 legacy 一樣，原本的合併式頁面不符合。
+
+### 2. 補回 Model Process 的可編輯工作頁
+- 原本狀態：只有 simulation output，沒有獨立 editable routing page。
+- 調整後：新增 Model Process 頁，允許新增、修改、刪除 process steps。
+- 原因：legacy workflow 中 process routing 是獨立維護頁，不只是結果展示。
+
+### 3. 補回 DLOH-L / IDL 的可編輯介面
+- 原本狀態：只看到 costed table，無法直接在 UI 維護 direct / indirect labor rows。
+- 調整後：新增 direct labor 與 indirect labor 的 CRUD 介面。
+- 原因：legacy workflow 中 labor setup 是主流程的一部分，不能只靠 import。
+
+### 4. 補回 L10 / L6 Labor Time Estimation 獨立頁面
+- 原本狀態：只顯示 snapshot，不能直接編修 stations。
+- 調整後：新增 L10 與 L6 labor time estimation 頁面，可新增、修改、刪除 station，並可同步回 direct labor rows。
+- 原因：legacy 版中 labor time estimation 是獨立工程作業面，不只是報表附屬資訊。
+
+### 5. 補回 L10 / L6 Summary 獨立頁面
+- 原本狀態：只有 dashboard / reports 的混合視圖。
+- 調整後：新增 Summary (L10) 與 Summary (L6) 兩個獨立頁面，各自顯示：
+  - simulation KPI
+  - yield summary
+  - direct / indirect labor breakdown
+  - overhead / material / SGA / profit / ICC
+  - full cost rollup
+  - warnings
+  - review gate
+  - import / export
+  - CSV preview
+- 原因：legacy 版有明確的 L10 / L6 summary 工作頁，且交付審核依賴這些頁面。
+
+### 6. 使用 process-specific project clone 計算 L10 / L6 summary
+- 調整內容：新增 process-specific project helper，讓同一份 project state 可以分別生成 L10 與 L6 summary。
+- 原因：避免單純依賴目前 active processType，導致 Summary (L10) / Summary (L6) 無法各自穩定呈現。
+
+### 7. 將 Basic Information 改回 legacy 的 4 個輸入分組
+- 原本狀態：Basic Information 將所有欄位攤平成單一 grid，缺少 Production Planning 等明確分組。
+- 調整後：改回以下 4 張卡片分組。
+  - Production Planning
+  - Shift Configuration
+  - Efficiency and Quality
+  - Batch Settings
+- 原因：使用者明確指出 production planning 分類缺失；legacy 版本的輸入理解是靠分組，不是只靠欄位存在。
+
+### 8. 將 Model Process 改成 sequence table 形式
+- 原本狀態：Model Process 以簡化 editable list 呈現，雖然有 step，但缺少 legacy 的 sequence table 語意。
+- 調整後：改成表格式 Seq / Process / Side / Action，並加入 side badge 與 sticky header。
+- 原因：使用者要求 sequence 必須明確可見；legacy 版本是 sequence table，不是鬆散 list editor。
+
+### 9. 補回 Simulation Results 的 bottleneck alert 與 CT mountain chart
+- 原本狀態：只有 KPI 與簡化表格，缺少 bottleneck alert 與圖表。
+- 調整後：新增：
+  - bottleneck alert
+  - takt reference line
+  - CT / bottleneck mountain chart
+  - raw CT / loss / final CT / utilization detail table
+- 原因：legacy simulation page 的核心價值在於快速辨識 bottleneck，而不是只看數字表格。
+
+### 10. 將整體視覺切回較接近 legacy 的黑色主題
+- 原本狀態：上一輪已收斂成淺色 material 方向，但與 legacy HTML 的深色工作台外觀不一致。
+- 調整後：改回深色背景、深色 sidebar、深色 worksheet card、深色表格、深色輸入框，並同步調整 KPI、badge、chart、decision button 的顏色。
+- 原因：使用者明確要求黑色主題要跟 legacy HTML 一致，且深色工作台是原始操作體驗的一部分。
+
+### 11. 補回 Equipment to Simulation Mapping 的完整工作流
+- 原本狀態：model 已有 simMachineGroup / simParallelQty / simRateOverride 欄位，但 simulation engine 沒有真正使用，UI 也沒有完整 preview 與寫回流程。
+- 調整後：
+  - Equipment baseline / extra tables 直接露出 sim mapping 欄位
+  - 新增 Equipment to Simulation Mapping 區塊，顯示 current rate、mapped parallel qty、derived rate、linked items
+  - simulation engine 在啟用 toggle 後會直接吃 equipment mapping
+  - 同時保留一鍵把 derived rate 寫回 Machine Rates 的顯式操作
+- 原因：使用者要求 equipment 與 simulation mapping 必須完整 parity，不能只有資料欄位存在但沒有真正驅動計算。
+
+### 12. 將 L6 Labor Time 改成真正的 segment matrix 版型
+- 原本狀態：L6 labor page 只是平面寬表格，雖然有 segments schema，但 UI 沒有真正以 segment 為中心。
+- 調整後：
+  - 以 segment 為主單位顯示多張 matrix
+  - 每個 segment 允許自訂名稱、增刪 station、刪除 segment
+  - station 以欄顯示，No / HC / Fixture / CT / Allowance / Std Man Hour / VPY / Shift Rate / DL Online 成為矩陣列
+  - 額外顯示 segment-level summary，例如 segment DL online 與 bottleneck UPH
+- 原因：使用者要求做成更接近 legacy 的真正 segment matrix 橫向版型，而不是延伸版 table。
+
+### 13. 收斂 MPM 與 Summary 的欄位順序與命名
+- 原本狀態：MPM / Summary 雖然功能完整，但 product profile、routing time、derived output、summary grouping 的順序與命名仍偏現代化。
+- 調整後：
+  - L10 MPM 改為 Product Information / Product Dimension / Test Time Setup / Volume and Lifecycle / Working Schedule
+  - L6 MPM 補 model name、offline blasting part、routing time 明細列
+  - Summary 加入 Product Profile 與 Calculation Result 區塊，並調整章節命名為更接近 legacy worksheet 語氣
+- 原因：使用者要求逐頁把 Summary 與 MPM 的欄位順序、命名、視覺細節再向 legacy 收斂。
+
+### 14. Summary 頁面完整 1:1 legacy 對齊（branch 202603-rc2）
+- 背景：Phase 2 gap review 確認 Summary 仍有以下差距：top card 多出一個完整 SectionCard、KPI strip 非 legacy 結構、DL/IDL 為兩張並排表、成本區塊命名與順序錯誤、Yield/Capacity section 為多餘欄位。
+- 調整內容：
+  - 移除最上方 "MVA Summary Sheet" SectionCard，改為純 summary-page-header（標題 + Export MVA 按鈕）
+  - 移除 KPI 卡片區段（非 legacy summary 結構）
+  - 移除 "Yield and Capacity" SectionCard（legacy 無此區段）
+  - 移除 "Cost Rollup" table（legacy 無此獨立表格）
+  - 移除底部重複的 renderReviewGate() 呼叫
+  - 將 Direct Labor + Indirect Labor 從兩張並排表改為單一組合表，兩個 thead section-header 行（對應 legacy "A. LABOR Cost"）
+  - 成本區塊改為兩欄版型：左側 D. Overhead（Equip Dep / Maint / Space / Power / Total）；右側上方 E. SG&A、右側下方 MVA Total Cost 大字
+  - Confirm 卡加入 Current Status readonly 欄位
+  - L6 Capacity Assumptions 的 Boards/Panel 與 PCB Size 欄位加入 summary-highlight 樣式
+  - 新增 CSS：summary-page-header、stack-md、summary-highlight、cost-total-display、th.section-header
+
+### 15. Space Setup 狀態機 UI（branch 202603-rc2）
+- 背景：Space Setup 頁所有子卡片（Building Area、Process Distribution、Add Row 按鈕、Import CSV）在 matrix 與 manual 兩種模式下都始終可見，不符合 legacy 行為。
+- 調整內容：
+  - Building Area by Floor、Line Specification (Line Length/Width)、Process Distribution 三個子卡片改為僅在 mode === 'matrix' 時渲染
+  - Add Row 按鈕與 Import Space Setup CSV 改為僅在 mode === 'manual' 時渲染（data-testid 對齊 legacy）
+  - Allocation table 所有欄位的 input / delete button 在 mode === 'matrix' 時設為 disabled
+  - SectionCard 標題隨模式顯示 "(Generated)" 或 "(Manual)"
+  - Mode Selection 說明文字更新以解釋兩種模式行為
+
+### 16. MPM L10 欄位順序修正（branch 202603-rc2）
+- 背景：L10 MPM 的 Product Information 子卡中包含 Model Name（legacy 無此欄）與 RFQ Qty/Month（legacy 應在 Volume and Lifecycle），欄位順序偏移。
+- 調整內容：
+  - 移除 Product Information 子卡的 Model Name 欄位（由 Project Name 衍生，UI 中不需獨立設定）
+  - 將 RFQ Qty / Month 移至 Volume and Lifecycle 子卡，置於第一欄
+  - Product Information 欄位順序改為：BU → Customer → Project Name → Yield (FPY)（與 legacy grid-4 一致）
+
+### 17. L6 Labor 多段落 CSV 識別（branch 202603-rc2）
+- 背景：`parseL6LaborTimeEstimationCsv` 原本只建立單一 segment，無法處理 legacy 標準格式中以 "total" 列作為段落終止符的多段落 CSV。
+- 調整內容：
+  - 在建立 stations 陣列後加入段落分割邏輯：遇到 `isTotal === true` 的行時推入一個 segment 並重置暫存列表
+  - 迴圈後若仍有未終止的暫存 stations（末段無 total 列），自動補入最後一個 segment
+  - 第一個 segment 使用 meta.segmentname（若存在）命名；後續 segment 自動命名為 "Segment N"
+  - 單段落 CSV（無 total 列）仍正常運作，退化為一個 segment
+  - 新增 4 個 unit test：單段落、雙段落分割、segmentname 命名、flat stations 完整性
+
+## 涉及檔案
+- [src/domain/models.ts](src/domain/models.ts)
+- [src/components/Sidebar.tsx](src/components/Sidebar.tsx)
+- [src/components/SectionCard.tsx](src/components/SectionCard.tsx)
+- [src/styles.css](src/styles.css)
+- [src/App.tsx](src/App.tsx)
+- [tests/functional/app.spec.tsx](tests/functional/app.spec.tsx)
+
+## 手動驗證方式
+
+### 導航與 hierarchy
+1. 啟動開發環境。
+2. 檢查左側導航是否依序顯示 5 個分組：Simulation、Plant Inputs、MPM Report Setup、Labor Time Estimation、MVA Summary。
+3. 檢查分組內是否有 16 個頁面，名稱與 legacy 一致。
+
+### Basic Information
+1. 進入 Basic Information。
+2. 確認畫面拆成 4 張卡：Production Planning、Shift Configuration、Efficiency and Quality、Batch Settings。
+3. 修改 Weekly Demand。
+4. 切到 Simulation Results，確認 KPI 有跟著變化。
+
+### Model Process
+1. 進入 Model Process。
+2. 確認表頭為 Seq / Process / Side / Action，且捲動時表頭固定。
+3. 新增一列 step，輸入 process 與 side。
+4. 切到 Simulation Results，確認該 routing 被納入結果。
+
+### Simulation Results
+1. 進入 Simulation Results。
+2. 確認有 KPI、bottleneck alert、CT mountain chart、detail table。
+3. 調高 Weekly Demand 或修改某個 machine rate / process，使 bottleneck 改變。
+4. 確認 alert 內容、chart 高柱位置、detail table highlight row 會同步變化。
+
+### DLOH-L / IDL Setup
+1. 進入 DLOH-L & IDL Setup。
+2. 新增 direct labor 與 indirect labor row。
+3. 切到 Summary (L10) 或 Summary (L6)，確認 labor breakdown 有更新。
+
+### Labor Time Estimation
+1. 進入 Labor Time (L10) 或 Labor Time (L6)。
+2. 修改 station 的 HC 或 cycle time。
+3. 若在 L6 頁，確認 segment matrix 會即時顯示 Avg CT 與 UPH。
+4. 按 Apply to Direct Labor，回到 DLOH-L & IDL Setup，確認 direct labor rows 已同步。
+
+### Equipment Mapping
+1. 進入 Equipment List。
+2. 在 baseline 或 extra equipment row 中填入 Sim Group、Sim Parallel Qty、Sim Rate Override。
+3. 確認 Equipment to Simulation Mapping 區塊會顯示 derived rate 與 linked items。
+4. 勾選 Use equipment mapping to drive simulation rates，切到 Simulation Results，確認相關 machine group 的 cycle time 會改變。
+5. 按 Write Derived Rates to Machine Rates，切到 Machine Rates，確認 rate 已寫回。
+
+### Summary
+1. 進入 Summary (L10) 與 Summary (L6)。
+2. 確認都有獨立 cost rollup、warnings、review gate、summary preview。
+3. 在 Review Gate 填入 reviewer 與 decision，確認狀態即時更新。
+
+## 測試驗證
+- Build:
+  - corepack pnpm build
+- Functional:
+  - corepack pnpm exec vitest run tests/functional/app.spec.tsx --reporter=verbose
+- Regression:
+  - corepack pnpm exec vitest run tests/regression/summary.spec.ts --reporter=verbose
+- Smoke:
+  - bash tests/e2e/smoke.sh
+- Full gate:
+  - corepack pnpm run test:all
+
+## 目前仍值得持續精進的地方
+- 官方 Excel 樣板匯出仍未完全追平 legacy xlsx-populate 工作流。
+- 某些 summary 與 MPM 的欄位順序已明顯靠近 legacy，但仍未做到逐像素逐欄位完全一致。
+- L6 segment matrix 已回到正確方向，但多 segment 匯入規則仍可再做得更貼近 legacy 原始 CSV。
+- Export MVA / Excel template workflow 仍未完全追平 legacy xlsx-populate 輸出流程。

@@ -1,0 +1,64 @@
+# =============================================================================
+# DDM-L6  Ephemeral Developer Tools
+# =============================================================================
+# Services defined here belong to the "tools" Compose profile and are NEVER
+# started by `docker compose up -d`.  Invoke them individually with:
+#
+#   docker compose -f docker-compose.tools.yml run --rm <service> [args]
+#
+# Exit codes propagate to the calling shell, making these services CI-friendly.
+#
+# Prerequisites
+#   ddm-pytest   — no running services needed
+#   ddm-api-test — requires ddm-backend to be healthy first:
+#                  docker compose up -d ddm-backend
+# =============================================================================
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # ddm-pytest — MiniMOST unit tests (pytest)
+  # ---------------------------------------------------------------------------
+  # Mounts backend source code and reference data read-only.
+  # Installs requirements + pytest at runtime so no separate test image is needed.
+  # The working directory matches main.py's assumed layout so `import main` works.
+  # ---------------------------------------------------------------------------
+  ddm-pytest:
+    image: python:3.11-slim
+    profiles: ["tools"]
+    working_dir: /app/backend
+    volumes:
+      - ./backend:/app/backend:ro   # source code — read-only
+      - ./data:/app/data:ro         # CSVs + db snapshot — read-only
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONUNBUFFERED: "1"
+    # Install application deps + pytest (not in requirements.txt) then run suite.
+    command: >
+      sh -c "pip install --no-cache-dir -r /app/backend/requirements.txt pytest -q
+             && pytest tests_most/ -v"
+
+  # ---------------------------------------------------------------------------
+  # ddm-api-test — curl-based API integration smoke test
+  # ---------------------------------------------------------------------------
+  # Uses Docker-internal DNS (ddm-backend:8000) instead of localhost so no
+  # host port mapping is required.  DDM_API_BASE overrides the hardcoded
+  # localhost URL in test_api.sh.
+  # ---------------------------------------------------------------------------
+  ddm-api-test:
+    image: alpine:3.19
+    profiles: ["tools"]
+    networks:
+      - ddm-net
+    volumes:
+      - ./test_api.sh:/test_api.sh:ro
+    environment:
+      DDM_API_BASE: http://ddm-backend:8000/api/v1
+    command: >
+      sh -c "apk add --no-cache --quiet curl jq bash
+             && bash /test_api.sh"
+
+networks:
+  ddm-net:
+    external: true
+    name: ddm-net

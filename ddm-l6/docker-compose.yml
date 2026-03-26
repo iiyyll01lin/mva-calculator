@@ -1,23 +1,87 @@
-version: "3.8"
+# =============================================================================
+# DDM-L6  Service Mesh
+# =============================================================================
+# Services:
+#   ddm-backend  — FastAPI / Uvicorn on :8000 (bind-mounts data/)
+#   ddm-demo     — Nginx on :9080  (proxies /api/* → ddm-backend)
+#
+# Network: ddm-net (bridge, explicit name so tools files can reference it
+#          as an external network regardless of the Compose project prefix)
+# =============================================================================
+
 services:
+
+  # ---------------------------------------------------------------------------
+  # FastAPI backend
+  # ---------------------------------------------------------------------------
+  ddm-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        HTTP_PROXY:  ${HTTP_PROXY:-}
+        HTTPS_PROXY: ${HTTPS_PROXY:-}
+        NO_PROXY:    ${NO_PROXY:-}
+        http_proxy:  ${http_proxy:-}
+        https_proxy: ${https_proxy:-}
+        no_proxy:    ${no_proxy:-}
+    ports:
+      - "8010:8000"
+    restart: unless-stopped
+    volumes:
+      # Bind-mount the data directory so db_persistent.json survives restarts
+      # and CSV catalogs are editable without rebuilding the image.
+      - ./data:/app/data
+    networks:
+      - ddm-net
+    environment:
+      PYTHONUNBUFFERED: "1"
+    healthcheck:
+      # Use Python's built-in urllib — no curl needed in the slim image.
+      test:
+        - "CMD"
+        - "python"
+        - "-c"
+        - "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health').read()"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  # ---------------------------------------------------------------------------
+  # Nginx static frontend + API reverse proxy
+  # ---------------------------------------------------------------------------
   ddm-demo:
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        HTTP_PROXY: ${HTTP_PROXY}
-        HTTPS_PROXY: ${HTTPS_PROXY}
-        NO_PROXY: ${NO_PROXY}
-        http_proxy: ${http_proxy}
-        https_proxy: ${https_proxy}
-        no_proxy: ${no_proxy}
+        HTTP_PROXY:  ${HTTP_PROXY:-}
+        HTTPS_PROXY: ${HTTPS_PROXY:-}
+        NO_PROXY:    ${NO_PROXY:-}
+        http_proxy:  ${http_proxy:-}
+        https_proxy: ${https_proxy:-}
+        no_proxy:    ${no_proxy:-}
     ports:
       - "9080:80"
     restart: unless-stopped
     environment:
-      - HTTP_PROXY=${HTTP_PROXY}
-      - HTTPS_PROXY=${HTTPS_PROXY}
-      - NO_PROXY=${NO_PROXY}
-      - http_proxy=${http_proxy}
-      - https_proxy=${https_proxy}
-      - no_proxy=${no_proxy}
+      - HTTP_PROXY=${HTTP_PROXY:-}
+      - HTTPS_PROXY=${HTTPS_PROXY:-}
+      - NO_PROXY=${NO_PROXY:-}
+      - http_proxy=${http_proxy:-}
+      - https_proxy=${https_proxy:-}
+      - no_proxy=${no_proxy:-}
+    networks:
+      - ddm-net
+    depends_on:
+      ddm-backend:
+        condition: service_healthy
+
+networks:
+  ddm-net:
+    driver: bridge
+    name: ddm-net   # Explicit name bypasses the Compose project-name prefix.
+    ipam:
+      config:
+        - subnet: 172.28.10.0/24
