@@ -12,6 +12,7 @@ import { useProjectImports } from './hooks/useProjectImports';
 import { useProcessSummary } from './hooks/useProcessSummary';
 import { formatTimestamp } from './utils/formatters';
 import { defaultProject } from './domain/defaults';
+import { LoginPage } from './features/LoginPage';
 
 /** Classifies an import/export feedback string into a banner severity level. */
 function classifyStatusType(msg: string): 'success' | 'error' | 'info' {
@@ -41,7 +42,7 @@ const SimulationPage = lazy(() => import('./features/SimulationPage').then((m) =
 export { validateProjectPayload, validateLineStandardsPayload } from './domain/importers';
 export { parseEquipmentRows, parseSpaceRows, parseLaborRows } from './domain/importers';
 
-export default function App() {
+function AppOrchestrator() {
   const {
     portfolio,
     project,
@@ -261,4 +262,17 @@ export default function App() {
       </ErrorBoundary>
     </div>
   );
+}
+
+/** Auth-guarded entry point rendered by main.tsx and used directly by tests. */
+export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    () => sessionStorage.getItem('mva_auth') === '1',
+  );
+
+  if (!isAuthenticated) {
+    return <LoginPage onLogin={() => setIsAuthenticated(true)} />;
+  }
+
+  return <AppOrchestrator />;
 }
