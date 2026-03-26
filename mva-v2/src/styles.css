@@ -273,6 +273,19 @@ label > span {
   color: #a8c8ff;
 }
 
+/* Computing indicator — compact inline banner shown while the Web Worker runs */
+.computing-banner {
+  padding: 0.45rem 0.9rem;
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+.computing-banner .page-loading-spinner {
+  width: 13px;
+  height: 13px;
+  border-width: 2px;
+  flex-shrink: 0;
+}
+
 .status-banner span[aria-hidden] {
   font-size: 1rem;
   line-height: 1;
