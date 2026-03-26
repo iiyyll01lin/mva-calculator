@@ -18,8 +18,15 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      args:
+        HTTP_PROXY:  ${HTTP_PROXY:-}
+        HTTPS_PROXY: ${HTTPS_PROXY:-}
+        NO_PROXY:    ${NO_PROXY:-}
+        http_proxy:  ${http_proxy:-}
+        https_proxy: ${https_proxy:-}
+        no_proxy:    ${no_proxy:-}
     ports:
-      - "8000:8000"
+      - "8010:8000"
     restart: unless-stopped
     volumes:
       # Bind-mount the data directory so db_persistent.json survives restarts
@@ -75,3 +82,6 @@ networks:
   ddm-net:
     driver: bridge
     name: ddm-net   # Explicit name bypasses the Compose project-name prefix.
+    ipam:
+      config:
+        - subnet: 172.28.10.0/24

@@ -27,6 +27,20 @@ RUN groupadd --system --gid 1001 appgroup \
 # With WORKDIR=/app/backend → DATA_DIR resolves to /app/data (bind-mounted below).
 WORKDIR /app/backend
 
+# ── Proxy build args (passed from docker-compose / CI for air-gapped builds) ──
+ARG HTTP_PROXY
+ARG HTTPS_PROXY
+ARG NO_PROXY
+ARG http_proxy
+ARG https_proxy
+ARG no_proxy
+ENV HTTP_PROXY=${HTTP_PROXY} \
+    HTTPS_PROXY=${HTTPS_PROXY} \
+    NO_PROXY=${NO_PROXY} \
+    http_proxy=${http_proxy} \
+    https_proxy=${https_proxy} \
+    no_proxy=${no_proxy}
+
 # ── Dependency layer (cached independently from application code) ─────────────
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
