@@ -65,7 +65,11 @@ export function parseMonthYearUpdateCsv(text: string) {
 export function parseEquipmentListSetupCsv(text: string) {
   const rows = parseCsv(text);
   const headerIndex = rows.findIndex((row) => row.some((cell) => normalizeHeader(cell) === 'process'));
-  if (headerIndex < 0) throw new Error('Equipment CSV is missing a process header.');
+  if (headerIndex < 0) throw new Error(
+    'Equipment Setup CSV is missing a required header row. ' +
+    'The first row containing a "process" column was not found. ' +
+    'Expected columns: process, item, qty, unitprice, depreciationyears.',
+  );
   const lookup = makeLookup(rows[headerIndex]);
   const equipmentList: EquipmentItem[] = rows.slice(headerIndex + 1)
     .filter((row) => row.some((cell) => String(cell).trim().length > 0))
@@ -93,7 +97,11 @@ export function parseEquipmentListSetupCsv(text: string) {
 export function parseSpaceSetupCsv(text: string) {
   const rows = parseCsv(text);
   const headerIndex = rows.findIndex((row) => row.some((cell) => normalizeHeader(cell) === 'floor'));
-  if (headerIndex < 0) throw new Error('Space CSV is missing a floor header.');
+  if (headerIndex < 0) throw new Error(
+    'Space Setup CSV is missing a required header row. ' +
+    'The first row containing a "floor" column was not found. ' +
+    'Expected columns: floor, process, areasqft.',
+  );
   const lookup = makeLookup(rows[headerIndex]);
   const allocations: SpaceAllocationRow[] = rows.slice(headerIndex + 1)
     .filter((row) => row.some((cell) => String(cell).trim().length > 0))
@@ -116,7 +124,10 @@ export function parseSpaceSetupCsv(text: string) {
 export function parseDlohIdlSetupCsv(text: string) {
   const rows = parseCsv(text);
   const headerIndex = rows.findIndex((row) => row.some((cell) => normalizeHeader(cell) === 'mode' || normalizeHeader(cell) === 'name'));
-  if (headerIndex < 0) throw new Error('DLOH/IDL CSV is missing a usable header.');
+  if (headerIndex < 0) throw new Error(
+    'DLOH/IDL Setup CSV is missing a required header row. ' +
+    'Expected columns: mode, name (or department), headcount.',
+  );
   const lookup = makeLookup(rows[headerIndex]);
   const idlL10: LaborRow[] = [];
   const idlL6: LaborRow[] = [];
@@ -319,12 +330,18 @@ import type { EquipmentItem as EqItem, LineStandard, ProjectState } from './mode
 
 function assertHeaders(header: string[] | undefined, requiredHeaders: string[]): Record<string, number> {
   if (!header || header.length === 0) {
-    throw new Error('CSV header row is missing.');
+    throw new Error(
+      'The CSV file appears to be empty or has no header row. ' +
+      'Please open the file and verify the first row contains column names.',
+    );
   }
   const lookup = Object.fromEntries(header.map((cell, index) => [cell.trim().toLowerCase(), index]));
   const missing = requiredHeaders.filter((h) => !(h in lookup));
   if (missing.length > 0) {
-    throw new Error(`CSV is missing required headers: ${missing.join(', ')}`);
+    throw new Error(
+      `Missing required headers: ${missing.map((h) => `"${h}"`).join(', ')}. ` +
+      `Columns found in file: ${header.map((h) => `"${h.trim()}"`).join(', ')}.`,
+    );
   }
   return lookup;
 }
@@ -335,20 +352,33 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 export function validateProjectPayload(payload: unknown): ProjectState {
   if (!isRecord(payload)) {
-    throw new Error('Project JSON payload must be an object.');
+    throw new Error(
+      'Import failed: the selected file is not a valid MVA project. ' +
+      'Please select a project JSON file previously exported from this tool.',
+    );
   }
   if (!isRecord(payload.basicInfo) || !Array.isArray(payload.machines) || !Array.isArray(payload.processSteps) || !isRecord(payload.plant)) {
-    throw new Error('Project JSON does not match the expected project structure.');
+    throw new Error(
+      'Import failed: this file does not match the expected project structure. ' +
+      'Required keys: basicInfo, machines, processSteps, plant. ' +
+      'This file may be from an incompatible version or be corrupted.',
+    );
   }
   return payload as unknown as ProjectState;
 }
 
 export function validateLineStandardsPayload(payload: unknown): LineStandard[] {
   if (!Array.isArray(payload)) {
-    throw new Error('Line standards JSON must be an array.');
+    throw new Error(
+      'Import failed: Line Standards file must be an array. ' +
+      'Please select a line-standards JSON file previously exported from this tool.',
+    );
   }
   if (!payload.every((item) => isRecord(item) && typeof item.name === 'string' && Array.isArray(item.equipmentList))) {
-    throw new Error('One or more line standards are malformed.');
+    throw new Error(
+      'Import failed: One or more line standard entries are malformed. ' +
+      'Each entry must have a "name" (string) and "equipmentList" (array).',
+    );
   }
   return payload as LineStandard[];
 }
