@@ -219,3 +219,56 @@ Current release-candidate scope preserves the core legacy workflow:
 - richer delete and edit controls for equipment and space lists
 - more alternative regression scenarios beyond the default baseline
 - optional API-backed persistence for collaboration and audit trails
+
+---
+
+## Deployment
+
+The application is packaged as a multi-stage Docker image: a Node/pnpm build stage
+produces the static Vite bundle, and an `nginx:alpine` stage serves it.
+
+### Prerequisites
+- Docker ≥ 24  
+- Docker Compose v2 (`docker compose` CLI plugin)
+
+### Build and run with Docker Compose
+
+```bash
+# From the mva-v2 directory:
+docker compose up --build -d
+```
+
+The app is available at **http://\<host\>:8080** once the container is healthy.
+
+### Stop / remove
+
+```bash
+docker compose down
+```
+
+### Build the image manually
+
+```bash
+docker build -t mva-app:latest .
+docker run -d -p 8080:80 --name mva-app --restart unless-stopped mva-app:latest
+```
+
+### Configuration reference
+
+| File | Purpose |
+|---|---|
+| `Dockerfile` | Multi-stage build: `builder` (Node 22 + pnpm) → `runner` (nginx:1.27-alpine) |
+| `nginx.conf` | SPA fallback (`try_files … /index.html`), gzip, long-lived asset cache, security headers |
+| `docker-compose.yml` | Exposes port 8080, `restart: unless-stopped`, built-in health-check |
+
+### Internal factory server notes
+
+1. Copy the `mva-v2/` directory (or the Docker image tarball) to the factory server.  
+2. If the server has no internet access, build the image offline on a connected machine and export it:
+   ```bash
+   docker save mva-app:latest | gzip > mva-app.tar.gz
+   # On the factory server:
+   docker load < mva-app.tar.gz
+   docker compose up -d
+   ```
+3. Adjust `TZ` in `docker-compose.yml` to match the local timezone if needed (e.g. `Asia/Taipei`).
