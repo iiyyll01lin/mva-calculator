@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import type { TabId } from '../domain/models';
 
 const tabGroups: Array<{
@@ -55,36 +55,41 @@ interface SidebarProps {
 
 export function Sidebar({ activeTab, onSelect }: SidebarProps) {
   const [sidebarWidth, setSidebarWidth] = useState(280);
-  const isDragging = useRef(false);
-  const startX = useRef(0);
-  const startWidth = useRef(0);
+  const isResizing = useRef(false);
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+  const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
-    isDragging.current = true;
-    startX.current = e.clientX;
-    startWidth.current = sidebarWidth;
-  }, [sidebarWidth]);
+    isResizing.current = true;
+    const startX = e.clientX;
+    const startWidth = sidebarWidth;
 
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isDragging.current) return;
-      const delta = e.clientX - startX.current;
-      const clamped = Math.min(500, Math.max(200, startWidth.current + delta));
-      setSidebarWidth(clamped);
-    };
-    const handleMouseUp = () => { isDragging.current = false; };
+    // Apply global drag polish: lock cursor and inhibit text selection
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+    const onMouseMove = (ev: MouseEvent) => {
+      if (!isResizing.current) return;
+      const delta = ev.clientX - startX;
+      setSidebarWidth(Math.min(500, Math.max(200, startWidth + delta)));
     };
-  }, []);
+
+    const onMouseUp = () => {
+      isResizing.current = false;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  };
 
   return (
-    <aside className="sidebar" style={{ width: sidebarWidth }}>
+    <aside
+      className="sidebar"
+      style={{ '--sidebar-width': `${sidebarWidth}px` } as React.CSSProperties}
+    >
       <div className="brand-block">
         <p className="eyebrow">MVA v2</p>
         <h1 className="brand-title">StreamWeaver</h1>
