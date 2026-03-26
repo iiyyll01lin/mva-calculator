@@ -11,10 +11,12 @@
     "test:unit": "vitest run tests/unit",
     "test:functional": "vitest run tests/functional",
     "test:regression": "vitest run tests/regression",
+    "test:perf": "vitest run tests/performance",
     "test:e2e": "bash tests/e2e/smoke.sh",
-    "test:all": "vitest run tests/unit && vitest run tests/functional && vitest run tests/regression && bash tests/e2e/smoke.sh"
+    "test:all": "vitest run tests/unit && vitest run tests/functional && vitest run tests/regression && vitest run tests/performance && bash tests/e2e/smoke.sh"
   },
   "dependencies": {
+    "@tanstack/react-virtual": "^3.13.23",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "xlsx": "0.18.5"
