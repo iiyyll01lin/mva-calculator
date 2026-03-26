@@ -4,6 +4,16 @@ services:
       context: .
       dockerfile: Dockerfile
       target: runner
+      # Inherit proxy variables from the host shell automatically.
+      # Values are left blank so Docker Compose reads them from the environment;
+      # if a variable is unset on the host, the ARG simply has no value.
+      args:
+        http_proxy:
+        https_proxy:
+        no_proxy:
+        HTTP_PROXY:
+        HTTPS_PROXY:
+        NO_PROXY:
     image: mva-app:latest
     container_name: mva-app
     ports:

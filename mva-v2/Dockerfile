@@ -4,8 +4,31 @@
 # =============================================================================
 FROM node:22-alpine AS builder
 
-# Enable pnpm via Corepack (ships with Node ≥ 16.10)
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# ── Corporate proxy support ───────────────────────────────────────────────────
+# Accept proxy co-ordinates as build-args so they can be injected by
+# docker-compose (from the host shell) without being baked into the image.
+ARG http_proxy
+ARG https_proxy
+ARG no_proxy
+
+# Expose them as both lower- and upper-case ENV vars so that npm, pnpm,
+# wget, and Alpine's apk all pick them up consistently.
+ENV HTTP_PROXY=$http_proxy \
+    HTTPS_PROXY=$https_proxy \
+    http_proxy=$http_proxy \
+    https_proxy=$https_proxy \
+    no_proxy=$no_proxy \
+    NO_PROXY=$no_proxy
+
+# Install pnpm via npm (proxy-friendly; no corepack network calls required).
+# strict-ssl false is needed when a corporate MITM CA intercepts TLS.
+RUN npm config set proxy     "$http_proxy" && \
+    npm config set https-proxy "$https_proxy" && \
+    npm config set strict-ssl false && \
+    npm install -g pnpm@latest && \
+    pnpm config set proxy      "$http_proxy" && \
+    pnpm config set https-proxy "$https_proxy" && \
+    pnpm config set strict-ssl false
 
 WORKDIR /app
 
