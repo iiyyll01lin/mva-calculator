@@ -1047,12 +1047,14 @@ table.data-table th.section-header {
 
 @media (max-width: 1120px) {
   .app-shell {
-    grid-template-columns: 1fr;
+    flex-direction: column;
     height: auto;
     overflow: visible;
   }
 
   .sidebar {
+    flex: 0 0 auto;
+    width: 100% !important;
     border-right: 0;
     border-bottom: 1px solid var(--line);
     overflow: visible;
@@ -1081,6 +1083,60 @@ table.data-table th.section-header {
   .matrix-summary-strip {
     grid-template-columns: 1fr;
   }
+}
+
+/* ── User Profile Block (Sidebar bottom) ────────────────────────────────── */
+
+.user-profile-block {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(13, 20, 31, 0.92);
+  overflow: hidden;
+}
+
+.user-avatar {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(79, 140, 255, 0.38), rgba(38, 178, 107, 0.28));
+  border: 1px solid rgba(79, 140, 255, 0.38);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #a8c8ff;
+  letter-spacing: 0.03em;
+}
+
+.user-profile-info {
+  min-width: 0;
+  display: grid;
+  gap: 0.15rem;
+}
+
+.user-display-name {
+  margin: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.user-role-label {
+  margin: 0;
+  font-size: 0.68rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
 /* ── Login Page ─────────────────────────────────────────────────────────── */

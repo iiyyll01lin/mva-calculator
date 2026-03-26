@@ -53,9 +53,19 @@ interface SidebarProps {
   onSelect: (tab: TabId) => void;
 }
 
+const DISPLAY_NAME_FALLBACK = 'Avery, Yeh';
+
 export function Sidebar({ activeTab, onSelect }: SidebarProps) {
   const [sidebarWidth, setSidebarWidth] = useState(280);
   const isResizing = useRef(false);
+  const displayName = sessionStorage.getItem('mva_display_name') ?? DISPLAY_NAME_FALLBACK;
+  // Derive initials: "Avery, Yeh" → "AY"
+  const initials = displayName
+    .split(/[,\s]+/)
+    .filter(Boolean)
+    .map((w) => w[0].toUpperCase())
+    .slice(0, 2)
+    .join('');
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -63,26 +73,25 @@ export function Sidebar({ activeTab, onSelect }: SidebarProps) {
     const startX = e.clientX;
     const startWidth = sidebarWidth;
 
-    // Apply global drag polish: lock cursor and inhibit text selection
+    // Lock cursor and inhibit text selection globally while dragging
     document.body.style.cursor = 'col-resize';
     document.body.style.userSelect = 'none';
 
     const onMouseMove = (ev: MouseEvent) => {
       if (!isResizing.current) return;
-      const delta = ev.clientX - startX;
-      setSidebarWidth(Math.min(500, Math.max(200, startWidth + delta)));
+      setSidebarWidth(Math.min(500, Math.max(200, startWidth + (ev.clientX - startX))));
     };
 
     const onMouseUp = () => {
       isResizing.current = false;
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
     };
 
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
   };
 
   return (
@@ -116,6 +125,15 @@ export function Sidebar({ activeTab, onSelect }: SidebarProps) {
           </section>
         ))}
       </nav>
+      {/* User profile block */}
+      <div className="user-profile-block">
+        <div className="user-avatar" aria-hidden="true">{initials}</div>
+        <div className="user-profile-info">
+          <p className="user-display-name">{displayName}</p>
+          <p className="user-role-label">Engineer</p>
+        </div>
+      </div>
+
       {/* Drag handle — sits on the right edge of the sidebar */}
       <div
         className="sidebar-resizer"

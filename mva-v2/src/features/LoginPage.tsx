@@ -13,6 +13,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
     e.preventDefault();
     if (username === 'Avery' && password === 'avery') {
       sessionStorage.setItem('mva_auth', '1');
+      sessionStorage.setItem('mva_display_name', 'Avery, Yeh');
       onLogin();
     } else {
       setError('Invalid credentials. Please try again.');
