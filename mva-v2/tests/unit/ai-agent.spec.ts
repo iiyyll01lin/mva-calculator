@@ -44,7 +44,7 @@ describe('extractAiContext', () => {
 
   it('does NOT expose any PII or financial credentials fields', () => {
     const sim = calculateSimulation(defaultProject);
-    const ctx = extractAiContext(defaultProject, sim) as Record<string, unknown>;
+    const ctx = extractAiContext(defaultProject, sim) as unknown as Record<string, unknown>;
     // These fields from ProjectState must not pass through to the AI context
     const forbiddenKeys = ['projectId', 'lastModified', 'confirmation', 'lineStandards'];
     for (const key of forbiddenKeys) {

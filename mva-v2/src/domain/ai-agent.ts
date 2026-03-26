@@ -137,7 +137,11 @@ export function hashAiContext(context: AiAgentContext): string {
  *   2. Suggest specific headcount re-allocation.
  *   3. Predict the UPH improvement with a calculation.
  */
-export function generateOptimizationPrompt(project: ProjectState, simulation: SimulationResults): string {
+export function generateOptimizationPrompt(
+  project: ProjectState,
+  simulation: SimulationResults,
+  displayName = 'Avery, Yeh',
+): string {
   const ctx = extractAiContext(project, simulation);
 
   const stationRows = ctx.stationSummary
@@ -148,7 +152,7 @@ export function generateOptimizationPrompt(project: ProjectState, simulation: Si
     )
     .join('\n');
 
-  return `You are a Lean Six Sigma Black Belt and Manufacturing IE Expert advising ${ctx.generatedFor ?? 'Avery, Yeh'} at a world-class EMS facility.
+  return `You are a Lean Six Sigma Black Belt and Manufacturing IE Expert advising ${displayName} at a world-class EMS facility.
 
 ## Line Configuration — ${ctx.modelName}
 - Demand: ${ctx.weeklyDemand} units/week
@@ -174,7 +178,7 @@ Reply in Markdown with three sections:
 ### Headcount Re-Allocation Recommendations
 ### Projected UPH Improvement
 
-Address the report directly to ${ctx.generatedFor ?? 'Avery, Yeh'}. Be concise, data-driven, and reference exact numbers from the table above.`;
+Address the report directly to ${displayName}. Be concise, data-driven, and reference exact numbers from the table above.`;
 }
 
 // ── Magic Wand computation ─────────────────────────────────────────────────
