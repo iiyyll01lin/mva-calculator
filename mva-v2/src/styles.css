@@ -88,18 +88,42 @@ label > span {
 }
 
 .app-shell {
-  display: grid;
-  grid-template-columns: 280px minmax(0, 1fr);
+  display: flex;
   height: 100vh;
   overflow: hidden;
 }
 
 .sidebar {
+  flex: 0 0 auto;
+  position: relative;
   padding: 1.5rem;
   border-right: 1px solid var(--line);
   background: linear-gradient(180deg, #0c121b 0%, #0f1621 100%);
   min-height: 0;
   overflow-y: auto;
+  overflow-x: hidden;
+  user-select: none;
+}
+
+.content-shell {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.sidebar-resizer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 5px;
+  height: 100%;
+  cursor: ew-resize;
+  background: transparent;
+  transition: background var(--transition-ui);
+  z-index: 10;
+}
+
+.sidebar-resizer:hover {
+  background: rgba(79, 140, 255, 0.45);
 }
 
 .brand-block {
@@ -116,6 +140,23 @@ label > span {
 .panel-list h3,
 .editable-list h3 {
   margin: 0;
+}
+
+/* Brand title — never lets long words overflow the sidebar */
+.brand-title {
+  font-size: 1.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Author attribution beneath the brand title */
+.author-line {
+  margin: 0.3rem 0 0;
+  font-size: 0.73rem;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+  opacity: 0.75;
 }
 
 .eyebrow {
@@ -1043,3 +1084,49 @@ table.data-table th.section-header {
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Login Page ─────────────────────────────────────────────────────────── */
+
+.login-shell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 2rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--bg-panel);
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 1.5rem;
+}
+
+.login-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.login-submit {
+  width: 100%;
+  margin-top: 0.25rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+}
+
+.login-error {
+  margin: 0;
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--radius-input);
+  background: rgba(224, 82, 82, 0.08);
+  border: 1px solid rgba(224, 82, 82, 0.32);
+  color: #f4a0a0;
+  font-size: 0.82rem;
+}
+

@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { TabId } from '../domain/models';
 
 const tabGroups: Array<{
@@ -53,11 +54,41 @@ interface SidebarProps {
 }
 
 export function Sidebar({ activeTab, onSelect }: SidebarProps) {
+  const [sidebarWidth, setSidebarWidth] = useState(280);
+  const isDragging = useRef(false);
+  const startX = useRef(0);
+  const startWidth = useRef(0);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    isDragging.current = true;
+    startX.current = e.clientX;
+    startWidth.current = sidebarWidth;
+  }, [sidebarWidth]);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging.current) return;
+      const delta = e.clientX - startX.current;
+      const clamped = Math.min(500, Math.max(200, startWidth.current + delta));
+      setSidebarWidth(clamped);
+    };
+    const handleMouseUp = () => { isDragging.current = false; };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, []);
+
   return (
-    <aside className="sidebar">
+    <aside className="sidebar" style={{ width: sidebarWidth }}>
       <div className="brand-block">
         <p className="eyebrow">MVA v2</p>
-        <h1>StreamWeaver</h1>
+        <h1 className="brand-title">StreamWeaver</h1>
+        <p className="author-line">Author: Jason YY Lin</p>
         <p className="muted">Modular manufacturing simulation and cost engineering workspace.</p>
       </div>
       <nav className="nav-stack" aria-label="Primary">
@@ -80,6 +111,14 @@ export function Sidebar({ activeTab, onSelect }: SidebarProps) {
           </section>
         ))}
       </nav>
+      {/* Drag handle — sits on the right edge of the sidebar */}
+      <div
+        className="sidebar-resizer"
+        onMouseDown={handleMouseDown}
+        role="separator"
+        aria-label="Resize sidebar"
+        aria-orientation="vertical"
+      />
     </aside>
   );
 }
