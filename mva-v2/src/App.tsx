@@ -1,15 +1,15 @@
-import { lazy, startTransition, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, startTransition, Suspense, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { SectionCard } from './components/SectionCard';
 import { Sidebar } from './components/Sidebar';
 import { SummaryPage } from './components/SummaryPage';
-import { calculateMva, calculateSimulation } from './domain/calculations';
 import { buildL10StationsCsv, buildProjectExport, buildSummaryCsv, downloadText } from './domain/exporters';
 import type { ProjectState, TabId } from './domain/models';
 import { loadSelectedLineStandardId, saveSelectedLineStandardId } from './domain/persistence';
 import { usePortfolioState } from './state/useProjectState';
 import { useProjectImports } from './hooks/useProjectImports';
 import { useProcessSummary } from './hooks/useProcessSummary';
+import { useCalcWorker } from './hooks/useCalcWorker';
 import { formatTimestamp } from './utils/formatters';
 import { defaultProject } from './domain/defaults';
 import { LoginPage } from './features/LoginPage';
@@ -66,13 +66,14 @@ function AppOrchestrator() {
   );
   const [statusMessage, setStatusMessage] = useState<string>('');
 
-  const simulation = useMemo(() => calculateSimulation(safeProject), [safeProject]);
-  const mva = useMemo(() => calculateMva(safeProject, simulation), [safeProject, simulation]);
-  // L10 and L6 process-scoped derivations encapsulated in useProcessSummary
-  // so App does not expose intermediate project snapshots as raw memos.
-  const { mva: l10Mva, simulation: l10Simulation, summaryCsv: l10SummaryCsv } = useProcessSummary(safeProject, 'L10');
-  const { mva: l6Mva, simulation: l6Simulation, summaryCsv: l6SummaryCsv } = useProcessSummary(safeProject, 'L6');
-  const summaryCsv = useMemo(() => buildSummaryCsv(safeProject), [safeProject]);
+  const { simulation, mva, isComputing } = useCalcWorker(safeProject);
+  // L10 and L6 process-scoped derivations are deferred so they never block
+  // the main thread during rapid data entry — their values are consumed only
+  // by their respective summary / MPM tabs and tolerate a render-cycle lag.
+  const deferredProject = useDeferredValue(safeProject);
+  const { mva: l10Mva, simulation: l10Simulation, summaryCsv: l10SummaryCsv } = useProcessSummary(deferredProject, 'L10');
+  const { mva: l6Mva, simulation: l6Simulation, summaryCsv: l6SummaryCsv } = useProcessSummary(deferredProject, 'L6');
+  const summaryCsv = useMemo(() => buildSummaryCsv(deferredProject), [deferredProject]);
 
   // Stable reference — feature pages wrapped in memo won't re-render just because
   // App re-renders for unrelated state changes (e.g. activeTab, statusMessage).
@@ -202,6 +203,13 @@ function AppOrchestrator() {
               {isDirty && <span className="dirty-badge" title="You have unsaved changes. Export Project JSON to persist them.">● Unsaved Changes</span>}
             </div>
           </header>
+
+          {(isComputing || deferredProject !== safeProject) && (
+            <div className="status-banner info computing-banner" role="status" aria-live="polite">
+              <span className="page-loading-spinner" aria-hidden="true" />
+              Computing…
+            </div>
+          )}
 
           {statusMessage && (
             <div className={`status-banner ${classifyStatusType(statusMessage)}`} role="status" aria-live="polite">
