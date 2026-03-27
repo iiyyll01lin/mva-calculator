@@ -22,6 +22,7 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy only the demo HTML and module helpers
 COPY l6-ddm-demo.html /usr/share/nginx/html/l6-ddm-demo.html
+COPY mission-control.html /usr/share/nginx/html/mission-control.html
 COPY mva /usr/share/nginx/html/mva
 
 EXPOSE 80

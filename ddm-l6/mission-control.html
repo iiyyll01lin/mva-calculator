@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MVA Mission Control — Agent Command Center</title>
+
+  <!-- Tailwind CSS (Play CDN — dark-mode class strategy) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand:  { DEFAULT: '#6366f1', light: '#818cf8', dark: '#4f46e5' },
+            neon:   { green: '#22d3ee', yellow: '#fde047', red: '#f87171', blue: '#60a5fa' },
+            surface:{ 900: '#0d0f14', 800: '#13161e', 700: '#1a1f2c', 600: '#222840', 500: '#2d3551' },
+          },
+          animation: {
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4,0,0.6,1) infinite',
+            'slide-in':   'slideIn 0.25s ease-out',
+          },
+          keyframes: {
+            slideIn: { '0%': { opacity: 0, transform: 'translateY(8px)' }, '100%': { opacity: 1, transform: 'translateY(0)' } },
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- React 18 + ReactDOM (UMD dev builds — swap to .production.min.js for prod) -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <!-- Babel Standalone — transpiles JSX in the browser (dev only) -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    /* Scrollbar styling */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #13161e; }
+    ::-webkit-scrollbar-thumb { background: #2d3551; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #6366f1; }
+
+    /* SSE node connector lines */
+    .span-node::before {
+      content: '';
+      position: absolute;
+      left: 15px; top: -24px;
+      width: 2px; height: 24px;
+      background: linear-gradient(to bottom, transparent, #2d3551);
+    }
+    .span-node:first-child::before { display: none; }
+
+    /* Animated status dot */
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .blink { animation: blink 1.2s ease-in-out infinite; }
+
+    /* Donut chart — pure CSS */
+    .donut-ring { transition: stroke-dashoffset 0.5s ease; }
+    @keyframes flash-border {
+      0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); border-color: rgba(239,68,68,0.6); }
+      50%      { box-shadow: 0 0 24px 6px rgba(239,68,68,0.5); border-color: rgba(239,68,68,1); }
+    }
+    .emergency-flash { animation: flash-border 1.2s ease-in-out infinite; }
+
+    @keyframes slide-down {
+      from { opacity: 0; transform: translateY(-20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .slide-down { animation: slide-down 0.3s ease-out; }
+  </style>
+</head>
+
+<body class="bg-surface-900 text-gray-100 font-mono antialiased min-h-screen">
+<div id="root"></div>
+
+<script type="text/babel">
+/* ============================================================
+   MVA Mission Control Dashboard
+   Technology: React 18 · Tailwind CSS · Browser SSE · SVG Charts
+   ============================================================ */
+
+const { useState, useEffect, useRef, useCallback, useMemo, useReducer } = React;
+
+// ──────────────────────────────────────────────────────────────
+// Constants & config
+// ──────────────────────────────────────────────────────────────
+const API_BASE = '';   // Same origin via nginx reverse proxy
+
+const SPAN_TYPE_META = {
+  routing:    { label: 'Routing',    color: '#60a5fa', icon: '⇢', bg: 'bg-blue-900/40',   border: 'border-blue-500/50'   },
+  tool_exec:  { label: 'Tool Exec',  color: '#34d399', icon: '⚙', bg: 'bg-emerald-900/40', border: 'border-emerald-500/50' },
+  reflection: { label: 'Reflection', color: '#fbbf24', icon: '↺', bg: 'bg-yellow-900/40',  border: 'border-yellow-500/50'  },
+  agent:      { label: 'Agent',      color: '#a78bfa', icon: '◈', bg: 'bg-violet-900/40',  border: 'border-violet-500/50'  },
+};
+
+const META = (type) => SPAN_TYPE_META[type] || { label: type, color: '#94a3b8', icon: '●', bg: 'bg-slate-800', border: 'border-slate-600' };
+
+// ──────────────────────────────────────────────────────────────
+// Helpers
+// ──────────────────────────────────────────────────────────────
+function apiFetch(path, opts = {}) {
+  const token = localStorage.getItem('mva_token');
+  return fetch(API_BASE + path, {
+    ...opts,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(opts.headers || {}),
+    },
+  });
+}
+
+function fmtMs(ms) {
+  if (ms == null) return '—';
+  if (ms < 1000) return `${Math.round(ms)}ms`;
+  return `${(ms / 1000).toFixed(1)}s`;
+}
+
+function fmtTokens(n) {
+  if (!n) return '0';
+  return n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
+}
+
+function timeAgo(iso) {
+  if (!iso) return '—';
+  const diff = (Date.now() - new Date(iso).getTime()) / 1000;
+  if (diff < 60) return `${Math.round(diff)}s ago`;
+  if (diff < 3600) return `${Math.round(diff / 60)}m ago`;
+  return `${Math.round(diff / 3600)}h ago`;
+}
+
+function shortId(id) {
+  return id ? id.slice(0, 8) + '…' : '—';
+}
+
+// ──────────────────────────────────────────────────────────────
+// Login Page
+// ──────────────────────────────────────────────────────────────
+function LoginPage({ onLogin }) {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError]       = useState('');
+  const [loading, setLoading]   = useState(false);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    try {
+      const form = new URLSearchParams({ username, password });
+      const res  = await fetch(`${API_BASE}/api/v1/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: form,
+      });
+      if (!res.ok) throw new Error((await res.json()).detail || 'Login failed');
+      const data = await res.json();
+      localStorage.setItem('mva_token', data.access_token);
+      onLogin(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-surface-900 p-4">
+      <div className="w-full max-w-sm">
+        <div className="text-center mb-8">
+          <div className="text-4xl mb-3">⬡</div>
+          <h1 className="text-2xl font-bold tracking-widest text-brand-light">MVA MISSION CONTROL</h1>
+          <p className="text-xs text-slate-500 mt-1 tracking-widest uppercase">Agent Command Center</p>
+        </div>
+        <form onSubmit={handleSubmit} className="bg-surface-800 border border-surface-600 rounded-xl p-6 space-y-4">
+          <div>
+            <label className="block text-xs text-slate-400 mb-1 uppercase tracking-wider">Username</label>
+            <input
+              className="w-full bg-surface-700 border border-surface-500 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand"
+              value={username} onChange={e => setUsername(e.target.value)}
+              placeholder="operator" autoComplete="username" required
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-slate-400 mb-1 uppercase tracking-wider">Password</label>
+            <input
+              type="password"
+              className="w-full bg-surface-700 border border-surface-500 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand"
+              value={password} onChange={e => setPassword(e.target.value)}
+              placeholder="••••••••" autoComplete="current-password" required
+            />
+          </div>
+          {error && <p className="text-xs text-red-400 bg-red-900/20 rounded px-3 py-2">{error}</p>}
+          <button
+            type="submit" disabled={loading}
+            className="w-full bg-brand hover:bg-brand-dark disabled:opacity-50 rounded-lg py-2 text-sm font-semibold transition-colors"
+          >
+            {loading ? '…' : 'Connect to Control'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
+// Top Nav
+// ──────────────────────────────────────────────────────────────
+function TopNav({ user, onLogout, activeTab, setActiveTab }) {
+  const tabs = [
+    { id: 'stream',   label: 'Thought Stream',  icon: '⟁' },
+    { id: 'action',   label: 'Action Center',    icon: '⚑' },
+    { id: 'health',   label: 'System Health',    icon: '◎' },
+    { id: 'twin',     label: 'Digital Twin',     icon: '⬡' },
+  ];
+  return (
+    <header className="flex items-center justify-between px-4 py-2 bg-surface-800 border-b border-surface-600 shrink-0">
+      <div className="flex items-center gap-3">
+        <span className="text-brand text-lg">⬡</span>
+        <span className="text-xs font-bold tracking-widest text-slate-300 uppercase">MVA Mission Control</span>
+        <span className="hidden md:flex items-center gap-1 text-xs text-slate-600">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 blink"></span>LIVE
+        </span>
+      </div>
+      <nav className="flex gap-1">
+        {tabs.map(t => (
+          <button key={t.id} onClick={() => setActiveTab(t.id)}
+            className={`px-3 py-1 rounded text-xs transition-colors ${
+              activeTab === t.id
+                ? 'bg-brand text-white'
+                : 'text-slate-400 hover:text-white hover:bg-surface-600'
+            }`}
+          >
+            <span className="mr-1">{t.icon}</span>{t.label}
+          </button>
+        ))}
+      </nav>
+      <div className="flex items-center gap-3">
+        <span className="text-xs text-slate-500">{user?.role ?? ''}</span>
+        <span className="text-xs text-slate-300">{user?.user_id ?? user?.sub ?? '—'}</span>
+        <button onClick={onLogout} className="text-xs text-red-400 hover:text-red-300 transition-colors px-2 py-1 rounded hover:bg-red-900/20">
+          ⏻ Logout
+        </button>
+      </div>
+    </header>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
+// Span Node — a single step in the thought stream
+// ──────────────────────────────────────────────────────────────
+function SpanNode({ span, index }) {
+  const [expanded, setExpanded] = useState(false);
+  const m = META(span.span_type);
+  const tu = span.token_usage;
+
+  return (
+    <div className={`relative span-node flex gap-3 animate-slide-in`}>
+      {/* Timeline dot */}
+      <div className="flex flex-col items-center shrink-0 pt-1">
+        <div className="w-8 h-8 rounded-full flex items-center justify-center text-base shrink-0"
+          style={{ background: m.color + '22', border: `1px solid ${m.color}66` }}>
+          {m.icon}
+        </div>
+        <div className="w-px flex-1 bg-surface-600 mt-1 min-h-4"></div>
+      </div>
+
+      {/* Card */}
+      <div className={`mb-3 flex-1 rounded-lg border ${m.border} ${m.bg} overflow-hidden`}>
+        <button className="w-full text-left flex items-center justify-between px-3 py-2 gap-2"
+          onClick={() => setExpanded(!expanded)}>
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-xs font-semibold truncate" style={{ color: m.color }}>{span.span_name}</span>
+            <span className="text-xs text-slate-500 shrink-0">{m.label}</span>
+            {span.tool_name && (
+              <span className="text-xs bg-slate-700 rounded px-1 text-slate-300 shrink-0">{span.tool_name}</span>
+            )}
+          </div>
+          <div className="flex items-center gap-2 shrink-0 text-xs text-slate-500">
+            {span.tool_success === true  && <span className="text-emerald-400">✓</span>}
+            {span.tool_success === false && <span className="text-red-400">✗</span>}
+            {span.error && <span className="text-red-400">⚠</span>}
+            <span>{fmtMs(span.duration_ms)}</span>
+            {tu && <span className="text-slate-600">{fmtTokens(tu.total_tokens)} tok</span>}
+            <span>{expanded ? '▲' : '▼'}</span>
+          </div>
+        </button>
+
+        {expanded && (
+          <div className="px-3 pb-3 space-y-2 border-t border-surface-600/50 pt-2">
+            {span.agent_name && (
+              <div className="text-xs"><span className="text-slate-500">Agent: </span><span className="text-violet-300">{span.agent_name}</span></div>
+            )}
+            {tu && (
+              <div className="text-xs text-slate-400 flex gap-4">
+                <span>↑ {tu.prompt_tokens} ptok</span>
+                <span>↓ {tu.completion_tokens} ctok</span>
+                <span className="text-amber-400">${(tu.estimated_cost_usd ?? 0).toFixed(6)}</span>
+              </div>
+            )}
+            {span.error && (
+              <div className="text-xs text-red-400 bg-red-900/20 rounded px-2 py-1 font-mono break-all">{span.error}</div>
+            )}
+            {span.raw_output && (
+              <details className="text-xs">
+                <summary className="cursor-pointer text-slate-500 hover:text-slate-300">Raw output ({span.raw_output.length} chars)</summary>
+                <pre className="mt-1 text-slate-400 bg-surface-900 rounded p-2 overflow-x-auto text-xs whitespace-pre-wrap break-all">
+                  {span.raw_output.slice(0, 2000)}{span.raw_output.length > 2000 ? '\n…[truncated]' : ''}
+                </pre>
+              </details>
+            )}
+            <div className="text-xs text-slate-600">{span.started_at}</div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
+// Tab 1: Thought Stream
+// ──────────────────────────────────────────────────────────────
+function ThoughtStreamTab() {
+  const [sessionId, setSessionId]   = useState('');
+  const [inputId, setInputId]       = useState('');
+  const [spans, setSpans]           = useState([]);
+  const [status, setStatus]         = useState('idle');  // idle | connecting | live | done | error
+  const [autoScroll, setAutoScroll] = useState(true);
+  const [sessions, setSessions]     = useState([]);
+  const esRef    = useRef(null);
+  const bottomRef = useRef(null);
+
+  // Load recent sessions for the picker
+  useEffect(() => {
+    apiFetch('/api/v1/agent/sessions?limit=20')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => d && setSessions(d.sessions || []))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (autoScroll && bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [spans, autoScroll]);
+
+  function connect(sid) {
+    if (esRef.current) {
+      esRef.current.close();
+      esRef.current = null;
+    }
+    setSpans([]);
+    setStatus('connecting');
+    setSessionId(sid);
+
+    const token = localStorage.getItem('mva_token') || '';
+    const url   = `${API_BASE}/api/v1/agent/stream/${encodeURIComponent(sid)}?token=${encodeURIComponent(token)}`;
+    const es    = new EventSource(url);
+    esRef.current = es;
+
+    es.onopen    = () => setStatus('live');
+    es.onmessage = (e) => {
+      try {
+        const span = JSON.parse(e.data);
+        setSpans(prev => [...prev, span]);
+      } catch {}
+    };
+    es.onerror = () => { setStatus('error'); es.close(); };
+  }
+
+  function disconnect() {
+    if (esRef.current) { esRef.current.close(); esRef.current = null; }
+    setStatus('idle');
+  }
+
+  async function loadReplay(sid) {
+    setStatus('connecting');
+    setSpans([]);
+    setSessionId(sid);
+    try {
+      const r = await apiFetch(`/api/v1/agent/session/${encodeURIComponent(sid)}/replay`);
+      const d = await r.json();
+      setSpans(d.spans || []);
+      setStatus('done');
+    } catch {
+      setStatus('error');
+    }
+  }
+
+  const statusMeta = {
+    idle:       { color: 'text-slate-500', dot: 'bg-slate-600',   label: 'IDLE'       },
+    connecting: { color: 'text-yellow-400', dot: 'bg-yellow-400 blink', label: 'CONNECTING' },
+    live:       { color: 'text-emerald-400', dot: 'bg-emerald-400 blink', label: 'LIVE'    },
+    done:       { color: 'text-blue-400',  dot: 'bg-blue-400',   label: 'REPLAY'     },
+    error:      { color: 'text-red-400',   dot: 'bg-red-400',    label: 'ERROR'      },
+  }[status];
+
+  return (
+    <div className="flex flex-col h-full overflow-hidden">
+      {/* Controls bar */}
+      <div className="flex flex-wrap items-center gap-2 p-3 bg-surface-800 border-b border-surface-600 shrink-0">
+        <div className="flex items-center gap-2 grow">
+          <input
+            className="grow min-w-0 bg-surface-700 border border-surface-500 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-brand font-mono"
+            placeholder="Session ID (UUID)"
+            value={inputId} onChange={e => setInputId(e.target.value)}
+          />
+          {sessions.length > 0 && (
+            <select
+              className="bg-surface-700 border border-surface-500 rounded px-2 py-1.5 text-xs shrink-0 max-w-xs"
+              value="" onChange={e => setInputId(e.target.value)}
+            >
+              <option value="">Recent sessions</option>
+              {sessions.map(s => (
+                <option key={s.session_id} value={s.session_id}>
+                  {shortId(s.session_id)} — {s.user_id} {s.has_pending ? '⚑' : ''}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+        <div className="flex gap-2 shrink-0">
+          <button onClick={() => inputId && connect(inputId)}
+            className="bg-brand hover:bg-brand-dark text-white text-xs rounded px-3 py-1.5 transition-colors">
+            ⟁ Live
+          </button>
+          <button onClick={() => inputId && loadReplay(inputId)}
+            className="bg-surface-600 hover:bg-surface-500 text-xs rounded px-3 py-1.5 transition-colors">
+            ↺ Replay
+          </button>
+          {status !== 'idle' && (
+            <button onClick={disconnect} className="text-red-400 hover:text-red-300 text-xs rounded px-2 py-1.5">
+              ✕
+            </button>
+          )}
+        </div>
+        <div className="flex items-center gap-1.5 shrink-0">
+          <div className={`w-2 h-2 rounded-full ${statusMeta.dot}`}></div>
+          <span className={`text-xs ${statusMeta.color}`}>{statusMeta.label}</span>
+          <span className="text-xs text-slate-600 ml-2">{spans.length} spans</span>
+        </div>
+        <label className="flex items-center gap-1 text-xs text-slate-500 cursor-pointer shrink-0">
+          <input type="checkbox" checked={autoScroll} onChange={e => setAutoScroll(e.target.checked)} />
+          auto-scroll
+        </label>
+      </div>
+
+      {/* Stream view */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-0">
+        {spans.length === 0 && (
+          <div className="flex flex-col items-center justify-center h-full gap-3 text-slate-600">
+            <span className="text-4xl">⟁</span>
+            <p className="text-sm">Enter a Session ID and click Live or Replay</p>
+          </div>
+        )}
+        {spans.map((s, i) => <SpanNode key={s.span_id || i} span={s} index={i} />)}
+        <div ref={bottomRef} />
+      </div>
+    </div>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
+// HITL Approval Card
+// ──────────────────────────────────────────────────────────────
+function HitlCard({ item, onResolved }) {
+  const [loading, setLoading] = useState(null);  // 'approve' | 'reject' | null
+  const [error, setError]     = useState('');
+  const pa = item.pending_action;
+
+  // Compute a rough security risk score from the tool args
+  // (numeric values outside safe range increase risk)
+  const riskScore = useMemo(() => {
+    let score = 0.2;  // baseline: all SENSITIVE tools carry some risk
+    const args = pa.raw_args || {};
+    if (args.num_operators && args.num_operators > 50) score += 0.3;
+    if (args.machine_rate_usd && args.machine_rate_usd > 10000) score += 0.3;
+    if (args.cycle_time_tmu && (args.cycle_time_tmu < 1 || args.cycle_time_tmu > 5000)) score += 0.2;
+    return Math.min(score, 1.0);
+  }, [pa]);
+
+  const riskColor = riskScore < 0.4 ? 'text-emerald-400' : riskScore < 0.7 ? 'text-yellow-400' : 'text-red-400';
+  const riskLabel = riskScore < 0.4 ? 'LOW' : riskScore < 0.7 ? 'MEDIUM' : 'HIGH';
+
+  async function act(type) {
+    setLoading(type);
+    setError('');
+    try {
+      const path = type === 'approve'
+        ? `/api/v1/agent/approve/${encodeURIComponent(item.session_id)}`
+        : `/api/v1/agent/reject/${encodeURIComponent(item.session_id)}`;
+      const res = await apiFetch(path, {
+        method: 'POST',
+        body: JSON.stringify({ action_id: pa.action_id }),
+      });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.detail || 'Request failed');
+      onResolved(item.session_id, type);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(null);
+    }
+  }
+
+  return (
+    <div className="bg-surface-800 border border-surface-600 rounded-xl p-4 space-y-3 animate-slide-in hover:border-brand/50 transition-colors">
+      {/* Header */}
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded px-2 py-0.5 font-semibold">
+              ⚑ PENDING APPROVAL
+            </span>
+            <span className="text-xs text-slate-500">{timeAgo(pa.created_at)}</span>
+          </div>
+          <div className="mt-1.5 text-sm font-bold text-white">{pa.tool_name}</div>
+          <div className="text-xs text-slate-500 font-mono">
+            Agent: <span className="text-violet-300">{pa.agent_name}</span>
+          </div>
+        </div>
+        <div className="shrink-0 text-right">
+          <div className="text-xs text-slate-500 mb-0.5">Security Risk</div>
+          <div className={`text-lg font-bold ${riskColor}`}>{Math.round(riskScore * 100)}%</div>
+          <div className={`text-xs font-semibold ${riskColor}`}>{riskLabel}</div>
+        </div>
+      </div>
+
+      {/* Sanitized args */}
+      <div>
+        <div className="text-xs text-slate-500 mb-1 uppercase tracking-wider">Sanitized Arguments</div>
+        <div className="bg-surface-900 rounded-lg p-3 space-y-1.5">
+          {Object.entries(pa.raw_args || {}).map(([k, v]) => (
+            <div key={k} className="flex justify-between gap-4 text-xs">
+              <span className="text-slate-500">{k}</span>
+              <span className="text-slate-200 font-mono truncate max-w-[200px]">{String(v)}</span>
+            </div>
+          ))}
+          {Object.keys(pa.raw_args || {}).length === 0 && (
+            <span className="text-xs text-slate-600">No arguments</span>
+          )}
+        </div>
+      </div>
+
+      {/* Session meta */}
+      <div className="text-xs text-slate-600 flex gap-4">
+        <span>Session: <span className="text-slate-400 font-mono">{shortId(item.session_id)}</span></span>
+        <span>User: <span className="text-slate-400">{item.user_id}</span></span>
+        <span>Turn: <span className="text-slate-400">#{item.turn_count}</span></span>
+      </div>
+
+      {error && <div className="text-xs text-red-400 bg-red-900/20 rounded px-2 py-1">{error}</div>}
+
+      {/* Action buttons */}
+      <div className="flex gap-2 pt-1">
+        <button onClick={() => act('approve')} disabled={!!loading}
+          className="flex-1 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 rounded-lg py-2 text-xs font-bold transition-colors">
+          {loading === 'approve' ? '…' : '✓ Approve'}
+        </button>
+        <button onClick={() => act('reject')} disabled={!!loading}
+          className="flex-1 bg-red-700 hover:bg-red-600 disabled:opacity-50 rounded-lg py-2 text-xs font-bold transition-colors">
+          {loading === 'reject' ? '…' : '✗ Reject'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
+// Tab 2: Action Center (HITL Gallery)
+// ──────────────────────────────────────────────────────────────
+function ActionCenterTab() {
+  const [items, setItems]   = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [lastFetch, setLastFetch] = useState(null);
+  const intervalRef = useRef(null);
+
+  async function fetchPending() {
+    setLoading(true);
+    try {
+      const r = await apiFetch('/api/v1/agent/pending');
+      if (r.ok) {
+        const d = await r.json();
+        setItems(d.pending_actions || []);
+        setLastFetch(new Date().toISOString());
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchPending();
+    intervalRef.current = setInterval(fetchPending, 10_000);
+    return () => clearInterval(intervalRef.current);
+  }, []);
+
+  function handleResolved(sessionId) {
+    setItems(prev => prev.filter(i => i.session_id !== sessionId));
+  }
+
+  return (
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="flex items-center justify-between p-3 bg-surface-800 border-b border-surface-600 shrink-0">
+        <div className="flex items-center gap-2">
+          <span className="text-base">⚑</span>
+          <span className="text-sm font-semibold">HITL Action Center</span>
+          {items.length > 0 && (
+            <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs rounded-full px-2 py-0.5 font-bold">
+              {items.length}
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-3">
+          {lastFetch && <span className="text-xs text-slate-600">Updated {timeAgo(lastFetch)}</span>}
+          <button onClick={fetchPending} disabled={loading}
+            className="text-xs bg-surface-600 hover:bg-surface-500 rounded px-3 py-1.5 transition-colors disabled:opacity-50">
+            {loading ? '…' : '↻ Refresh'}
+          </button>
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-4">
+        {items.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full gap-3 text-slate-600">
+            <span className="text-4xl">✓</span>
+            <p className="text-sm">No pending approvals</p>
+            <p className="text-xs text-slate-700">Auto-refreshing every 10 seconds</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+            {items.map(item => (
+              <HitlCard key={item.session_id + item.pending_action.action_id}
+                item={item} onResolved={handleResolved} />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
+// Mini bar chart (SVG, no deps)
+// ──────────────────────────────────────────────────────────────
+function BarChart({ data, height = 80, labelKey = 'label', valueKey = 'value', color = '#6366f1' }) {
+  const max = Math.max(...data.map(d => d[valueKey]), 1);
+  const barW = Math.max(8, Math.min(40, (300 - data.length * 4) / data.length));
+  const gap  = 4;
+  const svgW = data.length * (barW + gap);
+
+  return (
+    <div className="overflow-x-auto">
+      <svg width={Math.max(svgW, 200)} height={height + 24} className="block">
+        {data.map((d, i) => {
+          const barH = Math.max(2, (d[valueKey] / max) * height);
+          const x    = i * (barW + gap);
+          const y    = height - barH;
+          return (
+            <g key={i}>
+              <rect x={x} y={y} width={barW} height={barH} rx={2} fill={color} opacity={0.8}>
+                <title>{d[labelKey]}: {d[valueKey]}</title>
+              </rect>
+              <text x={x + barW / 2} y={height + 14} textAnchor="middle"
+                fontSize="9" fill="#64748b" className="font-mono">
+                {String(d[labelKey]).slice(0, 6)}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
+// Donut chart (SVG)
+// ──────────────────────────────────────────────────────────────
+function DonutChart({ segments, size = 120 }) {
+  const r   = 40;
+  const cx  = size / 2;
+  const cy  = size / 2;
+  const circ = 2 * Math.PI * r;
+  const total = segments.reduce((a, s) => a + s.value, 0) || 1;
+
+  let offset = 0;
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#1a1f2c" strokeWidth={18} />
+      {segments.map((seg, i) => {
+        const dash = (seg.value / total) * circ;
+        const gap  = circ - dash;
+        const el   = (
+          <circle key={i} cx={cx} cy={cy} r={r}
+            fill="none"
+            stroke={seg.color}
+            strokeWidth={18}
+            strokeDasharray={`${dash} ${gap}`}
+            strokeDashoffset={-offset}
+            strokeLinecap="butt"
+            style={{ transition: 'stroke-dashoffset 0.5s ease' }}
+            transform={`rotate(-90 ${cx} ${cy})`}
+          >
+            <title>{seg.label}: {seg.value}</title>
+          </circle>
+        );
+        offset += dash;
+        return el;
+      })}
+      <text x={cx} y={cy} textAnchor="middle" dominantBaseline="middle"
+        fontSize="13" fill="#cbd5e1" fontWeight="bold">
+        {total}
+      </text>
+      <text x={cx} y={cy + 14} textAnchor="middle" dominantBaseline="middle"
+        fontSize="8" fill="#64748b">spans</text>
+    </svg>
+  );
+}
+
+// Progress ring for success rate
+function ProgressRing({ pct, size = 100, color = '#22d3ee', label }) {
+  const r    = 36;
+  const circ = 2 * Math.PI * r;
+  const dash = (pct / 100) * circ;
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      <circle cx={50} cy={50} r={r} fill="none" stroke="#1a1f2c" strokeWidth={10} />
+      <circle cx={50} cy={50} r={r} fill="none" stroke={color} strokeWidth={10}
+        strokeDasharray={`${dash} ${circ - dash}`} strokeLinecap="round"
+        transform="rotate(-90 50 50)" style={{ transition: 'stroke-dasharray 0.8s ease' }} />
+      <text x={50} y={48} textAnchor="middle" dominantBaseline="middle"
+        fontSize="14" fill="#e2e8f0" fontWeight="bold">{Math.round(pct)}%</text>
+      <text x={50} y={62} textAnchor="middle" fontSize="7" fill="#64748b">{label}</text>
+    </svg>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
+// Tab 3: System Health
+// ──────────────────────────────────────────────────────────────
+function SystemHealthTab() {
+  const [metrics, setMetrics]   = useState(null);
+  const [loading, setLoading]   = useState(false);
+  const [lastFetch, setLastFetch] = useState(null);
+
+  async function fetchMetrics() {
+    setLoading(true);
+    try {
+      const r = await apiFetch('/api/v1/agent/telemetry/metrics?limit=1000');
+      if (r.ok) {
+        const d = await r.json();
+        setMetrics(d);
+        setLastFetch(new Date().toISOString());
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchMetrics();
+    const id = setInterval(fetchMetrics, 30_000);
+    return () => clearInterval(id);
+  }, []);
+
+  if (!metrics) return (
+    <div className="flex items-center justify-center h-full text-slate-600">
+      {loading ? 'Loading metrics…' : 'No metrics data available yet.'}
+    </div>
+  );
+
+  const { tool_execution: te, token_cost_by_agent: costMap, reflection_loops: rl,
+    span_type_distribution: std, latency_percentiles_ms: lat, recent_traces, total_spans_buffered } = metrics;
+
+  const successPct  = Math.round((te?.success_rate ?? 0) * 100);
+  const costEntries = Object.entries(costMap || {}).sort(([,a],[,b]) => b - a);
+  const tokenEntries = Object.entries(metrics.tokens_by_agent || {}).sort(([,a],[,b]) => b - a);
+
+  const donutData = Object.entries(std || {}).map(([k, v]) => ({
+    label: k, value: v, color: META(k).color
+  }));
+
+  const costBarData = costEntries.map(([k, v]) => ({
+    label: k.replace('Agent', ''), value: parseFloat(v.toFixed(6))
+  }));
+
+  const tokenBarData = tokenEntries.map(([k, v]) => ({
+    label: k.replace('Agent', ''), value: v
+  }));
+
+  return (
+    <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-sm font-semibold tracking-wider uppercase text-slate-300">System Health</h2>
+        <div className="flex items-center gap-3">
+          {lastFetch && <span className="text-xs text-slate-600">Updated {timeAgo(lastFetch)}</span>}
+          <button onClick={fetchMetrics} disabled={loading}
+            className="text-xs bg-surface-600 hover:bg-surface-500 rounded px-3 py-1.5 transition-colors disabled:opacity-50">
+            {loading ? '…' : '↻ Refresh'}
+          </button>
+        </div>
+      </div>
+
+      {/* KPI row */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {[
+          { label: 'Total Spans',    value: total_spans_buffered, color: 'text-brand-light' },
+          { label: 'Tool Success',   value: `${successPct}%`,     color: successPct > 80 ? 'text-emerald-400' : 'text-yellow-400' },
+          { label: 'Avg Reflections',value: rl?.avg_per_trace,    color: 'text-yellow-300' },
+          { label: 'P95 Latency',    value: fmtMs(lat?.p95),      color: 'text-blue-300'   },
+        ].map(kpi => (
+          <div key={kpi.label} className="bg-surface-800 border border-surface-600 rounded-xl p-3 text-center">
+            <div className={`text-2xl font-bold ${kpi.color}`}>{kpi.value ?? '—'}</div>
+            <div className="text-xs text-slate-500 mt-0.5">{kpi.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Charts row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Success rate ring */}
+        <div className="bg-surface-800 border border-surface-600 rounded-xl p-4 flex flex-col items-center">
+          <div className="text-xs text-slate-400 uppercase tracking-wider mb-3">Success Rate</div>
+          <ProgressRing pct={successPct} label="tool success" color={successPct > 80 ? '#22d3ee' : '#fbbf24'} />
+          <div className="mt-3 text-xs text-slate-600 text-center">
+            ✓{te?.success_count} &nbsp; ✗{te?.failure_count}
+          </div>
+        </div>
+
+        {/* Span type donut */}
+        <div className="bg-surface-800 border border-surface-600 rounded-xl p-4 flex flex-col items-center">
+          <div className="text-xs text-slate-400 uppercase tracking-wider mb-3">Span Distribution</div>
+          {donutData.length > 0 ? (
+            <>
+              <DonutChart segments={donutData} />
+              <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1">
+                {donutData.map(d => (
+                  <div key={d.label} className="flex items-center gap-1 text-xs">
+                    <div className="w-2 h-2 rounded-full shrink-0" style={{ background: d.color }}></div>
+                    <span className="text-slate-400">{d.label}</span>
+                    <span className="text-slate-300 ml-auto">{d.value}</span>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : <span className="text-slate-600 text-xs mt-8">No span data</span>}
+        </div>
+
+        {/* Latency percentiles */}
+        <div className="bg-surface-800 border border-surface-600 rounded-xl p-4">
+          <div className="text-xs text-slate-400 uppercase tracking-wider mb-3">Latency Percentiles</div>
+          <div className="space-y-3">
+            {[['P50', lat?.p50], ['P95', lat?.p95], ['P99', lat?.p99]].map(([label, val]) => {
+              const pct = Math.min(100, (val / Math.max(lat?.p99 || 1, 1)) * 100);
+              return (
+                <div key={label}>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="text-slate-500">{label}</span>
+                    <span className="text-slate-200">{fmtMs(val)}</span>
+                  </div>
+                  <div className="h-1.5 bg-surface-600 rounded-full">
+                    <div className="h-1.5 bg-blue-500 rounded-full" style={{ width: `${pct}%`, transition: 'width 0.5s ease' }}></div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div className="mt-4 text-xs text-slate-500">
+            Reflection loops: <span className="text-yellow-300">{rl?.total_reflection_spans}</span> total /
+            <span className="text-yellow-300"> {rl?.avg_per_trace}</span> avg/trace
+          </div>
+        </div>
+      </div>
+
+      {/* Token cost heatmap */}
+      {costBarData.length > 0 && (
+        <div className="bg-surface-800 border border-surface-600 rounded-xl p-4">
+          <div className="text-xs text-slate-400 uppercase tracking-wider mb-3">Token Cost Heatmap (USD per Agent)</div>
+          <div className="flex gap-8 items-end">
+            <BarChart data={costBarData} height={80} labelKey="label" valueKey="value" color="#f59e0b" />
+            <div className="space-y-1 min-w-0">
+              {costEntries.map(([agent, cost]) => (
+                <div key={agent} className="flex justify-between gap-4 text-xs">
+                  <span className="text-slate-400 truncate">{agent}</span>
+                  <span className="text-amber-300 font-mono shrink-0">${cost.toFixed(6)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Token usage by agent */}
+      {tokenBarData.length > 0 && (
+        <div className="bg-surface-800 border border-surface-600 rounded-xl p-4">
+          <div className="text-xs text-slate-400 uppercase tracking-wider mb-3">Token Usage by Agent</div>
+          <BarChart data={tokenBarData} height={80} labelKey="label" valueKey="value" color="#6366f1" />
+        </div>
+      )}
+
+      {/* Recent traces table */}
+      {recent_traces?.length > 0 && (
+        <div className="bg-surface-800 border border-surface-600 rounded-xl p-4">
+          <div className="text-xs text-slate-400 uppercase tracking-wider mb-3">Recent Traces</div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="text-slate-500 border-b border-surface-600">
+                  <th className="text-left pb-2 pr-4">Trace ID</th>
+                  <th className="text-left pb-2 pr-4">Agent</th>
+                  <th className="text-left pb-2 pr-4">Started</th>
+                  <th className="text-right pb-2 pr-4">Duration</th>
+                  <th className="text-left pb-2">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recent_traces.map(t => (
+                  <tr key={t.trace_id} className="border-b border-surface-700/50 hover:bg-surface-700/30">
+                    <td className="py-1.5 pr-4 font-mono text-slate-400">{shortId(t.trace_id)}</td>
+                    <td className="py-1.5 pr-4 text-violet-300">{t.agent_name}</td>
+                    <td className="py-1.5 pr-4 text-slate-500">{timeAgo(t.started_at)}</td>
+                    <td className="py-1.5 pr-4 text-right text-slate-300">{fmtMs(t.duration_ms)}</td>
+                    <td className="py-1.5">
+                      {t.has_error
+                        ? <span className="text-red-400">✗ Error</span>
+                        : <span className="text-emerald-400">✓ OK</span>
+                      }
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
+// Tab 4: Digital Twin Bridge
+// ──────────────────────────────────────────────────────────────
+function DigitalTwinTab() {
+  const [wsUrl, setWsUrl]       = useState('ws://omniverse-kit:8211/ws');
+  const [wsStatus, setWsStatus] = useState('disconnected');
+  const [wsLog, setWsLog]       = useState([]);
+  const wsRef = useRef(null);
+  const canvasRef = useRef(null);
+  const animRef   = useRef(null);
+
+  // ── Mock 3-D: animated station dots on a canvas ────────────
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const stations = Array.from({ length: 8 }, (_, i) => ({
+      x: 60 + i * 80, y: 100 + Math.sin(i) * 40,
+      r: 14, load: 0.3 + Math.random() * 0.7,
+      phase: Math.random() * Math.PI * 2,
+    }));
+
+    function draw(t) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#0d0f14';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Connection lines
+      ctx.strokeStyle = '#1a1f2c';
+      ctx.lineWidth   = 2;
+      for (let i = 0; i < stations.length - 1; i++) {
+        ctx.beginPath();
+        ctx.moveTo(stations[i].x, stations[i].y);
+        ctx.lineTo(stations[i + 1].x, stations[i + 1].y);
+        ctx.stroke();
+      }
+
+      // Station nodes
+      stations.forEach((s, i) => {
+        const pulse  = 0.5 + 0.5 * Math.sin(t / 800 + s.phase);
+        const load   = s.load;
+        const r2     = s.r + pulse * 6;
+        const hue    = (1 - load) * 120;  // green→red
+
+        // Glow
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, r2, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${hue},80%,40%,${0.15 * pulse})`;
+        ctx.fill();
+
+        // Body
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `hsl(${hue},70%,35%)`;
+        ctx.fill();
+        ctx.strokeStyle = `hsl(${hue},80%,60%)`;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Load bar
+        ctx.fillStyle = '#1a1f2c';
+        ctx.fillRect(s.x - 14, s.y + s.r + 4, 28, 4);
+        ctx.fillStyle = `hsl(${hue},80%,55%)`;
+        ctx.fillRect(s.x - 14, s.y + s.r + 4, 28 * load, 4);
+
+        // Label
+        ctx.fillStyle = '#94a3b8';
+        ctx.font      = '9px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(`S${i + 1}`, s.x, s.y + s.r + 16);
+
+        // Animate load
+        s.load = Math.max(0.1, Math.min(1, s.load + (Math.random() - 0.5) * 0.05));
+      });
+
+      // Throughput label
+      const totalLoad = stations.reduce((a, s) => a + s.load, 0) / stations.length;
+      ctx.fillStyle = '#475569';
+      ctx.font      = '11px monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText(`Avg Load: ${Math.round(totalLoad * 100)}%`, 10, 20);
+      ctx.fillText(`Lines: ${stations.length}`, 10, 36);
+
+      animRef.current = requestAnimationFrame(draw);
+    }
+
+    animRef.current = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(animRef.current);
+  }, []);
+
+  // ── WebSocket bridge ────────────────────────────────────────
+  function connectWs() {
+    if (wsRef.current) wsRef.current.close();
+    try {
+      const ws = new WebSocket(wsUrl);
+      wsRef.current = ws;
+      setWsStatus('connecting');
+      ws.onopen    = () => { setWsStatus('connected'); logWs('Connected to ' + wsUrl); };
+      ws.onclose   = () => { setWsStatus('disconnected'); logWs('Disconnected'); };
+      ws.onerror   = () => { setWsStatus('error'); logWs('Connection error'); };
+      ws.onmessage = (e) => logWs('← ' + String(e.data).slice(0, 200));
+    } catch (err) {
+      setWsStatus('error');
+      logWs('Error: ' + err.message);
+    }
+  }
+
+  function sendTestMsg() {
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      const msg = JSON.stringify({
+        type: 'simulation_trigger',
+        payload: { agent: 'SimulationAgent', timestamp: new Date().toISOString() },
+      });
+      wsRef.current.send(msg);
+      logWs('→ ' + msg);
+    }
+  }
+
+  function logWs(msg) {
+    setWsLog(prev => [...prev.slice(-50), `[${new Date().toTimeString().slice(0, 8)}] ${msg}`]);
+  }
+
+  const wsStatusColor = { connected: 'text-emerald-400', connecting: 'text-yellow-400 blink',
+    disconnected: 'text-slate-500', error: 'text-red-400' }[wsStatus];
+
+  return (
+    <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-sm font-semibold tracking-wider uppercase text-slate-300">Digital Twin Bridge</h2>
+        <span className="text-xs text-slate-600 bg-surface-700 rounded px-2 py-1">NVIDIA Omniverse / USD Integration</span>
+      </div>
+
+      {/* 3D viewport mock */}
+      <div className="bg-surface-800 border border-surface-600 rounded-xl overflow-hidden">
+        <div className="flex items-center justify-between px-3 py-2 border-b border-surface-600">
+          <span className="text-xs text-slate-400 uppercase tracking-wider">Manufacturing Line — Live Simulation View</span>
+          <div className="flex items-center gap-2 text-xs">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 blink"></span>
+            <span className="text-emerald-400">SIMULATING</span>
+          </div>
+        </div>
+        <canvas ref={canvasRef} width={720} height={180} className="w-full" style={{ imageRendering: 'auto' }} />
+      </div>
+
+      {/* WebSocket bridge controls / documentation */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Connection panel */}
+        <div className="bg-surface-800 border border-surface-600 rounded-xl p-4 space-y-3">
+          <div className="text-xs text-slate-400 uppercase tracking-wider">Omniverse Kit WebSocket Bridge</div>
+          <div className="flex gap-2">
+            <input
+              className="flex-1 bg-surface-700 border border-surface-500 rounded px-2 py-1.5 text-xs focus:outline-none focus:border-brand font-mono"
+              value={wsUrl} onChange={e => setWsUrl(e.target.value)}
+            />
+          </div>
+          <div className="flex gap-2">
+            <button onClick={connectWs}
+              className="flex-1 bg-brand hover:bg-brand-dark text-xs rounded-lg py-2 transition-colors">
+              Connect
+            </button>
+            <button onClick={sendTestMsg} disabled={wsStatus !== 'connected'}
+              className="flex-1 bg-surface-600 hover:bg-surface-500 disabled:opacity-40 text-xs rounded-lg py-2 transition-colors">
+              Send Trigger
+            </button>
+          </div>
+          <div className="flex items-center gap-2 text-xs">
+            <div className={`w-2 h-2 rounded-full ${wsStatus === 'connected' ? 'bg-emerald-400' : wsStatus === 'connecting' ? 'bg-yellow-400' : wsStatus === 'error' ? 'bg-red-400' : 'bg-slate-600'}`}></div>
+            <span className={wsStatusColor}>{wsStatus.toUpperCase()}</span>
+          </div>
+          <div className="bg-surface-900 rounded-lg p-2 h-28 overflow-y-auto font-mono text-xs text-slate-400 space-y-0.5">
+            {wsLog.length === 0 && <span className="text-slate-600">— no messages —</span>}
+            {wsLog.map((l, i) => <div key={i}>{l}</div>)}
+          </div>
+        </div>
+
+        {/* Interface documentation */}
+        <div className="bg-surface-800 border border-surface-600 rounded-xl p-4 space-y-3">
+          <div className="text-xs text-slate-400 uppercase tracking-wider">Interface Specification</div>
+          <div className="space-y-3 text-xs">
+            <div>
+              <div className="text-slate-300 font-semibold mb-1">Agent → Digital Twin (WebSocket)</div>
+              <pre className="bg-surface-900 rounded p-2 text-slate-400 overflow-x-auto">{`{
+  "type": "simulation_trigger",
+  "payload": {
+    "model_id": "SQT-K860G6-BASY",
+    "cycle_time_tmu": 480,
+    "num_operators": 4,
+    "machine_rate_usd": 250.0,
+    "results": { "throughput_uph": 3600 }
+  }
+}`}</pre>
+            </div>
+            <div>
+              <div className="text-slate-300 font-semibold mb-1">Digital Twin → Agent (MQTT / WS)</div>
+              <pre className="bg-surface-900 rounded p-2 text-slate-400 overflow-x-auto">{`{
+  "type": "twin_state_update",
+  "topic": "mva/dt/manufacturing_line",
+  "payload": {
+    "station_loads": [0.7, 0.5, 0.9, 0.6],
+    "bottleneck_index": 2,
+    "usd_scene_path": "/World/ManufLine"
+  }
+}`}</pre>
+            </div>
+            <div className="text-slate-600">
+              MQTT broker: <code className="text-slate-400">mqtt://omniverse-mqtt:1883</code><br />
+              USD live sync: <code className="text-slate-400">omni.client.live</code> nucleus extension<br />
+              Kit API: <code className="text-slate-400">POST /kit/commands/execute</code>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
+// Emergency Alert Overlay — shown on EMERGENCY_PROPOSAL SSE event
+// ──────────────────────────────────────────────────────────────
+function EmergencyAlertOverlay({ alerts, onDismiss }) {
+  const [activeIdx, setActiveIdx] = useState(0);
+  const [loading, setLoading] = useState(null);  // 'approve' | 'reject'
+  const [actionError, setActionError] = useState('');
+
+  if (!alerts || alerts.length === 0) return null;
+
+  const alert = alerts[Math.min(activeIdx, alerts.length - 1)];
+
+  async function handleDecision(type) {
+    setLoading(type);
+    setActionError('');
+    const path = `/api/v1/watchdog/proposals/${encodeURIComponent(alert.proposal_id)}/${type}`;
+    try {
+      const res = await apiFetch(path, { method: 'POST' });
+      const d   = await res.json();
+      if (!res.ok) throw new Error(d.detail || 'Request failed');
+      onDismiss(alert.proposal_id);
+      setActiveIdx(0);
+    } catch (err) {
+      setActionError(err.message);
+    } finally {
+      setLoading(null);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-8 px-4"
+         style={{ background: 'rgba(0,0,0,0.75)' }}>
+      {/* Backdrop click dismisses */}
+      <div className="absolute inset-0" onClick={() => onDismiss(alert.proposal_id)} />
+
+      <div className="relative w-full max-w-2xl bg-surface-800 rounded-2xl border-2 border-red-500 emergency-flash slide-down overflow-hidden">
+        {/* Header banner */}
+        <div className="flex items-center justify-between px-5 py-3 bg-red-900/60 border-b border-red-500/50">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl blink">🚨</span>
+            <div>
+              <div className="text-sm font-extrabold tracking-widest text-red-200 uppercase">
+                Autonomous Swarm Alert — Emergency Proposal
+              </div>
+              <div className="text-xs text-red-400 font-mono mt-0.5">
+                {alert.machine_id} · {alert.anomaly_type} · yield {alert.current_value?.toFixed(1)}%
+                &nbsp;(threshold {alert.threshold?.toFixed(0)}%)
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            {alerts.length > 1 && (
+              <div className="flex gap-1">
+                {alerts.map((_, i) => (
+                  <button key={i} onClick={() => setActiveIdx(i)}
+                    className={`w-2 h-2 rounded-full transition-colors ${i === activeIdx ? 'bg-red-400' : 'bg-surface-500 hover:bg-red-600'}`} />
+                ))}
+              </div>
+            )}
+            <button onClick={() => onDismiss(alert.proposal_id)}
+              className="text-red-400 hover:text-red-200 text-lg leading-none px-1">✕</button>
+          </div>
+        </div>
+
+        <div className="p-5 space-y-4 max-h-[70vh] overflow-y-auto">
+          {/* Confidence + session */}
+          <div className="flex items-center gap-4 text-xs">
+            <span className="bg-red-900/40 text-red-300 border border-red-500/30 rounded px-2 py-1 font-semibold">
+              ⚑ PENDING APPROVAL
+            </span>
+            <span className="text-slate-500">Confidence:
+              <span className="text-emerald-400 font-bold ml-1">
+                {alert.confidence_score != null ? (alert.confidence_score * 100).toFixed(0) + '%' : '—'}
+              </span>
+            </span>
+            <span className="text-slate-600 font-mono">
+              session: {alert.session_id ? alert.session_id.slice(9, 17) : '—'}
+            </span>
+          </div>
+
+          {/* Swarm summary */}
+          <div className="bg-surface-900 rounded-xl p-4 border border-surface-600">
+            <div className="text-xs text-slate-400 uppercase tracking-wider mb-2">Swarm Consensus Summary</div>
+            <p className="text-sm text-slate-200 leading-relaxed">{alert.summary}</p>
+          </div>
+
+          {/* Action items */}
+          {alert.action_items?.length > 0 && (
+            <div className="bg-surface-900 rounded-xl p-4 border border-surface-600">
+              <div className="text-xs text-slate-400 uppercase tracking-wider mb-2">Proposed Actions</div>
+              <ul className="space-y-1.5">
+                {alert.action_items.map((item, i) => (
+                  <li key={i} className="flex gap-2 text-sm text-slate-300">
+                    <span className="text-emerald-400 shrink-0">▸</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Trade-off resolution */}
+          {alert.trade_off_resolution && (
+            <div className="bg-surface-900 rounded-xl p-4 border border-surface-600">
+              <div className="text-xs text-slate-400 uppercase tracking-wider mb-2">Trade-off Resolution</div>
+              <p className="text-xs text-slate-400 leading-relaxed">{alert.trade_off_resolution}</p>
+            </div>
+          )}
+
+          {/* KPIs */}
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { label: 'Operators',    value: alert.num_operators },
+              { label: 'UPH',          value: alert.throughput_uph?.toFixed(1) },
+              { label: 'Cost/Unit',    value: alert.cost_per_unit_usd != null ? `$${alert.cost_per_unit_usd.toFixed(4)}` : '—' },
+            ].map(kpi => (
+              <div key={kpi.label} className="bg-surface-700 rounded-lg p-3 text-center">
+                <div className="text-lg font-bold text-brand-light">{kpi.value ?? '—'}</div>
+                <div className="text-xs text-slate-500">{kpi.label}</div>
+              </div>
+            ))}
+          </div>
+
+          {actionError && (
+            <div className="text-xs text-red-400 bg-red-900/20 rounded px-3 py-2">{actionError}</div>
+          )}
+
+          {/* One-click Approve / Reject */}
+          <div className="flex gap-3 pt-1">
+            <button onClick={() => handleDecision('approve')} disabled={!!loading}
+              className="flex-1 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 rounded-xl py-3 text-sm font-extrabold tracking-wider transition-colors">
+              {loading === 'approve' ? '…' : '✓ Approve & Execute'}
+            </button>
+            <button onClick={() => handleDecision('reject')} disabled={!!loading}
+              className="flex-1 bg-red-700 hover:bg-red-600 disabled:opacity-50 rounded-xl py-3 text-sm font-extrabold tracking-wider transition-colors">
+              {loading === 'reject' ? '…' : '✗ Reject'}
+            </button>
+          </div>
+
+          <p className="text-center text-xs text-slate-600">
+            Autonomous analysis by IoT Watchdog Swarm · no human prompt was issued
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
+// Main App
+// ──────────────────────────────────────────────────────────────
+function App() {
+  const [user, setUser]         = useState(() => {
+    const t = localStorage.getItem('mva_token');
+    if (!t) return null;
+    try {
+      const payload = JSON.parse(atob(t.split('.')[1]));
+      if (payload.exp && payload.exp * 1000 < Date.now()) {
+        localStorage.removeItem('mva_token');
+        return null;
+      }
+      return payload;
+    } catch { return null; }
+  });
+  const [activeTab, setActiveTab] = useState('stream');
+
+  // ── Emergency Proposal state ────────────────────────────────
+  const [emergencyAlerts, setEmergencyAlerts] = useState([]);
+  const emergencyEsRef = useRef(null);
+
+  // Subscribe to the Watchdog emergency SSE stream when a user logs in.
+  useEffect(() => {
+    if (!user) {
+      if (emergencyEsRef.current) {
+        emergencyEsRef.current.close();
+        emergencyEsRef.current = null;
+      }
+      return;
+    }
+    const token = localStorage.getItem('mva_token') || '';
+    const url   = `${API_BASE}/api/v1/watchdog/stream?token=${encodeURIComponent(token)}`;
+    const es    = new EventSource(url);
+    emergencyEsRef.current = es;
+
+    es.addEventListener('EMERGENCY_PROPOSAL', (e) => {
+      try {
+        const proposal = JSON.parse(e.data);
+        setEmergencyAlerts(prev => {
+          // De-duplicate: don't add the same proposal_id twice.
+          if (prev.some(p => p.proposal_id === proposal.proposal_id)) return prev;
+          return [...prev, proposal];
+        });
+      } catch {}
+    });
+
+    es.onerror = () => {
+      // Reconnect handled automatically by the browser EventSource API.
+    };
+
+    return () => {
+      es.close();
+      emergencyEsRef.current = null;
+    };
+  }, [user]);
+
+  function dismissEmergencyAlert(proposalId) {
+    setEmergencyAlerts(prev => prev.filter(p => p.proposal_id !== proposalId));
+  }
+
+  function handleLogin(data) {
+    try {
+      const payload = JSON.parse(atob(data.access_token.split('.')[1]));
+      setUser(payload);
+    } catch { setUser({ sub: 'operator' }); }
+  }
+
+  function handleLogout() {
+    localStorage.removeItem('mva_token');
+    setUser(null);
+  }
+
+  if (!user) return <LoginPage onLogin={handleLogin} />;
+
+  return (
+    <div className="flex flex-col h-screen overflow-hidden">
+      {/* Emergency overlay is rendered above everything else */}
+      <EmergencyAlertOverlay
+        alerts={emergencyAlerts}
+        onDismiss={dismissEmergencyAlert}
+      />
+      {/* Persistent top-bar badge when alerts are present but overlay is dismissed */}
+      {emergencyAlerts.length > 0 && (
+        <div
+          className="fixed top-0 right-0 z-40 m-2 cursor-pointer"
+          onClick={() => {/* re-open handled by overlay presence */}}
+        >
+          <span className="flex items-center gap-1 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg blink">
+            🚨 {emergencyAlerts.length} Emergency
+          </span>
+        </div>
+      )}
+      <TopNav user={user} onLogout={handleLogout} activeTab={activeTab} setActiveTab={setActiveTab} />
+      <main className="flex-1 overflow-hidden flex flex-col">
+        {activeTab === 'stream' && <ThoughtStreamTab />}
+        {activeTab === 'action' && <ActionCenterTab />}
+        {activeTab === 'health' && <SystemHealthTab />}
+        {activeTab === 'twin'   && <DigitalTwinTab />}
+      </main>
+    </div>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
+// Mount
+// ──────────────────────────────────────────────────────────────
+const container = document.getElementById('root');
+const root = ReactDOM.createRoot(container);
+root.render(<App />);
+</script>
+</body>
+</html>
