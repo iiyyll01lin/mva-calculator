@@ -1,0 +1,102 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# ────────────────────────────────────────────────────────────────────────────
+# Project metadata
+# ────────────────────────────────────────────────────────────────────────────
+
+[project]
+name = "cyberswarm"
+version = "0.1.0"
+description = "Generic multi-agent swarm debate & cryptographic provenance framework for Cyber-Physical AI systems"
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.11"
+keywords = ["agents", "swarm", "debate", "cryptography", "llm", "multi-agent", "cyber-physical"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Typing :: Typed",
+]
+
+# Core dependencies kept intentionally minimal — only pure-Python and
+# the cryptography library (wheels available on every major platform).
+dependencies = [
+    "pydantic>=2.0",
+    "cryptography>=41.0",
+]
+
+# ────────────────────────────────────────────────────────────────────────────
+# Optional extras — install only what you use
+# ────────────────────────────────────────────────────────────────────────────
+
+[project.optional-dependencies]
+# HTTP client — required for the built-in Langfuse telemetry backend
+http   = ["httpx>=0.27"]
+
+# Storage backends for the AuditLog plugin system
+redis    = ["redis>=5.0"]
+s3       = ["boto3>=1.34"]
+postgres = ["asyncpg>=0.29"]
+
+# OpenTelemetry OTLP span exporter
+otel = [
+    "opentelemetry-sdk>=1.24",
+    "opentelemetry-exporter-otlp-proto-grpc>=1.24",
+]
+
+# Batteries-included install (http + otel)
+all = ["cyberswarm[http,otel]"]
+
+# Development toolchain
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "hatch",
+    "ruff",
+    "mypy",
+]
+
+[project.urls]
+"Source"       = "https://github.com/iiyyll01lin/cyberswarm"
+"Bug Tracker"  = "https://github.com/iiyyll01lin/cyberswarm/issues"
+"Changelog"    = "https://github.com/iiyyll01lin/cyberswarm/blob/main/CHANGELOG.md"
+
+# ────────────────────────────────────────────────────────────────────────────
+# Hatch environments
+# ────────────────────────────────────────────────────────────────────────────
+
+[tool.hatch.envs.default]
+features = ["dev", "http"]
+
+[tool.hatch.envs.default.scripts]
+test     = "pytest tests/ -v"
+lint     = "ruff check cyberswarm/ tests/"
+typecheck = "mypy cyberswarm/ --strict"
+
+[tool.hatch.build.targets.sdist]
+include = ["/cyberswarm", "/tests", "/examples", "README.md", "LICENSE"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["cyberswarm"]
+
+# ────────────────────────────────────────────────────────────────────────────
+# Tool configuration
+# ────────────────────────────────────────────────────────────────────────────
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
