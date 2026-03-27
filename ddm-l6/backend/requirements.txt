@@ -4,3 +4,20 @@ pydantic==2.5.2
 python-jose[cryptography]==3.3.0
 PyJWT==2.8.0
 python-multipart==0.0.6
+
+# ── LLMOps Telemetry ─────────────────────────────────────────────────────────
+# Required for Langfuse emission backend (async HTTP client)
+httpx>=0.27.0
+
+# ── Stateful Agent Memory Layer ───────────────────────────────────────────────
+# FileMemoryStore uses only stdlib; RedisMemoryStore requires the optional dep:
+# redis[asyncio]>=5.0.0
+
+# ── Testing ───────────────────────────────────────────────────────────────────
+pytest>=7.4.0
+pytest-asyncio>=0.23.0
+
+# Optional: OpenTelemetry OTLP export (install to enable OTEL tracing)
+# opentelemetry-api>=1.24.0
+# opentelemetry-sdk>=1.24.0
+# opentelemetry-exporter-otlp-proto-grpc>=1.24.0
