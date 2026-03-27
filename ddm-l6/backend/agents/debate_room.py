@@ -36,6 +36,7 @@ Design principles
 from __future__ import annotations
 
 import asyncio
+import functools
 import json
 import logging
 import uuid
@@ -46,6 +47,7 @@ from pydantic import BaseModel, Field
 
 from telemetry import LlmUsage, agent_span, estimate_tokens
 from llm_client import ChatMessage, LlmCallResult, call_llm
+from memory.alignment_store import build_system_prompt
 
 # TemporalAnalyst is imported lazily inside coroutines to avoid circular imports
 # (agents/temporal_analyst.py → tools/temporal_rag.py → data_ops/agentic_etl.py)
@@ -154,7 +156,7 @@ class DebateSession(BaseModel):
 # System Prompts
 # ────────────────────────────────────────────────────────────────────────────
 
-_COST_SYSTEM_PROMPT = """\
+_COST_BASE_PROMPT = """\
 You are CostOptimizationAgent — a ruthlessly cost-focused industrial engineering analyst.
 Your sole objective is to minimize total manufacturing cost per unit and headcount.
 You do NOT consider throughput or quality unless they directly affect unit cost.
@@ -178,7 +180,7 @@ Always output a valid JSON object matching this schema exactly:
 Respond with raw JSON only — no markdown fences, no extra text.\
 """
 
-_QUALITY_SYSTEM_PROMPT = """\
+_QUALITY_BASE_PROMPT = """\
 You are QualityAndTimeAgent — a throughput and quality champion.
 Your sole objective is to maximize UPH and minimize defect rate / cycle time.
 You do NOT heavily weigh cost unless it creates a hard budget constraint.
@@ -208,7 +210,7 @@ Output a valid JSON object matching this schema exactly:
 Respond with raw JSON only — no markdown fences, no extra text.\
 """
 
-_JUDGE_SYSTEM_PROMPT = """\
+_JUDGE_BASE_PROMPT = """\
 You are ConsensusJudgeAgent — an impartial industrial optimization architect.
 You receive Plan A (cost-optimized) and Plan B (quality/throughput-optimized).
 Your objective: synthesize a globally optimal plan that captures the best of both.
@@ -328,7 +330,7 @@ async def run_cost_agent(
 
         enriched_query = query + hist_context
         messages = [
-            ChatMessage(role="system", content=_COST_SYSTEM_PROMPT),
+            ChatMessage(role="system", content=build_system_prompt(DEBATE_AGENT_COST, _COST_BASE_PROMPT)),
             ChatMessage(role="user",   content=f"Manufacturing optimization query:\n{enriched_query}"),
         ]
         span.prompt = messages[-1].content
@@ -391,7 +393,7 @@ async def run_quality_agent(
         plan_a_json   = plan_a.model_dump_json(indent=2)
         context_block = f"Original query:\n{query}{hist_context}"
         messages = [
-            ChatMessage(role="system",    content=_QUALITY_SYSTEM_PROMPT),
+            ChatMessage(role="system",    content=build_system_prompt(DEBATE_AGENT_QUALITY, _QUALITY_BASE_PROMPT)),
             ChatMessage(role="user",      content=context_block),
             ChatMessage(role="assistant", content=f"Plan A (CostAgent):\n{plan_a_json}"),
             ChatMessage(role="user",      content="Critique Plan A and propose your counter-plan (Plan B)."),
@@ -461,7 +463,7 @@ async def run_consensus_judge(
             f"Plan B (Quality-Optimized):\n{plan_b.model_dump_json(indent=2)}"
         )
         messages = [
-            ChatMessage(role="system", content=_JUDGE_SYSTEM_PROMPT),
+            ChatMessage(role="system", content=build_system_prompt(DEBATE_AGENT_JUDGE, _JUDGE_BASE_PROMPT)),
             ChatMessage(role="user",   content=context),
         ]
         span.prompt = context

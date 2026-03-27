@@ -3801,6 +3801,25 @@ class RejectActionRequest(BaseModel):
         min_length=32,
         max_length=64,
     )
+    correction_directive: Optional[str] = Field(
+        default=None,
+        description=(
+            "Optional free-text rule the expert wants to inject into the "
+            "agent's future system prompts (e.g. 'Never slow down Machine 3 "
+            "during peak hours — route overflow to Machine 2 instead')."
+        ),
+        max_length=2000,
+    )
+    agent_target: Optional[str] = Field(
+        default=None,
+        description=(
+            "Agent the correction targets: 'CostOptimizationAgent', "
+            "'QualityAndTimeAgent', 'ConsensusJudgeAgent', or 'GLOBAL'. "
+            "Defaults to 'GLOBAL' when correction_directive is provided "
+            "but agent_target is omitted."
+        ),
+        max_length=64,
+    )
 
 
 @app.post(
@@ -3849,11 +3868,181 @@ async def reject_agent_action(
         "HITL REJECTED action_id=%s session=%s by user=%s",
         request.action_id, session_id, current_user["user_id"],
     )
+
+    directive_id: Optional[str] = None
+    if request.correction_directive and request.correction_directive.strip():
+        from memory.alignment_store import get_alignment_store, CorrectionDirective
+        from telemetry import TamperEvidentAuditLog
+
+        target = (request.agent_target or "GLOBAL").strip()
+        directive = CorrectionDirective(
+            agent_target   = target,
+            directive_text = request.correction_directive.strip(),
+            author_id      = current_user["user_id"],
+        )
+        alignment_store = get_alignment_store()
+        if not alignment_store._initialized:
+            await alignment_store.initialize()
+        await alignment_store.add_directive(directive)
+        directive_id = directive.id
+
+        # Cryptographically sign and chain the alignment event so auditors
+        # know exactly who changed the AI's behaviour and when.
+        import asyncio as _asyncio_local
+        _asyncio_local.create_task(
+            TamperEvidentAuditLog.record(
+                event_type = "ALIGNMENT_DIRECTIVE_ADDED",
+                entity_id  = directive.id,
+                payload    = {
+                    "directive_id":    directive.id,
+                    "agent_target":    directive.agent_target,
+                    "directive_text":  directive.directive_text,
+                    "author_id":       directive.author_id,
+                    "timestamp":       directive.timestamp,
+                    "rejected_action": request.action_id,
+                    "session_id":      session_id,
+                },
+            )
+        )
+        logger.info(
+            "ALIGNMENT directive id=%s target=%s saved and chained by user=%s",
+            directive.id[:8], directive.agent_target, current_user["user_id"],
+        )
+
     return {
-        "status":     "rejected",
-        "session_id": session_id,
-        "action_id":  request.action_id,
-        "resolved_by": current_user["user_id"],
+        "status":        "rejected",
+        "session_id":    session_id,
+        "action_id":     request.action_id,
+        "resolved_by":   current_user["user_id"],
+        "directive_id":  directive_id,
+    }
+
+
+# ============================================
+# Alignment Knowledge Base — Admin Endpoints
+# ============================================
+
+@app.get(
+    "/api/v1/alignment/directives",
+    summary="List all alignment directives in the knowledge base",
+    tags=["Mission Control"],
+)
+async def list_alignment_directives(
+    current_user: dict = Depends(verify_token),
+):
+    """
+    Return all CorrectionDirectives ever recorded (active and deactivated).
+    Only Engineers and Managers may access this endpoint.
+    """
+    if current_user["role"] not in (UserRole.MANAGER, UserRole.ENGINEER):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only Engineers and Managers may view alignment directives.",
+        )
+    from memory.alignment_store import get_alignment_store
+    store = get_alignment_store()
+    if not store._initialized:
+        await store.initialize()
+    return {
+        "directives": [d.model_dump() for d in store.list_all()],
+        "count":      len(store.list_all()),
+    }
+
+
+@app.delete(
+    "/api/v1/alignment/directives/{directive_id}",
+    summary="Deactivate an alignment directive",
+    tags=["Mission Control"],
+)
+async def deactivate_alignment_directive(
+    directive_id: str,
+    current_user: dict = Depends(verify_token),
+):
+    """
+    Soft-delete a directive by marking it inactive.  The directive stays in
+    the audit chain; only is_active is set to False so it is no longer
+    injected into future agent prompts.  Only Managers may deactivate rules.
+    """
+    if current_user["role"] != UserRole.MANAGER:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only Managers may deactivate alignment directives.",
+        )
+    from memory.alignment_store import get_alignment_store
+    from telemetry import TamperEvidentAuditLog
+    store = get_alignment_store()
+    if not store._initialized:
+        await store.initialize()
+    directive = await store.deactivate(directive_id)
+    if directive is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Directive not found.")
+
+    import asyncio as _asyncio_local
+    _asyncio_local.create_task(
+        TamperEvidentAuditLog.record(
+            event_type = "ALIGNMENT_DIRECTIVE_DEACTIVATED",
+            entity_id  = directive.id,
+            payload    = {
+                "directive_id":   directive.id,
+                "agent_target":   directive.agent_target,
+                "directive_text": directive.directive_text,
+                "deactivated_by": current_user["user_id"],
+            },
+        )
+    )
+    return {"status": "deactivated", "directive_id": directive_id}
+
+
+@app.get(
+    "/api/v1/alignment/directives/active/{agent_name}",
+    summary="Preview directives currently injected for a specific agent",
+    tags=["Mission Control"],
+)
+async def get_active_directives_for_agent(
+    agent_name: str,
+    current_user: dict = Depends(verify_token),
+):
+    """
+    Return only the active directives that will be injected into *agent_name*'s
+    next system prompt.  Useful for debugging alignment behaviour.
+    """
+    if current_user["role"] not in (UserRole.MANAGER, UserRole.ENGINEER):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only Engineers and Managers may preview agent directives.",
+        )
+    from memory.alignment_store import get_alignment_store
+    store = get_alignment_store()
+    if not store._initialized:
+        await store.initialize()
+    active = store.list_active(agent_name)
+    return {
+        "agent_name": agent_name,
+        "directives": [d.model_dump() for d in active],
+        "count":      len(active),
+    }
+
+
+@app.get(
+    "/api/v1/alignment/cache/status",
+    summary="Inspect system-prompt cache version and hit/miss statistics",
+    tags=["Mission Control"],
+)
+async def get_alignment_cache_status(
+    current_user: dict = Depends(verify_token),
+):
+    """
+    Return the current LRU cache version and hit/miss info for build_system_prompt.
+    Bump signals that a new directive was added and the cache was invalidated.
+    """
+    from memory.alignment_store import get_cache_version, _cached_build
+    info = _cached_build.cache_info()
+    return {
+        "cache_version": get_cache_version(),
+        "lru_hits":      info.hits,
+        "lru_misses":    info.misses,
+        "lru_maxsize":   info.maxsize,
+        "lru_currsize":  info.currsize,
     }
 
 
@@ -4114,6 +4303,22 @@ async def _startup_iot_watchdog():
     """
     from events.iot_watchdog import start_watchdog
     await start_watchdog()
+
+
+@app.on_event("startup")
+async def _startup_alignment_store():
+    """
+    Pre-warm the AlignmentStore from its JSON persistence file.
+
+    Runs once at boot so the first build_system_prompt() call during a
+    Swarm Debate is guaranteed to hit the in-memory dict rather than
+    triggering a cold disk read mid-debate.
+    """
+    from memory.alignment_store import get_alignment_store
+    store = get_alignment_store()
+    await store.initialize()
+    import logging as _log
+    _log.getLogger(__name__).info("AlignmentStore pre-warmed at startup.")
 
 
 @app.on_event("shutdown")
