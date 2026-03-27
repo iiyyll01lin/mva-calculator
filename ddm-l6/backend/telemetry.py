@@ -743,6 +743,11 @@ class EmergencyProposal:
     created_at:           str               = field(
         default_factory=lambda: datetime.now(timezone.utc).isoformat()
     )
+    # SITL physics validation payload (Step 3 — Simulation-in-the-Loop).
+    # Populated by SimulationValidatorAgent before the proposal is broadcast.
+    # Contains SimulationReport fields: status, collision_risk_pct, collisions,
+    # predicted_throughput_uph, path_efficiency_pct, warnings, rtsp_preview_url.
+    simulation_report:       Optional[Dict[str, Any]] = None
     # Digital signature over the canonical JSON of the other fields.
     # Populated by broadcast_emergency_proposal() before fan-out.
     cryptographic_signature: Optional[str]  = None

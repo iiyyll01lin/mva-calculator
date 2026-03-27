@@ -1495,6 +1495,7 @@ function CyberPhysicalTab() {
   const [dispatch, setDispatch]     = useState([]);
   const [activeCamera, setActCamera] = useState(0);
   const [lastDispatch, setLastDispatch] = useState(null);
+  const [lastSimReport, setLastSimReport] = useState(null);
   const esRef = useRef(null);
 
   // Subscribe to VLM_ANOMALY SSE events from the backend
@@ -1534,6 +1535,13 @@ function CyberPhysicalTab() {
       try {
         const update = JSON.parse(e.data);
         setFleet(update.robots || []);
+      } catch {}
+    });
+
+    es.addEventListener('SIMULATION_REPORT', (e) => {
+      try {
+        const report = JSON.parse(e.data);
+        setLastSimReport(report);
       } catch {}
     });
 
@@ -1753,8 +1761,136 @@ function CyberPhysicalTab() {
   "signature": "<Ed25519-sig>"
 }`}</div>
           </div>
+
+          {/* ── SITL Simulation Preview ─────────────────────────────────── */}
+          <SimulationPreviewPanel simReport={lastSimReport} />
         </div>
       </div>
+    </div>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
+// Simulation Preview Panel — Cyber-Physical Operations tab
+// Displays the latest SITL physics validation result with a
+// mocked AGV path canvas and collision risk indicator.
+// ──────────────────────────────────────────────────────────────
+function SimulationPreviewPanel({ simReport }) {
+  const risk   = simReport?.collision_risk_pct ?? null;
+  const status = simReport?.status ?? null;
+
+  const riskColor = risk === null ? 'text-slate-500'
+    : risk === 0   ? 'text-emerald-400'
+    : risk < 15    ? 'text-yellow-400'
+    : 'text-red-400';
+
+  const statusBadge = status === 'SUCCESS'   ? 'bg-emerald-900/40 text-emerald-400 border-emerald-500/40'
+    : status === 'DEGRADED'  ? 'bg-yellow-900/40 text-yellow-400 border-yellow-500/40'
+    : status === 'COLLISION' ? 'bg-red-900/40 text-red-400 border-red-500/40'
+    : 'bg-surface-700 text-slate-500 border-surface-500';
+
+  return (
+    <div className="bg-surface-800 border border-surface-600 rounded-xl overflow-hidden">
+      <div className="flex items-center justify-between px-3 py-2 border-b border-surface-600">
+        <span className="text-xs text-slate-400 uppercase tracking-wider">🔬 SITL Simulation Preview</span>
+        {status && (
+          <span className={`text-xs font-bold border rounded px-2 py-0.5 ${statusBadge}`}>{status}</span>
+        )}
+      </div>
+
+      {/* Mocked 3-D AGV path canvas */}
+      <div className="p-3">
+        <svg viewBox="0 0 280 120" className="w-full rounded-lg bg-surface-900 border border-surface-700" style={{ height: 110 }}>
+          {/* Grid */}
+          {[0,1,2,3,4,5,6].map(i => (
+            <line key={`v${i}`} x1={i*40} y1="0" x2={i*40} y2="120" stroke="#1a1f2c" strokeWidth="1" />
+          ))}
+          {[0,1,2,3].map(i => (
+            <line key={`h${i}`} x1="0" y1={i*40} x2="280" y2={i*40} stroke="#1a1f2c" strokeWidth="1" />
+          ))}
+          {/* Obstacle boxes */}
+          <rect x="95" y="38" width="18" height="44" rx="2" fill="#3b1c1c" stroke="#dc2626" strokeWidth="1" opacity="0.8" />
+          <text x="104" y="63" textAnchor="middle" fontSize="6" fill="#ef4444">⬛</text>
+          <rect x="183" y="55" width="18" height="32" rx="2" fill="#3b1c1c" stroke="#dc2626" strokeWidth="1" opacity="0.8" />
+          {/* AGV predicted path */}
+          <path d="M 20,60 Q 80,55 140,60 Q 180,63 220,60 L 260,60"
+            stroke={risk !== null && risk > 15 ? '#ef4444' : '#22c55e'}
+            strokeWidth="2.5" fill="none" strokeDasharray={risk !== null && risk > 15 ? '5,3' : 'none'} />
+          {/* AGV icon */}
+          <circle cx="20" cy="60" r="8" fill="#1e3a5f" stroke="#3b82f6" strokeWidth="1.5" />
+          <text x="20" y="63" textAnchor="middle" fontSize="10">🚘</text>
+          {/* Destination */}
+          <circle cx="260" cy="60" r="6" fill="#14532d" stroke="#22c55e" strokeWidth="1.5" />
+          <text x="260" y="63" textAnchor="middle" fontSize="8">✓</text>
+          {/* Collision warning markers */}
+          {simReport?.collisions_detected?.map((col, i) => {
+            const tx = 40 + (i + 1) * 60;
+            return (
+              <g key={i}>
+                <circle cx={tx} cy="60" r="7" fill="#7f1d1d" stroke="#ef4444" strokeWidth="1.5" opacity="0.9" />
+                <text x={tx} y="63" textAnchor="middle" fontSize="9">💥</text>
+                <text x={tx} y="78" textAnchor="middle" fontSize="6" fill="#fca5a5">{col.robot_id}</text>
+              </g>
+            );
+          })}
+          {/* Engine label */}
+          <text x="274" y="115" textAnchor="end" fontSize="6" fill="#374151">
+            {simReport?.engine ?? 'KinematicMock'}
+          </text>
+        </svg>
+      </div>
+
+      {/* Metrics row */}
+      <div className="px-3 pb-3 grid grid-cols-3 gap-2">
+        <div className="bg-surface-700 rounded-lg p-2 text-center">
+          <div className={`text-base font-bold ${riskColor}`}>
+            {risk !== null ? `${risk.toFixed(0)}%` : '—'}
+          </div>
+          <div className="text-xs text-slate-500">Collision Risk</div>
+        </div>
+        <div className="bg-surface-700 rounded-lg p-2 text-center">
+          <div className="text-base font-bold text-brand-light">
+            {simReport?.predicted_throughput_uph != null
+              ? simReport.predicted_throughput_uph.toFixed(0)
+              : '—'}
+          </div>
+          <div className="text-xs text-slate-500">Pred. UPH</div>
+        </div>
+        <div className="bg-surface-700 rounded-lg p-2 text-center">
+          <div className="text-base font-bold text-violet-300">
+            {simReport?.path_efficiency_pct != null
+              ? `${simReport.path_efficiency_pct.toFixed(0)}%`
+              : '—'}
+          </div>
+          <div className="text-xs text-slate-500">Path Eff.</div>
+        </div>
+      </div>
+
+      {/* RTSP preview link */}
+      {simReport?.rtsp_preview_url && (
+        <div className="px-3 pb-3">
+          <div className="text-xs text-slate-500 truncate">
+            🎥 Preview: <span className="text-brand-light font-mono">{simReport.rtsp_preview_url}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Warnings */}
+      {simReport?.warnings?.length > 0 && (
+        <div className="px-3 pb-3 space-y-1">
+          {simReport.warnings.slice(0, 3).map((w, i) => (
+            <div key={i} className="text-xs text-yellow-400 bg-yellow-900/20 rounded px-2 py-1 truncate">
+              ⚠ {w}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {!simReport && (
+        <div className="px-3 pb-4 text-center text-xs text-slate-600">
+          Awaiting SITL validation result…
+        </div>
+      )}
     </div>
   );
 }
@@ -1902,6 +2038,111 @@ function EmergencyAlertOverlay({ alerts, onDismiss }) {
               </div>
             ))}
           </div>
+
+          {/* ── Simulation Preview (SITL) ────────────────────────────── */}
+          {alert.simulation_report && (() => {
+            const sim = alert.simulation_report;
+            const risk = sim.collision_risk_pct ?? 0;
+            const riskColor = risk === 0 ? 'text-emerald-400' : risk < 15 ? 'text-yellow-400' : 'text-red-400';
+            const statusBadge = sim.status === 'SUCCESS'
+              ? 'bg-emerald-900/40 text-emerald-400 border-emerald-500/40'
+              : sim.status === 'DEGRADED' ? 'bg-yellow-900/40 text-yellow-400 border-yellow-500/40'
+              : sim.status === 'COLLISION' ? 'bg-red-900/40 text-red-400 border-red-500/40'
+              : 'bg-surface-700 text-slate-400 border-surface-500';
+            return (
+              <div className="bg-surface-900 rounded-xl border border-surface-600 overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-2 border-b border-surface-600">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">🔬</span>
+                    <span className="text-xs text-slate-400 uppercase tracking-wider">Simulation Preview (SITL)</span>
+                  </div>
+                  <span className={`text-xs font-bold border rounded px-2 py-0.5 ${statusBadge}`}>{sim.status}</span>
+                </div>
+                <div className="p-4 space-y-3">
+                  {/* AGV path canvas */}
+                  <svg viewBox="0 0 340 90" className="w-full rounded bg-surface-800 border border-surface-700" style={{ height: 80 }}>
+                    {[0,1,2,3,4,5,6,7,8].map(i => (
+                      <line key={`v${i}`} x1={i*40} y1="0" x2={i*40} y2="90" stroke="#171c28" strokeWidth="1" />
+                    ))}
+                    {[0,1,2].map(i => (
+                      <line key={`h${i}`} x1="0" y1={i*45} x2="340" y2={i*45} stroke="#171c28" strokeWidth="1" />
+                    ))}
+                    <rect x="113" y="25" width="16" height="40" rx="2" fill="#3b1c1c" stroke="#dc2626" strokeWidth="1" opacity="0.7" />
+                    <rect x="217" y="30" width="16" height="30" rx="2" fill="#3b1c1c" stroke="#dc2626" strokeWidth="1" opacity="0.7" />
+                    <path d="M 20,45 Q 90,38 160,45 Q 220,50 300,45"
+                      stroke={risk > 15 ? '#ef4444' : '#22c55e'}
+                      strokeWidth="2" fill="none" strokeDasharray={risk > 15 ? '4,3' : 'none'} />
+                    <circle cx="20" cy="45" r="8" fill="#1e3a5f" stroke="#3b82f6" strokeWidth="1.5" />
+                    <text x="20" y="48" textAnchor="middle" fontSize="10">🚘</text>
+                    <circle cx="300" cy="45" r="6" fill="#14532d" stroke="#22c55e" strokeWidth="1.5" />
+                    <text x="300" y="48" textAnchor="middle" fontSize="8">✓</text>
+                    {sim.collisions_detected?.map((col, i) => {
+                      const tx = 70 + i * 80;
+                      return (
+                        <g key={i}>
+                          <circle cx={tx} cy="45" r="7" fill="#7f1d1d" stroke="#ef4444" strokeWidth="1.5" opacity="0.9" />
+                          <text x={tx} y="48" textAnchor="middle" fontSize="9">💥</text>
+                        </g>
+                      );
+                    })}
+                    <text x="332" y="86" textAnchor="end" fontSize="6" fill="#374151">{sim.engine ?? 'KinematicMock'}</text>
+                  </svg>
+
+                  {/* Risk + throughput row */}
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="bg-surface-800 rounded-lg p-2 text-center">
+                      <div className={`text-base font-bold ${riskColor}`}>
+                        Predicted Collision Risk: {risk.toFixed(0)}%
+                      </div>
+                      <div className="text-xs text-slate-500">Collision Risk</div>
+                    </div>
+                    <div className="bg-surface-800 rounded-lg p-2 text-center">
+                      <div className="text-base font-bold text-brand-light">
+                        {sim.predicted_throughput_uph?.toFixed(0) ?? '—'}
+                      </div>
+                      <div className="text-xs text-slate-500">Pred. UPH</div>
+                    </div>
+                    <div className="bg-surface-800 rounded-lg p-2 text-center">
+                      <div className="text-base font-bold text-violet-300">
+                        {sim.path_efficiency_pct != null ? `${sim.path_efficiency_pct.toFixed(0)}%` : '—'}
+                      </div>
+                      <div className="text-xs text-slate-500">Path Eff.</div>
+                    </div>
+                  </div>
+
+                  {/* Collision events */}
+                  {sim.collisions_detected?.length > 0 && (
+                    <div className="space-y-1">
+                      {sim.collisions_detected.map((col, i) => (
+                        <div key={i} className="flex items-center gap-2 text-xs bg-red-900/20 border border-red-500/30 rounded px-2 py-1">
+                          <span className="text-red-400 font-bold">⚠</span>
+                          <span className="text-red-300 font-mono">{col.robot_id}</span>
+                          <span className="text-red-400">→ {col.obstacle_label}</span>
+                          <span className="text-slate-500 ml-auto">t={col.collision_time_s?.toFixed(1)}s @ {col.relative_speed_ms?.toFixed(2)}m/s</span>
+                          <span className="text-red-500 font-semibold">{col.severity}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* RTSP stream */}
+                  {sim.rtsp_preview_url && (
+                    <div className="text-xs text-slate-500 truncate">
+                      🎥 Stream: <span className="text-brand-light font-mono">{sim.rtsp_preview_url}</span>
+                    </div>
+                  )}
+
+                  {/* Physics engine metadata */}
+                  <div className="flex gap-3 text-xs text-slate-600">
+                    <span>Engine: <span className="text-slate-400">{sim.engine}</span></span>
+                    <span>Cmds: <span className="text-slate-400">{sim.commands_simulated}</span></span>
+                    <span>Wall: <span className="text-slate-400">{sim.wall_time_ms?.toFixed(1)}ms</span></span>
+                    <span className="ml-auto text-emerald-600 text-xs">✓ Cryptographically signed</span>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
 
           {actionError && (
             <div className="text-xs text-red-400 bg-red-900/20 rounded px-3 py-2">{actionError}</div>
