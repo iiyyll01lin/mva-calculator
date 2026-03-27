@@ -3581,6 +3581,433 @@ async def get_project(project_id: str, current_user: dict = Depends(verify_token
     raise HTTPException(status_code=404, detail="Project not found")
 
 # ============================================
+# Agentic Workflow Endpoints (Stateful Multi-Turn)
+# ============================================
+
+from agent_router_poc import (
+    AuthContext as AgentAuthContext,
+    run_agent_workflow,
+    resume_after_approval,
+)
+
+
+class AgentQueryRequest(BaseModel):
+    """Request body for the stateful agent query endpoint."""
+    query:      str            = Field(..., min_length=1, max_length=4096,
+                                       description="Natural-language query for the agent.")
+    session_id: Optional[str] = Field(default=None,
+                                       description="Existing session UUID for multi-turn conversations. "
+                                                   "Omit to start a fresh session.")
+
+
+@app.post("/api/v1/agent/query")
+async def agent_query(
+    request:     AgentQueryRequest,
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    current_user: dict = Depends(verify_token),
+):
+    """
+    Stateful multi-turn agent endpoint.
+
+    Pass ``session_id`` from a previous response to continue the same
+    conversation.  Omit (or send ``null``) to start a new session.
+    The response always contains the ``session_id`` to use for the next turn.
+
+    When the agent encounters a SENSITIVE tool (e.g. ``run_simulation``),
+    the response will have ``status="PENDING_APPROVAL"`` and an ``action_id``.
+    Call ``POST /api/v1/agent/approve/{session_id}`` with that ``action_id``
+    to authorise execution.
+    """
+    auth = AgentAuthContext(
+        user_id   = current_user["user_id"],
+        role      = current_user["role"],
+        jwt_token = credentials.credentials,
+    )
+    result = await run_agent_workflow(
+        user_query = request.query,
+        auth       = auth,
+        session_id = request.session_id,
+    )
+    return result
+
+
+class ApproveActionRequest(BaseModel):
+    """Request body for the HITL approval endpoint."""
+    action_id: str = Field(
+        ...,
+        description="The action_id returned in the PENDING_APPROVAL response.",
+        min_length=32,
+        max_length=64,
+    )
+
+
+@app.post("/api/v1/agent/approve/{session_id}")
+async def approve_agent_action(
+    session_id:   str,
+    request:      ApproveActionRequest,
+    credentials:  HTTPAuthorizationCredentials = Depends(security),
+    current_user: dict = Depends(verify_token),
+):
+    """
+    Human-in-the-Loop (HITL) approval endpoint.
+
+    Validates ``action_id`` against the stored PendingAction for the given
+    session, runs ToolGuard pre-flight security checks, executes the approved
+    tool, and returns the result.
+
+    Only users with the ``Manager`` role or above may approve SENSITIVE actions.
+    A ``TOOL_APPROVED`` security audit event is emitted on success.
+    """
+    if current_user["role"] not in (UserRole.MANAGER, UserRole.ENGINEER):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only Engineers and Managers may approve agent actions.",
+        )
+
+    try:
+        result = await resume_after_approval(
+            session_id  = session_id,
+            action_id   = request.action_id,
+            approver_id = current_user["user_id"],
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        )
+    return result
+
+
+@app.delete("/api/v1/agent/session/{session_id}")
+async def delete_agent_session(
+    session_id:   str,
+    current_user: dict = Depends(verify_token),
+):
+    """Delete a stored agent session (GDPR / cleanup)."""
+    from memory_store import get_memory_store
+    store = get_memory_store()
+    await store.delete(session_id)
+    return {"status": "deleted", "session_id": session_id}
+
+
+# ============================================
+# Mission Control Dashboard — Agent Observability API
+# ============================================
+
+from fastapi.responses import StreamingResponse as _StreamingResponse
+import asyncio as _asyncio
+from collections import defaultdict as _defaultdict
+
+
+def _sse_verify_token(token: Optional[str] = None) -> dict:
+    """
+    Lightweight token check for SSE endpoints where the browser cannot set
+    Authorization headers.  Accepts the raw JWT via ``?token=`` query param.
+    Raises 401 on failure to prevent unauthenticated span exposure.
+    """
+    if not token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="token required")
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="token expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="token invalid")
+
+
+@app.get(
+    "/api/v1/agent/stream/{session_id}",
+    summary="SSE: real-time agent span stream for a session",
+    tags=["Mission Control"],
+)
+async def stream_agent_spans(
+    session_id: str,
+    token: Optional[str] = None,
+):
+    """
+    Server-Sent Events stream of :class:`AgentSpanRecord` objects for the
+    given ``session_id`` (== trace_id).
+
+    Because browsers cannot send custom ``Authorization`` headers with the
+    native ``EventSource`` API, authentication is performed via the ``?token=``
+    query parameter.
+
+    The stream first replays all spans currently in the ring buffer that belong
+    to ``session_id``, then pushes new spans in real-time as the agent runs.
+    A keep-alive ``: ping`` comment is sent every 30 s to prevent proxy timeouts.
+
+    Clients should handle ``event: done`` to detect end-of-session.
+    """
+    _sse_verify_token(token)
+
+    from telemetry import subscribe_to_trace, unsubscribe_from_trace, get_trace_spans
+
+    async def _event_generator():
+        # 1. Replay historical spans already in the buffer for this trace.
+        historical = get_trace_spans(session_id)
+        for span in historical:
+            yield f"data: {span.to_json()}\n\n"
+
+        # 2. Subscribe for live spans going forward.
+        queue = await subscribe_to_trace(session_id)
+        try:
+            while True:
+                try:
+                    span = await _asyncio.wait_for(queue.get(), timeout=30.0)
+                    yield f"data: {span.to_json()}\n\n"
+                except _asyncio.TimeoutError:
+                    # Keep-alive comment — prevents proxy / load-balancer timeout.
+                    yield ": ping\n\n"
+        except GeneratorExit:
+            pass
+        finally:
+            await unsubscribe_from_trace(session_id, queue)
+
+    return _StreamingResponse(
+        _event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control":    "no-cache",
+            "X-Accel-Buffering": "no",   # Disable nginx buffering for SSE
+        },
+    )
+
+
+@app.get(
+    "/api/v1/agent/pending",
+    summary="List all sessions with a PENDING HITL approval request",
+    tags=["Mission Control"],
+)
+async def list_pending_actions(
+    current_user: dict = Depends(verify_token),
+):
+    """
+    Return every session that currently has an unresolved HITL
+    ``PENDING_APPROVAL`` action.  The dashboard polls this endpoint to
+    populate the Action Center gallery.
+    """
+    from memory_store import get_memory_store
+    store = get_memory_store()
+    pending = await store.list_pending_actions()
+    return {"pending_actions": pending, "count": len(pending)}
+
+
+class RejectActionRequest(BaseModel):
+    """Request body for rejecting a HITL pending action."""
+    action_id: str = Field(
+        ...,
+        description="The action_id returned in the PENDING_APPROVAL response.",
+        min_length=32,
+        max_length=64,
+    )
+
+
+@app.post(
+    "/api/v1/agent/reject/{session_id}",
+    summary="Reject a HITL pending action for a session",
+    tags=["Mission Control"],
+)
+async def reject_agent_action(
+    session_id:   str,
+    request:      RejectActionRequest,
+    current_user: dict = Depends(verify_token),
+):
+    """
+    Mark a ``PENDING`` action as ``REJECTED`` without executing the tool.
+
+    Only Engineers and Managers may reject SENSITIVE actions.
+    A ``TOOL_REJECTED`` event is logged for audit purposes.
+    """
+    if current_user["role"] not in (UserRole.MANAGER, UserRole.ENGINEER):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only Engineers and Managers may reject agent actions.",
+        )
+
+    from memory_store import get_memory_store, PendingActionStatus
+    store = get_memory_store()
+    session_obj = await store.load(session_id)
+    if session_obj is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Session not found.")
+    if session_obj.pending_action is None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No pending action for this session.")
+    if session_obj.pending_action.action_id != request.action_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="action_id mismatch.")
+    if session_obj.pending_action.status != PendingActionStatus.PENDING:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Action is already in state: {session_obj.pending_action.status}",
+        )
+
+    session_obj.pending_action.status   = PendingActionStatus.REJECTED
+    session_obj.pending_action.resolved_at = datetime.now(timezone.utc)
+    session_obj.pending_action.resolved_by = current_user["user_id"]
+    await store.save(session_obj)
+
+    logger.info(
+        "HITL REJECTED action_id=%s session=%s by user=%s",
+        request.action_id, session_id, current_user["user_id"],
+    )
+    return {
+        "status":     "rejected",
+        "session_id": session_id,
+        "action_id":  request.action_id,
+        "resolved_by": current_user["user_id"],
+    }
+
+
+@app.get(
+    "/api/v1/agent/telemetry/metrics",
+    summary="Aggregated telemetry analytics from the span ring buffer",
+    tags=["Mission Control"],
+)
+async def get_telemetry_metrics(
+    limit: int = 500,
+    current_user: dict = Depends(verify_token),
+):
+    """
+    Compute and return aggregated runtime analytics from the in-memory span
+    ring buffer.  Powers the System Health dashboard panel.
+
+    Metrics returned:
+      - ``tool_execution``: success / failure counts and rate.
+      - ``token_cost_by_agent``: cumulative USD cost per agent type.
+      - ``reflection_loops``: average and total reflection spans.
+      - ``span_type_distribution``: counts per span_type tag.
+      - ``recent_traces``: lightweight metadata for the 20 most-recent traces.
+      - ``total_spans_buffered``: total span count currently in the buffer.
+    """
+    from telemetry import get_buffered_spans
+
+    spans = get_buffered_spans(limit=limit)
+
+    # ── Tool execution success / failure ────────────────────────────────────
+    tool_execs = [s for s in spans if s.span_type == "tool_exec"]
+    success_count = sum(1 for s in tool_execs if s.tool_success is True)
+    failure_count = sum(1 for s in tool_execs if s.tool_success is False)
+    total_tools   = success_count + failure_count
+
+    # ── Token cost grouped by agent ─────────────────────────────────────────
+    cost_by_agent: dict = _defaultdict(float)
+    tokens_by_agent: dict = _defaultdict(int)
+    for s in spans:
+        if s.token_usage:
+            cost_by_agent[s.agent_name]   += s.token_usage.get("estimated_cost_usd", 0.0)
+            tokens_by_agent[s.agent_name] += s.token_usage.get("total_tokens", 0)
+
+    # ── Reflection loops per trace ───────────────────────────────────────────
+    reflection_by_trace: dict = _defaultdict(int)
+    for s in spans:
+        if s.span_type == "reflection":
+            reflection_by_trace[s.trace_id] += 1
+
+    avg_reflections = (
+        sum(reflection_by_trace.values()) / len(reflection_by_trace)
+        if reflection_by_trace else 0.0
+    )
+
+    # ── Span type distribution ───────────────────────────────────────────────
+    span_type_counts: dict = _defaultdict(int)
+    for s in spans:
+        span_type_counts[s.span_type] += 1
+
+    # ── Duration percentiles ─────────────────────────────────────────────────
+    durations = sorted(s.duration_ms for s in spans)
+    p50 = durations[len(durations) // 2]         if durations else 0.0
+    p95 = durations[int(len(durations) * 0.95)]  if durations else 0.0
+    p99 = durations[int(len(durations) * 0.99)]  if durations else 0.0
+
+    # ── Recent 20 unique traces ──────────────────────────────────────────────
+    seen_traces: dict = {}
+    for s in reversed(spans):
+        if s.trace_id not in seen_traces:
+            seen_traces[s.trace_id] = {
+                "trace_id":   s.trace_id,
+                "agent_name": s.agent_name,
+                "started_at": s.started_at,
+                "duration_ms": s.duration_ms,
+                "has_error":  bool(s.error),
+            }
+        if len(seen_traces) >= 20:
+            break
+
+    return {
+        "tool_execution": {
+            "success_count": success_count,
+            "failure_count": failure_count,
+            "success_rate":  round(success_count / max(1, total_tools), 4),
+        },
+        "token_cost_by_agent":  {k: round(v, 8) for k, v in cost_by_agent.items()},
+        "tokens_by_agent":      dict(tokens_by_agent),
+        "reflection_loops": {
+            "avg_per_trace":         round(avg_reflections, 2),
+            "total_reflection_spans": span_type_counts.get("reflection", 0),
+            "traces_with_reflection": len(reflection_by_trace),
+        },
+        "span_type_distribution": dict(span_type_counts),
+        "latency_percentiles_ms": {"p50": p50, "p95": p95, "p99": p99},
+        "recent_traces":          list(seen_traces.values()),
+        "total_spans_buffered":   len(spans),
+    }
+
+
+@app.get(
+    "/api/v1/agent/session/{session_id}/replay",
+    summary="Fetch full reasoning trace for a past session (replay)",
+    tags=["Mission Control"],
+)
+async def replay_session(
+    session_id:   str,
+    current_user: dict = Depends(verify_token),
+):
+    """
+    Return the complete span trace and session metadata for ``session_id``.
+
+    The Thought Stream component uses this to re-visualise a past agent
+    reasoning run without reconnecting to a live SSE stream.
+
+    Spans are sourced from the in-memory ring buffer; they are available
+    for as long as the buffer has not been overwritten.  For permanent
+    storage configure ``MVA_TELEMETRY_LOG`` to persist spans to JSONL.
+    """
+    from telemetry import get_trace_spans
+    from memory_store import get_memory_store
+
+    spans   = get_trace_spans(session_id)
+    store   = get_memory_store()
+    session_obj = await store.load(session_id)
+
+    return {
+        "session_id":  session_id,
+        "span_count":  len(spans),
+        "spans":       [s.to_dict() for s in spans],
+        "session":     session_obj.model_dump(mode="json") if session_obj else None,
+    }
+
+
+@app.get(
+    "/api/v1/agent/sessions",
+    summary="List recent agent sessions (for replay picker)",
+    tags=["Mission Control"],
+)
+async def list_agent_sessions(
+    limit: int = 50,
+    current_user: dict = Depends(verify_token),
+):
+    """
+    Return lightweight metadata for the most-recent ``limit`` sessions.
+
+    Used by the dashboard's Session Replay panel to populate the session
+    picker dropdown.
+    """
+    from memory_store import get_memory_store
+    store = get_memory_store()
+    sessions = await store.list_sessions(limit=limit)
+    return {"sessions": sessions, "count": len(sessions)}
+
+
+# ============================================
 # Health Check
 # ============================================
 
@@ -3671,6 +4098,203 @@ async def export_database(current_user: dict = Depends(verify_token)):
     }
     
     return export_data
+
+
+# ============================================
+# IoT Watchdog — Background Task Lifecycle
+# ============================================
+
+@app.on_event("startup")
+async def _startup_iot_watchdog():
+    """
+    Start the IoT Watchdog background task when the FastAPI application boots.
+
+    The watchdog runs in the same asyncio event loop as the FastAPI server
+    (via asyncio.create_task) so it never spawns threads or extra processes.
+    """
+    from events.iot_watchdog import start_watchdog
+    await start_watchdog()
+
+
+@app.on_event("shutdown")
+async def _shutdown_iot_watchdog():
+    """
+    Gracefully cancel the watchdog background task on application shutdown.
+
+    Waits up to 5 seconds for the task to exit cleanly before returning, so
+    no CancelledError tracebacks leak into the log on SIGTERM/SIGINT.
+    """
+    from events.iot_watchdog import stop_watchdog
+    await stop_watchdog()
+
+
+# ============================================
+# Watchdog API — Status, Proposals, and Emergency SSE Stream
+# ============================================
+
+# In-memory proposal store: proposal_id → dict
+# Keyed here so the watchdog stream and HTTP endpoints share the same store.
+_emergency_proposals: dict = {}
+
+
+@app.get(
+    "/api/v1/watchdog/status",
+    summary="IoT Watchdog runtime status",
+    tags=["Watchdog"],
+)
+async def watchdog_status(current_user: dict = Depends(verify_token)):
+    """Return live status of the IoT Watchdog background task."""
+    from events.iot_watchdog import get_watchdog_status
+    return get_watchdog_status()
+
+
+@app.get(
+    "/api/v1/watchdog/proposals",
+    summary="List all unresolved Emergency Proposals",
+    tags=["Watchdog"],
+)
+async def list_emergency_proposals(current_user: dict = Depends(verify_token)):
+    """Return all PENDING_APPROVAL emergency proposals produced by the Watchdog."""
+    items = [
+        p for p in _emergency_proposals.values()
+        if p.get("status") == "PENDING_APPROVAL"
+    ]
+    return {"proposals": items, "count": len(items)}
+
+
+class _ProposalDecision(BaseModel):
+    proposal_id: str = Field(..., min_length=32, max_length=64)
+
+
+@app.post(
+    "/api/v1/watchdog/proposals/{proposal_id}/approve",
+    summary="Approve an Emergency Proposal (HITL one-click action)",
+    tags=["Watchdog"],
+)
+async def approve_emergency_proposal(
+    proposal_id:  str,
+    current_user: dict = Depends(verify_token),
+):
+    """
+    Mark an Emergency Proposal as APPROVED.
+
+    Only Engineers and Managers may approve emergency proposals.
+    A structured audit log entry is written on approval.
+    """
+    if current_user["role"] not in (UserRole.MANAGER, UserRole.ENGINEER):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only Engineers and Managers may approve emergency proposals.",
+        )
+    if proposal_id not in _emergency_proposals:
+        raise HTTPException(status_code=404, detail="Proposal not found.")
+
+    _emergency_proposals[proposal_id]["status"]      = "APPROVED"
+    _emergency_proposals[proposal_id]["resolved_by"] = current_user["user_id"]
+    _emergency_proposals[proposal_id]["resolved_at"] = datetime.now(timezone.utc).isoformat()
+
+    logger.info(
+        "EMERGENCY_PROPOSAL APPROVED proposal_id=%s by user=%s",
+        proposal_id[:8], current_user["user_id"],
+    )
+    return {
+        "status":      "approved",
+        "proposal_id": proposal_id,
+        "resolved_by": current_user["user_id"],
+    }
+
+
+@app.post(
+    "/api/v1/watchdog/proposals/{proposal_id}/reject",
+    summary="Reject an Emergency Proposal",
+    tags=["Watchdog"],
+)
+async def reject_emergency_proposal(
+    proposal_id:  str,
+    current_user: dict = Depends(verify_token),
+):
+    """Mark an Emergency Proposal as REJECTED."""
+    if current_user["role"] not in (UserRole.MANAGER, UserRole.ENGINEER):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only Engineers and Managers may reject emergency proposals.",
+        )
+    if proposal_id not in _emergency_proposals:
+        raise HTTPException(status_code=404, detail="Proposal not found.")
+
+    _emergency_proposals[proposal_id]["status"]      = "REJECTED"
+    _emergency_proposals[proposal_id]["resolved_by"] = current_user["user_id"]
+    _emergency_proposals[proposal_id]["resolved_at"] = datetime.now(timezone.utc).isoformat()
+
+    logger.info(
+        "EMERGENCY_PROPOSAL REJECTED proposal_id=%s by user=%s",
+        proposal_id[:8], current_user["user_id"],
+    )
+    return {
+        "status":      "rejected",
+        "proposal_id": proposal_id,
+        "resolved_by": current_user["user_id"],
+    }
+
+
+@app.get(
+    "/api/v1/watchdog/stream",
+    summary="SSE: real-time Emergency Proposal push stream",
+    tags=["Watchdog"],
+)
+async def stream_emergency_proposals(token: Optional[str] = None):
+    """
+    Server-Sent Events stream that pushes ``EMERGENCY_PROPOSAL`` events to all
+    connected Mission Control clients whenever the IoT Watchdog detects an
+    anomaly and the Swarm reaches consensus.
+
+    Unlike the per-session ``/agent/stream/{session_id}`` endpoint, this
+    stream is global — every connected dashboard client receives every
+    emergency proposal simultaneously.
+
+    Authentication via ``?token=`` query param (same as the span stream).
+
+    Event format::
+
+        event: EMERGENCY_PROPOSAL
+        data: <JSON-encoded EmergencyProposal>
+
+    Keep-alive ``": ping"`` comments are sent every 30 s to prevent proxy
+    / load-balancer timeouts.
+    """
+    _sse_verify_token(token)
+
+    from telemetry import subscribe_to_emergency, unsubscribe_from_emergency
+
+    async def _event_gen():
+        queue = await subscribe_to_emergency()
+        try:
+            while True:
+                try:
+                    proposal = await _asyncio.wait_for(queue.get(), timeout=30.0)
+                    # Persist to in-memory store so the proposals list endpoint
+                    # reflects the latest state.
+                    payload = proposal.to_dict()
+                    _emergency_proposals[proposal.proposal_id] = payload
+                    yield (
+                        f"event: EMERGENCY_PROPOSAL\n"
+                        f"data: {proposal.to_json()}\n\n"
+                    )
+                except _asyncio.TimeoutError:
+                    yield ": ping\n\n"
+        except GeneratorExit:
+            pass
+        finally:
+            await unsubscribe_from_emergency(queue)
+
+    return _StreamingResponse(
+        _event_gen(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control":     "no-cache",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 # ============================================
