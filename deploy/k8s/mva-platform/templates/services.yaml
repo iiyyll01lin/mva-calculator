@@ -1,0 +1,76 @@
+# =============================================================================
+# Services
+# =============================================================================
+
+# ── mva-api-server ClusterIP Service ─────────────────────────────────────────
+{{- if .Values.apiServer.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mva-platform.fullname" . }}-api
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "mva-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api-server
+  annotations:
+    # Topology-aware routing — prefer local-zone endpoints when available.
+    service.kubernetes.io/topology-mode: "Auto"
+spec:
+  type: {{ .Values.apiServer.service.type }}
+  selector:
+    {{- include "mva-platform.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: api-server
+  ports:
+    - name: http
+      port: {{ .Values.apiServer.service.port }}
+      targetPort: {{ .Values.apiServer.service.targetPort }}
+      protocol: TCP
+{{- end }}
+
+---
+
+# ── mva-watchdog-worker ClusterIP Service ────────────────────────────────────
+{{- if .Values.watchdogWorker.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mva-platform.fullname" . }}-watchdog
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "mva-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: watchdog-worker
+spec:
+  type: {{ .Values.watchdogWorker.service.type }}
+  selector:
+    {{- include "mva-platform.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: watchdog-worker
+  ports:
+    - name: http
+      port: {{ .Values.watchdogWorker.service.port }}
+      targetPort: {{ .Values.watchdogWorker.service.targetPort }}
+      protocol: TCP
+{{- end }}
+
+---
+
+# ── mva-mission-control ClusterIP Service ────────────────────────────────────
+{{- if .Values.missionControl.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mva-platform.fullname" . }}-mission-control
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "mva-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: mission-control
+spec:
+  type: {{ .Values.missionControl.service.type }}
+  selector:
+    {{- include "mva-platform.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: mission-control
+  ports:
+    - name: http
+      port: {{ .Values.missionControl.service.port }}
+      targetPort: {{ .Values.missionControl.service.targetPort }}
+      protocol: TCP
+{{- end }}

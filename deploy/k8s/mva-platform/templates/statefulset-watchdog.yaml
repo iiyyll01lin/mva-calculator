@@ -1,0 +1,154 @@
+# =============================================================================
+# mva-watchdog-worker  — IoT Event Listener
+# =============================================================================
+# Deployed as a StatefulSet to provide:
+#   1. Stable network identity (pod-0, pod-1) for leader-election via Redis lock.
+#   2. Ordered scale-down so pod-1 (standby) terminates before pod-0 (primary).
+#   3. Controlled rollout ensuring active stream processor is not disrupted.
+#
+# Leader election strategy (application-level):
+#   - Both pods attempt to acquire a Redis distributed lock on startup.
+#   - The lock holder processes the IoT stream.
+#   - The standby polls the lock with a 5-second interval and promotes itself
+#     if the lock expires (TTL 30 s) — providing ~30-second RTO.
+# =============================================================================
+{{- if .Values.watchdogWorker.enabled }}
+{{- $kind := .Values.watchdogWorker.kind | default "StatefulSet" }}
+apiVersion: apps/v1
+kind: {{ $kind }}
+metadata:
+  name: {{ include "mva-platform.fullname" . }}-watchdog
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "mva-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: watchdog-worker
+spec:
+  replicas: {{ .Values.watchdogWorker.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "mva-platform.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: watchdog-worker
+  {{- if eq $kind "StatefulSet" }}
+  serviceName: {{ include "mva-platform.fullname" . }}-watchdog-headless
+  podManagementPolicy: OrderedReady    # Ensures pod-0 starts before pod-1.
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0                     # Set partition=1 for canary upgrades.
+  {{- else }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 0
+  {{- end }}
+  template:
+    metadata:
+      labels:
+        {{- include "mva-platform.labels" . | nindent 8 }}
+        app.kubernetes.io/component: watchdog-worker
+    spec:
+      serviceAccountName: {{ include "mva-platform.serviceAccountName" . }}
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: {{ .Values.watchdogWorker.terminationGracePeriodSeconds }}
+
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- include "mva-platform.imagePullSecrets" $ | nindent 8 }}
+      {{- end }}
+
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+        seccompProfile:
+          type: RuntimeDefault
+
+      {{- with .Values.watchdogWorker.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.watchdogWorker.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      containers:
+        - name: watchdog-worker
+          image: "{{ .Values.watchdogWorker.image.repository }}:{{ include "mva-platform.imageTag" (dict "image" .Values.watchdogWorker.image "root" .) }}"
+          imagePullPolicy: {{ .Values.watchdogWorker.image.pullPolicy }}
+
+          {{- with .Values.watchdogWorker.command }}
+          command:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          lifecycle:
+            preStop:
+              exec:
+                # Allow the watchdog loop to emit a final FactoryStreamTick
+                # and release the Redis leader-election lock cleanly.
+                command: ["/bin/sh", "-c", "sleep 5"]
+
+          ports:
+            - name: http
+              containerPort: {{ .Values.watchdogWorker.service.targetPort }}
+              protocol: TCP
+
+          env:
+            # Expose ordinal index so pod-0 can self-identify as primary.
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            {{- toYaml .Values.watchdogWorker.env | nindent 12 }}
+            {{- include "mva-platform.secretEnvVars" .Values.watchdogWorker.secretEnv | nindent 12 }}
+
+          livenessProbe:
+            {{- toYaml .Values.watchdogWorker.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.watchdogWorker.readinessProbe | nindent 12 }}
+
+          resources:
+            {{- toYaml .Values.watchdogWorker.resources | nindent 12 }}
+
+          securityContext:
+            {{- toYaml .Values.watchdogWorker.securityContext | nindent 12 }}
+
+          volumeMounts:
+            - name: tmp-dir
+              mountPath: /tmp
+            {{- with .Values.watchdogWorker.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+
+      volumes:
+        - name: tmp-dir
+          emptyDir: {}
+        {{- with .Values.watchdogWorker.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+
+---
+# Headless Service — required for StatefulSet DNS (pod-0.mva-watchdog-headless).
+{{- if eq $kind "StatefulSet" }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mva-platform.fullname" . }}-watchdog-headless
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "mva-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: watchdog-worker
+spec:
+  clusterIP: None
+  selector:
+    {{- include "mva-platform.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: watchdog-worker
+  ports:
+    - name: http
+      port: {{ .Values.watchdogWorker.service.port }}
+      targetPort: {{ .Values.watchdogWorker.service.targetPort }}
+{{- end }}
+{{- end }}

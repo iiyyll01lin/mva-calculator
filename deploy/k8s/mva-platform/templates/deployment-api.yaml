@@ -1,0 +1,192 @@
+# =============================================================================
+# mva-api-server  — Stateless FastAPI Deployment
+# =============================================================================
+# Design decisions:
+#   • ReadOnlyRootFilesystem=true; writable paths emptyDir-mounted.
+#   • preStop hook sends SIGTERM + waits terminationGracePeriodSeconds so
+#     in-flight SSE streams can drain before the pod is removed from the
+#     service endpoint slice.
+#   • PodDisruptionBudget keeps minAvailable=2 during rolling upgrades.
+# =============================================================================
+{{- if .Values.apiServer.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mva-platform.fullname" . }}-api
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "mva-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api-server
+  annotations:
+    # Trigger rolling update when the ConfigMap changes.
+    checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+spec:
+  replicas: {{ .Values.apiServer.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "mva-platform.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: api-server
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      # Never go below minAvailable (PDB) and add at most 1 surge pod at a time.
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        {{- include "mva-platform.labels" . | nindent 8 }}
+        app.kubernetes.io/component: api-server
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+    spec:
+      serviceAccountName: {{ include "mva-platform.serviceAccountName" . }}
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: {{ .Values.apiServer.terminationGracePeriodSeconds }}
+
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- include "mva-platform.imagePullSecrets" $ | nindent 8 }}
+      {{- end }}
+
+      # ── Pod-level security context ───────────────────────────────────────
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+        seccompProfile:
+          type: RuntimeDefault
+
+      # ── Affinity / spread ────────────────────────────────────────────────
+      {{- with .Values.apiServer.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.apiServer.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.apiServer.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.apiServer.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      containers:
+        # ── Primary API container ──────────────────────────────────────────
+        - name: api-server
+          image: "{{ .Values.apiServer.image.repository }}:{{ include "mva-platform.imageTag" (dict "image" .Values.apiServer.image "root" .) }}"
+          imagePullPolicy: {{ .Values.apiServer.image.pullPolicy }}
+
+          # Graceful shutdown: let uvicorn finish processing in-flight requests.
+          lifecycle:
+            preStop:
+              exec:
+                # Signal uvicorn workers to stop accepting new connections
+                # and wait for existing SSE streams to close.
+                command: ["/bin/sh", "-c", "sleep 10"]
+
+          ports:
+            - name: http
+              containerPort: {{ .Values.apiServer.service.targetPort }}
+              protocol: TCP
+
+          # ── Environment variables ────────────────────────────────────────
+          env:
+            {{- toYaml .Values.apiServer.env | nindent 12 }}
+            {{- include "mva-platform.secretEnvVars" .Values.apiServer.secretEnv | nindent 12 }}
+
+          # ── Probes ────────────────────────────────────────────────────────
+          livenessProbe:
+            {{- toYaml .Values.apiServer.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.apiServer.readinessProbe | nindent 12 }}
+
+          # ── Resources ─────────────────────────────────────────────────────
+          resources:
+            {{- toYaml .Values.apiServer.resources | nindent 12 }}
+
+          # ── Container security context ─────────────────────────────────────
+          securityContext:
+            {{- toYaml .Values.apiServer.securityContext | nindent 12 }}
+
+          # ── Volume mounts ──────────────────────────────────────────────────
+          volumeMounts:
+            - name: audit-log-storage
+              mountPath: {{ .Values.auditLog.pvc.mountPath }}
+            - name: tmp-dir
+              mountPath: /tmp
+            {{- with .Values.apiServer.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+
+        {{- if .Values.auditLog.auditSidecar.enabled }}
+        # ── Audit Sidecar ────────────────────────────────────────────────────
+        # Reads cryptographic audit events from the Redis stream written by all
+        # API pods and serializes them to audit_chain.jsonl on the PVC.
+        # This pattern serializes all writes, preventing concurrent-write corruption
+        # that would occur if multiple pods appended directly to the JSONL file.
+        - name: audit-sidecar
+          image: "{{ .Values.auditLog.auditSidecar.image.repository }}:{{ include "mva-platform.imageTag" (dict "image" .Values.auditLog.auditSidecar.image "root" .) }}"
+          imagePullPolicy: {{ .Values.auditLog.auditSidecar.image.pullPolicy }}
+          env:
+            {{- include "mva-platform.secretEnvVars" .Values.apiServer.secretEnv | nindent 12 }}
+            - name: AUDIT_OUTPUT_PATH
+              value: "{{ .Values.auditLog.pvc.mountPath }}/audit_chain.jsonl"
+            - name: AUDIT_REDIS_STREAM_KEY
+              value: "mva:audit:stream"
+          resources:
+            {{- toYaml .Values.auditLog.auditSidecar.resources | nindent 12 }}
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+            runAsGroup: 1001
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            seccompProfile:
+              type: RuntimeDefault
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: audit-log-storage
+              mountPath: {{ .Values.auditLog.pvc.mountPath }}
+            - name: tmp-dir
+              mountPath: /tmp
+        {{- end }}
+
+      volumes:
+        - name: audit-log-storage
+          persistentVolumeClaim:
+            claimName: {{ include "mva-platform.fullname" . }}-audit-log
+        - name: tmp-dir
+          emptyDir: {}
+        {{- with .Values.apiServer.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+
+---
+# PodDisruptionBudget — protects rolling upgrades and node drains.
+{{- if .Values.apiServer.podDisruptionBudget.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "mva-platform.fullname" . }}-api-pdb
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "mva-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api-server
+spec:
+  minAvailable: {{ .Values.apiServer.podDisruptionBudget.minAvailable }}
+  selector:
+    matchLabels:
+      {{- include "mva-platform.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: api-server
+{{- end }}
+{{- end }}

@@ -1,0 +1,190 @@
+# =============================================================================
+# NetworkPolicy — Default-Deny with Explicit Allow Rules
+# =============================================================================
+# Security posture: Zero-trust east-west traffic.
+# Only explicitly declared ingress/egress paths are permitted.
+#
+# Traffic matrix:
+#   Ingress Controller  →  mission-control:8080  (frontend HTTP)
+#   Ingress Controller  →  api-server:8000        (REST + SSE)
+#   mission-control     →  api-server:8000        (internal proxy)
+#   api-server          →  redis-master:6379      (session state, audit stream)
+#   api-server          →  redis-replica:6379     (read replicas)
+#   watchdog-worker     →  api-server:8000        (anomaly event push)
+#   watchdog-worker     →  redis-master:6379      (leader election lock)
+#   api-server/watchdog →  0.0.0.0/0  TCP 443    (LLM provider HTTPS egress)
+#   All pods            →  kube-dns:53            (DNS resolution)
+# =============================================================================
+{{- if .Values.networkPolicy.enabled }}
+
+# ── Default deny-all ingress + egress for the namespace ─────────────────────
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "mva-platform.fullname" . }}-default-deny
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "mva-platform.labels" . | nindent 4 }}
+spec:
+  podSelector: {}     # Matches all pods in the namespace.
+  policyTypes:
+    - Ingress
+    - Egress
+
+---
+# ── Allow: Ingress controller → API server ───────────────────────────────────
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "mva-platform.fullname" . }}-allow-ingress-to-api
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "mva-platform.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "mva-platform.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: api-server
+  policyTypes:
+    - Ingress
+  ingress:
+    # Allow traffic from the NGINX Ingress controller namespace/pod.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: {{ .Values.apiServer.service.targetPort }}
+    # Allow traffic from the mission-control proxy.
+    - from:
+        - podSelector:
+            matchLabels:
+              {{- include "mva-platform.selectorLabels" . | nindent 14 }}
+              app.kubernetes.io/component: mission-control
+      ports:
+        - protocol: TCP
+          port: {{ .Values.apiServer.service.targetPort }}
+    # Allow traffic from watchdog workers (anomaly event POST).
+    - from:
+        - podSelector:
+            matchLabels:
+              {{- include "mva-platform.selectorLabels" . | nindent 14 }}
+              app.kubernetes.io/component: watchdog-worker
+      ports:
+        - protocol: TCP
+          port: {{ .Values.apiServer.service.targetPort }}
+
+---
+# ── Allow: Ingress controller → Mission Control ───────────────────────────────
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "mva-platform.fullname" . }}-allow-ingress-to-mc
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "mva-platform.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "mva-platform.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: mission-control
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 8080
+
+---
+# ── Allow: API server + Watchdog → Redis ─────────────────────────────────────
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "mva-platform.fullname" . }}-allow-redis-egress
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "mva-platform.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "mva-platform.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Egress
+  egress:
+    # Redis master and replicas.
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: redis
+      ports:
+        - protocol: TCP
+          port: 6379
+    # DNS resolution.
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # LLM provider HTTPS egress (OpenAI, Azure OpenAI, etc.).
+    - ports:
+        - protocol: TCP
+          port: 443
+
+---
+# ── Allow: Mission Control → API server (internal proxy) ─────────────────────
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "mva-platform.fullname" . }}-allow-mc-egress
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "mva-platform.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "mva-platform.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: mission-control
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              {{- include "mva-platform.selectorLabels" . | nindent 14 }}
+              app.kubernetes.io/component: api-server
+      ports:
+        - protocol: TCP
+          port: {{ .Values.apiServer.service.targetPort }}
+    # DNS.
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+
+{{- end }}

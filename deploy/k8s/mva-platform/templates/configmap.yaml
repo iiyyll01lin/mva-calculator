@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "mva-platform.fullname" . }}-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "mva-platform.labels" . | nindent 4 }}
+data:
+  # ── NGINX configuration for the Mission Control frontend ─────────────────
+  # Injected into mva-mission-control pods via volume mount.
+  nginx.conf: |
+    worker_processes auto;
+    error_log /var/log/nginx/error.log warn;
+    pid /tmp/nginx.pid;              # Non-root: write pid to /tmp.
+
+    events {
+      worker_connections 1024;
+    }
+
+    http {
+      include       /etc/nginx/mime.types;
+      default_type  application/octet-stream;
+      sendfile      on;
+      keepalive_timeout 65;
+
+      # Upstream: Kubernetes ClusterIP service for the API server.
+      upstream mva_api {
+        server {{ include "mva-platform.fullname" . }}-api:{{ .Values.apiServer.service.port }};
+        keepalive 32;
+      }
+
+      server {
+        listen 8080;                 # Non-privileged port for non-root nginx.
+        server_name _;
+        root /usr/share/nginx/html;
+        index mission-control.html;
+
+        # ── SSE stream endpoint ───────────────────────────────────────────
+        location /api/v1/agent/stream/ {
+          proxy_pass         http://mva_api;
+          proxy_http_version 1.1;
+          proxy_set_header   Host              $host;
+          proxy_set_header   X-Real-IP         $remote_addr;
+          proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+          proxy_set_header   X-Forwarded-Proto $scheme;
+          proxy_set_header   Connection        "";
+          proxy_buffering         off;
+          proxy_cache             off;
+          proxy_read_timeout      3600s;
+          chunked_transfer_encoding on;
+        }
+
+        # ── General API proxy ─────────────────────────────────────────────
+        location /api/ {
+          proxy_pass         http://mva_api;
+          proxy_http_version 1.1;
+          proxy_set_header   Host              $host;
+          proxy_set_header   X-Real-IP         $remote_addr;
+          proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+          proxy_set_header   X-Forwarded-Proto $scheme;
+          proxy_set_header   Connection        "";
+          proxy_connect_timeout 10s;
+          proxy_read_timeout    60s;
+        }
+
+        # ── Static assets ─────────────────────────────────────────────────
+        location / {
+          try_files $uri $uri/ /mission-control.html;
+          expires 1h;
+          add_header Cache-Control "public, max-age=3600";
+        }
+
+        # ── Health probe (used by K8s readinessProbe) ─────────────────────
+        location /healthz {
+          return 200 "ok\n";
+          add_header Content-Type text/plain;
+        }
+      }
+    }

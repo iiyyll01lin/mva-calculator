@@ -1,0 +1,115 @@
+# =============================================================================
+# mva-mission-control  — NGINX Frontend Deployment
+# =============================================================================
+{{- if .Values.missionControl.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mva-platform.fullname" . }}-mission-control
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "mva-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: mission-control
+spec:
+  replicas: {{ .Values.missionControl.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "mva-platform.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: mission-control
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        {{- include "mva-platform.labels" . | nindent 8 }}
+        app.kubernetes.io/component: mission-control
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      serviceAccountName: {{ include "mva-platform.serviceAccountName" . }}
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
+
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- include "mva-platform.imagePullSecrets" $ | nindent 8 }}
+      {{- end }}
+
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101        # Standard nginx uid.
+        runAsGroup: 101
+        fsGroup: 101
+        seccompProfile:
+          type: RuntimeDefault
+
+      {{- with .Values.missionControl.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.missionControl.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      containers:
+        - name: mission-control
+          image: "{{ .Values.missionControl.image.repository }}:{{ include "mva-platform.imageTag" (dict "image" .Values.missionControl.image "root" .) }}"
+          imagePullPolicy: {{ .Values.missionControl.image.pullPolicy }}
+
+          ports:
+            - name: http
+              containerPort: 8080    # Non-privileged port (nginx listens on 8080).
+              protocol: TCP
+
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 15
+
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+          resources:
+            {{- toYaml .Values.missionControl.resources | nindent 12 }}
+
+          securityContext:
+            {{- toYaml .Values.missionControl.securityContext | nindent 12 }}
+
+          volumeMounts:
+            # Override default nginx.conf with our cluster-aware configuration.
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+              readOnly: true
+            # nginx needs writable /tmp, /var/run, and /var/cache.
+            - name: nginx-tmp
+              mountPath: /tmp
+            - name: nginx-run
+              mountPath: /var/run
+            - name: nginx-cache
+              mountPath: /var/cache/nginx
+
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: {{ include "mva-platform.fullname" . }}-config
+            items:
+              - key: nginx.conf
+                path: nginx.conf
+        - name: nginx-tmp
+          emptyDir: {}
+        - name: nginx-run
+          emptyDir: {}
+        - name: nginx-cache
+          emptyDir: {}
+{{- end }}

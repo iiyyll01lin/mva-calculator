@@ -1,0 +1,406 @@
+# =============================================================================
+# MVA Platform — Helm Values
+# =============================================================================
+# Override any value via:
+#   helm install mva-platform ./deploy/k8s/mva-platform \
+#       --set apiServer.image.tag=v2.1.0 \
+#       -f my-env-overrides.yaml
+# =============================================================================
+
+# ── Global settings ────────────────────────────────────────────────────────
+global:
+  # Image pull secret name (create separately: kubectl create secret docker-registry …)
+  imagePullSecrets: []
+  # Cluster-wide labels applied to every resource.
+  commonLabels:
+    app.kubernetes.io/part-of: mva-platform
+    team: platform-engineering
+
+# ── Image registry defaults ─────────────────────────────────────────────────
+imageRegistry: "registry.example.com"   # Override per-environment.
+imageTag: "2.0.0"                        # Global default; overridden per component.
+
+# =============================================================================
+# mva-api-server  — Stateless FastAPI / Uvicorn gateway
+# =============================================================================
+apiServer:
+  enabled: true
+  replicaCount: 3          # Minimum replicas; HPA will scale beyond this.
+
+  image:
+    repository: "registry.example.com/mva/api-server"
+    tag: ""                # Defaults to .Values.imageTag when empty.
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 8000
+    targetPort: 8000
+
+  # Pod resource requests / limits.  Right-size for LLM routing workloads.
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "512Mi"
+    limits:
+      cpu: "2000m"
+      memory: "2Gi"
+
+  # Liveness / readiness probes — mirrors the Docker healthcheck.
+  livenessProbe:
+    httpGet:
+      path: /api/v1/health
+      port: 8000
+    initialDelaySeconds: 30
+    periodSeconds: 15
+    failureThreshold: 3
+    timeoutSeconds: 10
+
+  readinessProbe:
+    httpGet:
+      path: /api/v1/health
+      port: 8000
+    initialDelaySeconds: 15
+    periodSeconds: 10
+    failureThreshold: 3
+    timeoutSeconds: 5
+
+  # Graceful shutdown — allows in-flight SSE streams to drain.
+  terminationGracePeriodSeconds: 60
+
+  # Extra environment variables injected into the container.
+  env:
+    - name: PYTHONUNBUFFERED
+      value: "1"
+    - name: MVA_MEMORY_BACKEND
+      value: "redis"
+    - name: MVA_PRUNE_TOKEN_LIMIT
+      value: "4000"
+    - name: MVA_SESSION_TTL_SECONDS
+      value: "86400"
+
+  # Secret environment variables (created by templates/secrets.yaml).
+  secretEnv:
+    - name: REDIS_URL
+      secretName: mva-platform-secrets
+      secretKey: redis-url
+    - name: JWT_SECRET_KEY
+      secretName: mva-platform-secrets
+      secretKey: jwt-secret-key
+    - name: LLM_API_KEY
+      secretName: mva-platform-secrets
+      secretKey: llm-api-key
+
+  # Pod disruption budget — ensures at least 2 pods are always running.
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 2
+
+  # Anti-affinity: spread pods across nodes.
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/component
+                  operator: In
+                  values:
+                    - api-server
+            topologyKey: kubernetes.io/hostname
+
+  nodeSelector: {}
+  tolerations: []
+  topologySpreadConstraints: []
+
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    runAsGroup: 1001
+    readOnlyRootFilesystem: true
+    allowPrivilegeEscalation: false
+    seccompProfile:
+      type: RuntimeDefault
+    capabilities:
+      drop:
+        - ALL
+
+  # Volumes mounted into the API server pod.
+  extraVolumeMounts:
+    - name: audit-log-storage
+      mountPath: /app/data/audit
+    - name: tmp-dir
+      mountPath: /tmp
+
+  extraVolumes:
+    - name: tmp-dir
+      emptyDir: {}
+
+# =============================================================================
+# mva-watchdog-worker  — IoT Event Listener (stateful, singleton-preferred)
+# =============================================================================
+watchdogWorker:
+  enabled: true
+
+  # StatefulSet is preferred: guarantees stable identity for the singleton
+  # stream processor and allows orderly scale-down with PodManagementPolicy.
+  kind: StatefulSet      # "StatefulSet" | "Deployment"
+  replicaCount: 2        # 2 replicas: active + hot-standby (leader election via Redis lock).
+
+  image:
+    repository: "registry.example.com/mva/api-server"   # Same image; different CMD.
+    tag: ""
+    pullPolicy: IfNotPresent
+
+  command: ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001"]
+
+  service:
+    type: ClusterIP
+    port: 8001
+    targetPort: 8001
+
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "256Mi"
+    limits:
+      cpu: "1000m"
+      memory: "1Gi"
+
+  livenessProbe:
+    httpGet:
+      path: /api/v1/health
+      port: 8001
+    initialDelaySeconds: 30
+    periodSeconds: 20
+    failureThreshold: 3
+    timeoutSeconds: 10
+
+  readinessProbe:
+    httpGet:
+      path: /api/v1/health
+      port: 8001
+    initialDelaySeconds: 15
+    periodSeconds: 10
+    failureThreshold: 3
+
+  terminationGracePeriodSeconds: 30
+
+  env:
+    - name: PYTHONUNBUFFERED
+      value: "1"
+    - name: MVA_MEMORY_BACKEND
+      value: "redis"
+    - name: WATCHDOG_MODE
+      value: "standalone"
+
+  secretEnv:
+    - name: REDIS_URL
+      secretName: mva-platform-secrets
+      secretKey: redis-url
+    - name: LLM_API_KEY
+      secretName: mva-platform-secrets
+      secretKey: llm-api-key
+
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    runAsGroup: 1001
+    readOnlyRootFilesystem: true
+    allowPrivilegeEscalation: false
+    seccompProfile:
+      type: RuntimeDefault
+    capabilities:
+      drop:
+        - ALL
+
+  extraVolumeMounts:
+    - name: tmp-dir
+      mountPath: /tmp
+
+  extraVolumes:
+    - name: tmp-dir
+      emptyDir: {}
+
+  nodeSelector: {}
+  tolerations: []
+
+# =============================================================================
+# mva-mission-control  — NGINX static frontend
+# =============================================================================
+missionControl:
+  enabled: true
+  replicaCount: 2
+
+  image:
+    repository: "registry.example.com/mva/mission-control"
+    tag: ""
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 80
+
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "64Mi"
+    limits:
+      cpu: "500m"
+      memory: "256Mi"
+
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 101       # Standard nginx uid in official image.
+    runAsGroup: 101
+    readOnlyRootFilesystem: false  # nginx writes pid/tmp files.
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+
+  nodeSelector: {}
+  tolerations: []
+
+# =============================================================================
+# Ingress — NGINX Ingress Controller routes
+# =============================================================================
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    # Enable gzip for static assets.
+    nginx.ingress.kubernetes.io/enable-compression: "true"
+    # Force HTTPS on production.
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # For SSE: disable response buffering entirely.
+    nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
+    nginx.ingress.kubernetes.io/upstream-keepalive-connections: "32"
+
+  host: "mva.example.com"     # Override per environment.
+  tlsSecretName: "mva-tls"    # cert-manager or manually provisioned secret.
+
+  # Separate SSE path annotation (applied to /api/v1/agent/stream/ location).
+  sseAnnotations:
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "7200"
+
+# =============================================================================
+# Horizontal Pod Autoscaler
+# =============================================================================
+hpa:
+  apiServer:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 50
+    # CPU-based scaling: scale up when average CPU > 70%.
+    targetCPUUtilizationPercentage: 70
+    # Memory-based scaling: scale up when average memory > 80%.
+    targetMemoryUtilizationPercentage: 80
+    # Custom metric: pending agent routing requests in the Redis queue.
+    customMetrics:
+      enabled: true
+      pendingAgentRequests:
+        metricName: "pending_agent_routing_requests"
+        targetAverageValue: "100"    # Scale up when avg queue depth > 100.
+
+  watchdogWorker:
+    enabled: false          # Watchdog is event-driven; manual scaling preferred.
+
+# =============================================================================
+# Persistent Volume Claims — Cryptographic Audit Log
+# =============================================================================
+auditLog:
+  pvc:
+    enabled: true
+    accessMode: ReadWriteMany   # RWX — shared across all API pods.
+    # NOTE: RWX requires a distributed storage class (NFS, EFS, Azure Files,
+    # CephFS, GCS Filestore).  Set storageClassName to match your provider.
+    storageClassName: "efs-sc"  # AWS EFS example. Use "standard-rwx" on GKE.
+    storage: "10Gi"
+    mountPath: "/app/data/audit"
+
+  # Use a dedicated Audit Sidecar to guarantee safe concurrent appends.
+  # When enabled, all API pods write audit events to a Redis stream; the
+  # sidecar flushes the stream to audit_chain.jsonl on the PVC.
+  auditSidecar:
+    enabled: true
+    image:
+      repository: "registry.example.com/mva/audit-sidecar"
+      tag: ""
+      pullPolicy: IfNotPresent
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "200m"
+        memory: "128Mi"
+
+# =============================================================================
+# Redis  (Bitnami dependency — distributed session state)
+# =============================================================================
+redis:
+  enabled: true
+  architecture: replication    # "standalone" | "replication" (HA with Sentinel).
+  auth:
+    enabled: true
+    existingSecret: "mva-platform-secrets"
+    existingSecretPasswordKey: "redis-password"
+  master:
+    persistence:
+      enabled: true
+      storageClass: ""          # Use cluster default.
+      size: "8Gi"
+    resources:
+      requests:
+        cpu: "250m"
+        memory: "256Mi"
+      limits:
+        cpu: "1000m"
+        memory: "1Gi"
+    podSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 1001
+  replica:
+    replicaCount: 2
+    persistence:
+      enabled: true
+      storageClass: ""
+      size: "8Gi"
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "128Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+
+# =============================================================================
+# ServiceAccount & RBAC
+# =============================================================================
+serviceAccount:
+  create: true
+  name: "mva-platform"
+  annotations: {}
+  # AWS IRSA example:
+  # annotations:
+  #   eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/mva-platform-role
+
+# =============================================================================
+# Network Policy — default-deny, explicit allow
+# =============================================================================
+networkPolicy:
+  enabled: true
+
+# =============================================================================
+# Pod Security (applied at namespace level; requires PSA admission plugin)
+# =============================================================================
+podSecurityPolicy:
+  # Namespace-level Pod Security Standards label ("restricted" | "baseline")
+  standard: "restricted"

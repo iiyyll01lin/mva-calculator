@@ -1,0 +1,132 @@
+# =============================================================================
+# Horizontal Pod Autoscaler — mva-api-server
+# =============================================================================
+# Scaling triggers (evaluated independently; whichever fires first wins):
+#
+#   1. CPU Utilization > 70%
+#      Standard HPA metric.  Fires during CPU-heavy Swarm Debate loops and
+#      parallel LLM inference fan-outs.
+#
+#   2. Memory Utilization > 80%
+#      Prevents OOMKill cascades when large context windows are loaded for
+#      multi-turn debate sessions.
+#
+#   3. Custom Metric: pending_agent_routing_requests (Prometheus → KEDA or
+#      custom-metrics-apiserver required)
+#      Scale up when the Redis routing queue depth exceeds 100 pending tasks.
+#      This metric directly represents backpressure on the Swarm Orchestrator
+#      and fires faster than CPU/memory during LLM-I/O-bound bursts where
+#      pods are waiting on model responses (low CPU, high concurrency).
+#
+# Prerequisites for custom metrics:
+#   Option A — KEDA (recommended):
+#     helm install keda kedacore/keda --namespace keda --create-namespace
+#     Then replace this HPA with a KEDA ScaledObject (see comment below).
+#   Option B — Prometheus Adapter:
+#     Deploy prometheus-adapter configured to expose pending_agent_routing_requests.
+#
+# =============================================================================
+{{- if .Values.hpa.apiServer.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "mva-platform.fullname" . }}-api-hpa
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "mva-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api-server
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "mva-platform.fullname" . }}-api
+  minReplicas: {{ .Values.hpa.apiServer.minReplicas }}
+  maxReplicas: {{ .Values.hpa.apiServer.maxReplicas }}
+
+  metrics:
+    # ── 1. CPU — scale up when average pod CPU > 70% ───────────────────────
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.hpa.apiServer.targetCPUUtilizationPercentage }}
+
+    # ── 2. Memory — scale up when average pod memory > 80% ────────────────
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.hpa.apiServer.targetMemoryUtilizationPercentage }}
+
+    {{- if .Values.hpa.apiServer.customMetrics.enabled }}
+    # ── 3. Custom: pending agent routing requests ──────────────────────────
+    # Requires prometheus-adapter or KEDA to expose this metric via the
+    # custom.metrics.k8s.io API group.
+    # Metric collected by telemetry.py via a Prometheus counter/gauge:
+    #   mva_pending_agent_routing_requests (gauge, per-pod)
+    - type: Pods
+      pods:
+        metric:
+          name: {{ .Values.hpa.apiServer.customMetrics.pendingAgentRequests.metricName }}
+        target:
+          type: AverageValue
+          averageValue: {{ .Values.hpa.apiServer.customMetrics.pendingAgentRequests.targetAverageValue }}
+    {{- end }}
+
+  behavior:
+    # ── Scale-up: aggressive — respond to LLM bursts within 30 s ──────────
+    scaleUp:
+      stabilizationWindowSeconds: 30
+      policies:
+        # Allow adding up to 4 pods per 60 s period.
+        - type: Pods
+          value: 4
+          periodSeconds: 60
+        # Or 100% of current replicas every 30 s for extreme spikes.
+        - type: Percent
+          value: 100
+          periodSeconds: 30
+      selectPolicy: Max   # Use whichever policy adds the most pods.
+
+    # ── Scale-down: conservative — wait 5 min before removing pods ────────
+    # Prevents thrashing and allows in-flight SSE sessions to complete.
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 120    # Remove at most 1 pod every 2 minutes.
+      selectPolicy: Min
+{{- end }}
+
+# =============================================================================
+# KEDA ScaledObject (alternative to HPA — uncomment if KEDA is installed)
+# =============================================================================
+# KEDA provides richer Redis-native scaling without requiring prometheus-adapter.
+# It monitors the Redis stream/list directly and scales the Deployment accordingly.
+#
+# apiVersion: keda.sh/v1alpha1
+# kind: ScaledObject
+# metadata:
+#   name: {{ include "mva-platform.fullname" . }}-api-scaledobject
+#   namespace: {{ .Release.Namespace }}
+# spec:
+#   scaleTargetRef:
+#     name: {{ include "mva-platform.fullname" . }}-api
+#   minReplicaCount: {{ .Values.hpa.apiServer.minReplicas }}
+#   maxReplicaCount: {{ .Values.hpa.apiServer.maxReplicas }}
+#   cooldownPeriod: 300
+#   triggers:
+#     - type: redis
+#       metadata:
+#         address: mva-platform-redis-master:6379
+#         listName: mva:agent:routing:queue
+#         listLength: "100"
+#       authenticationRef:
+#         name: mva-redis-trigger-auth
+#     - type: cpu
+#       metricType: Utilization
+#       metadata:
+#         value: "70"

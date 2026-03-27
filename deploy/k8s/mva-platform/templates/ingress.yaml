@@ -1,0 +1,94 @@
+# =============================================================================
+# Ingress — NGINX Ingress Controller
+# =============================================================================
+# Routes:
+#   /api/v1/agent/stream/*  →  mva-api-server  (SSE, no buffering, 2h timeout)
+#   /api/*                  →  mva-api-server  (REST)
+#   /                       →  mva-mission-control  (static frontend)
+#
+# TLS:
+#   - Uses a pre-provisioned or cert-manager-managed TLS secret.
+#   - Override ingress.tlsSecretName per environment.
+# =============================================================================
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "mva-platform.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "mva-platform.labels" . | nindent 4 }}
+  annotations:
+    # ── General proxy settings ─────────────────────────────────────────────
+    {{- toYaml .Values.ingress.annotations | nindent 4 }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  tls:
+    - hosts:
+        - {{ .Values.ingress.host | quote }}
+      secretName: {{ .Values.ingress.tlsSecretName }}
+  rules:
+    - host: {{ .Values.ingress.host | quote }}
+      http:
+        paths:
+          # ── SSE Stream — must be declared BEFORE /api/ to ensure nginx
+          #    picks the more specific path and applies SSE-specific timeouts.
+          - path: /api/v1/agent/stream/
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "mva-platform.fullname" . }}-api
+                port:
+                  number: {{ .Values.apiServer.service.port }}
+
+          # ── REST API ────────────────────────────────────────────────────
+          - path: /api/
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "mva-platform.fullname" . }}-api
+                port:
+                  number: {{ .Values.apiServer.service.port }}
+
+          # ── Frontend SPA ────────────────────────────────────────────────
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "mva-platform.fullname" . }}-mission-control
+                port:
+                  number: {{ .Values.missionControl.service.port }}
+
+---
+# Dedicated Ingress for the SSE endpoint with overridden annotations.
+# Splitting into a separate Ingress resource guarantees the SSE-specific
+# annotations are scoped only to the stream path, not the entire domain.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "mva-platform.fullname" . }}-sse
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "mva-platform.labels" . | nindent 4 }}
+  annotations:
+    # Merge base annotations with SSE-specific overrides.
+    {{- toYaml .Values.ingress.annotations | nindent 4 }}
+    {{- toYaml .Values.ingress.sseAnnotations | nindent 4 }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  tls:
+    - hosts:
+        - {{ .Values.ingress.host | quote }}
+      secretName: {{ .Values.ingress.tlsSecretName }}
+  rules:
+    - host: {{ .Values.ingress.host | quote }}
+      http:
+        paths:
+          - path: /api/v1/agent/stream/
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "mva-platform.fullname" . }}-api
+                port:
+                  number: {{ .Values.apiServer.service.port }}
+{{- end }}

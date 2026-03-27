@@ -1,0 +1,92 @@
+# =============================================================================
+# Persistent Volume Claims — Cryptographic Audit Log
+# =============================================================================
+#
+# Architecture Decision: Dedicated Audit Sidecar Pattern
+# ───────────────────────────────────────────────────────
+# Problem: audit_chain.jsonl uses a hash-chain where each entry must include
+# the SHA-256 of the previous entry (prev_hash field).  With N API pods each
+# appending directly to the same file concurrently, race conditions corrupt the
+# chain integrity — an append from pod B can interleave with pod A's in-progress
+# write, producing a partially-written JSON line and breaking hash validation.
+#
+# Solution (implemented in deployment-api.yaml):
+#   1. Every API pod writes cryptographically-signed audit events to a Redis
+#      Stream key  mva:audit:stream  (append-only, atomic XADD operation).
+#
+#   2. A single Audit Sidecar container co-located in EACH API pod runs in
+#      exclusive consumer-group mode.  Exactly one sidecar (via Redis consumer-
+#      group acknowledgement) reads, chains, and flushes events to the PVC.
+#
+#   3. Other sidecars remain in hot-standby: they only begin writing if the
+#      primary sidecar's consumer-group heartbeat expires.
+#
+# This guarantees:
+#   • At-least-once delivery (Redis stream persistence + consumer-group ACK).
+#   • Serialized writes to JSONL — no concurrent corruption.
+#   • Pod failures do not drop audit events (stream outlives pod lifecycle).
+#   • PVC is mounted RWX so the standby sidecar can take over without a PVC
+#     re-mount cycle.
+#
+# Storage Class Requirements:
+#   • ReadWriteMany (RWX) access mode requires a distributed storage class.
+#   • AWS EKS:       efs-sc   (AWS EFS CSI driver)
+#   • Google GKE:    standard-rwx  (Filestore CSI driver) or nfs-client
+#   • Azure AKS:     azureblob-nfs-premium (Blob NFS) or azurefile-csi
+#   • On-Prem:       nfs, cephfs, or longhorn-rwx
+#   • Rook-Ceph:     rook-cephfs
+# =============================================================================
+
+{{- if .Values.auditLog.pvc.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "mva-platform.fullname" . }}-audit-log
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "mva-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: audit-log
+  annotations:
+    # Retain the PVC on chart uninstall to prevent forensic evidence loss.
+    helm.sh/resource-policy: keep
+spec:
+  accessModes:
+    - {{ .Values.auditLog.pvc.accessMode }}   # Must be ReadWriteMany for HA.
+  storageClassName: {{ .Values.auditLog.pvc.storageClassName | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.auditLog.pvc.storage }}
+
+---
+# =============================================================================
+# StorageClass reference examples (do NOT apply these — configure per cluster)
+# =============================================================================
+# ── AWS EFS CSI StorageClass (create once per cluster) ──────────────────────
+# apiVersion: storage.k8s.io/v1
+# kind: StorageClass
+# metadata:
+#   name: efs-sc
+# provisioner: efs.csi.aws.com
+# parameters:
+#   provisioningMode: efs-ap
+#   fileSystemId: fs-XXXXXXXXXXXXXXXX   # Your EFS filesystem ID
+#   directoryPerms: "700"
+#   basePath: "/mva-audit"
+# mountOptions:
+#   - tls
+# reclaimPolicy: Retain      # Never delete audit data automatically.
+# volumeBindingMode: Immediate
+#
+# ── GKE Filestore StorageClass ────────────────────────────────────────────────
+# apiVersion: storage.k8s.io/v1
+# kind: StorageClass
+# metadata:
+#   name: standard-rwx
+# provisioner: filestore.csi.storage.gke.io
+# parameters:
+#   tier: STANDARD
+#   network: default
+# allowVolumeExpansion: true
+# reclaimPolicy: Retain
+# volumeBindingMode: WaitForFirstConsumer
+{{- end }}

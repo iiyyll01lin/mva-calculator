@@ -1,0 +1,35 @@
+apiVersion: v2
+name: mva-platform
+description: |
+  Enterprise MVA Platform — Autonomous Swarm, Cryptographic Provenance, and
+  Continuous Alignment.  Production-grade Helm chart targeting AWS EKS,
+  Google GKE, and On-Premises OpenShift.
+type: application
+version: 1.0.0
+appVersion: "2.0.0"
+
+keywords:
+  - llm
+  - agentic
+  - industrial-engineering
+  - autonomous-swarm
+
+maintainers:
+  - name: MVA Platform Team
+
+# ── Helm library dependencies ──────────────────────────────────────────────
+dependencies:
+  # Bitnami Redis Cluster — distributed session state and alignment store.
+  # Docs: https://artifacthub.io/packages/helm/bitnami/redis
+  - name: redis
+    version: "19.x.x"
+    repository: "oci://registry-1.docker.io/bitnamicharts"
+    alias: redis
+    condition: redis.enabled
+
+  # cert-manager CRD integration (optional; use if you manage TLS via Helm).
+  # Requires cert-manager to be pre-installed in the cluster.
+  # - name: cert-manager
+  #   version: "1.14.x"
+  #   repository: "https://charts.jetstack.io"
+  #   condition: certManager.enabled
