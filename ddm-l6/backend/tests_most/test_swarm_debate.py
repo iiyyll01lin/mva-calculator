@@ -296,8 +296,10 @@ class TestQualityAndTimeAgent:
         plan_a = DebatePlan.model_validate(json.loads(_cost_json()))
         mock_result = _make_llm_result(_quality_json())
         with patch("agents.debate_room.call_llm", new=AsyncMock(return_value=mock_result)):
-            critique = await run_quality_agent(SAMPLE_QUERY, plan_a, SESSION_ID, turn=2)
+            result = await run_quality_agent(SAMPLE_QUERY, plan_a, SESSION_ID, turn=2)
 
+        # v3.0: run_quality_agent returns (CritiquePlan, Optional[dict]) tuple
+        critique = result[0] if isinstance(result, tuple) else result
         assert isinstance(critique, CritiquePlan)
         assert critique.critiqued_plan_id == "COST-PLAN-A"
         assert len(critique.weaknesses_found) > 0
@@ -310,8 +312,10 @@ class TestQualityAndTimeAgent:
         plan_a = DebatePlan.model_validate(json.loads(_cost_json()))
         mock_result = _make_llm_result(_quality_json())
         with patch("agents.debate_room.call_llm", new=AsyncMock(return_value=mock_result)):
-            critique = await run_quality_agent(SAMPLE_QUERY, plan_a, SESSION_ID, turn=2)
+            result = await run_quality_agent(SAMPLE_QUERY, plan_a, SESSION_ID, turn=2)
 
+        # v3.0: run_quality_agent returns (CritiquePlan, Optional[dict]) tuple
+        critique = result[0] if isinstance(result, tuple) else result
         assert critique.counter_plan.throughput_uph > plan_a.throughput_uph
 
 

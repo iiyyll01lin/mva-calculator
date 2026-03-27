@@ -89,10 +89,12 @@ const { useState, useEffect, useRef, useCallback, useMemo, useReducer } = React;
 const API_BASE = '';   // Same origin via nginx reverse proxy
 
 const SPAN_TYPE_META = {
-  routing:    { label: 'Routing',    color: '#60a5fa', icon: '⇢', bg: 'bg-blue-900/40',   border: 'border-blue-500/50'   },
-  tool_exec:  { label: 'Tool Exec',  color: '#34d399', icon: '⚙', bg: 'bg-emerald-900/40', border: 'border-emerald-500/50' },
-  reflection: { label: 'Reflection', color: '#fbbf24', icon: '↺', bg: 'bg-yellow-900/40',  border: 'border-yellow-500/50'  },
-  agent:      { label: 'Agent',      color: '#a78bfa', icon: '◈', bg: 'bg-violet-900/40',  border: 'border-violet-500/50'  },
+  routing:        { label: 'Routing',      color: '#60a5fa', icon: '⇢', bg: 'bg-blue-900/40',   border: 'border-blue-500/50'   },
+  tool_exec:      { label: 'Tool Exec',    color: '#34d399', icon: '⚙', bg: 'bg-emerald-900/40', border: 'border-emerald-500/50' },
+  reflection:     { label: 'Reflection',  color: '#fbbf24', icon: '↺', bg: 'bg-yellow-900/40',  border: 'border-yellow-500/50'  },
+  agent:          { label: 'Agent',        color: '#a78bfa', icon: '◈', bg: 'bg-violet-900/40',  border: 'border-violet-500/50'  },
+  debate:         { label: 'Debate',       color: '#f472b6', icon: '⚖', bg: 'bg-pink-900/40',    border: 'border-pink-500/50'    },
+  cyber_physical: { label: 'Cyber-Phys',  color: '#fb923c', icon: '🤖', bg: 'bg-orange-900/40', border: 'border-orange-500/50'  },
 };
 
 const META = (type) => SPAN_TYPE_META[type] || { label: type, color: '#94a3b8', icon: '●', bg: 'bg-slate-800', border: 'border-slate-600' };
@@ -284,10 +286,11 @@ function VerificationShield() {
 // ──────────────────────────────────────────────────────────────
 function TopNav({ user, onLogout, activeTab, setActiveTab }) {
   const tabs = [
-    { id: 'stream',   label: 'Thought Stream',  icon: '⟁' },
-    { id: 'action',   label: 'Action Center',    icon: '⚑' },
-    { id: 'health',   label: 'System Health',    icon: '◎' },
-    { id: 'twin',     label: 'Digital Twin',     icon: '⬡' },
+    { id: 'stream',         label: 'Thought Stream',     icon: '⟁' },
+    { id: 'action',         label: 'Action Center',       icon: '⚑' },
+    { id: 'health',         label: 'System Health',       icon: '◎' },
+    { id: 'twin',           label: 'Digital Twin',        icon: '⬡' },
+    { id: 'cyber_physical', label: 'Cyber-Physical Ops',  icon: '🤖' },
   ];
   return (
     <header className="flex items-center justify-between px-4 py-2 bg-surface-800 border-b border-surface-600 shrink-0">
@@ -298,7 +301,7 @@ function TopNav({ user, onLogout, activeTab, setActiveTab }) {
           <span className="w-2 h-2 rounded-full bg-emerald-400 blink"></span>LIVE
         </span>
       </div>
-      <nav className="flex gap-1">
+      <nav className="flex gap-1 flex-wrap">
         {tabs.map(t => (
           <button key={t.id} onClick={() => setActiveTab(t.id)}
             className={`px-3 py-1 rounded text-xs transition-colors ${
@@ -1356,7 +1359,407 @@ function DigitalTwinTab() {
 }
 
 // ──────────────────────────────────────────────────────────────
-// Emergency Alert Overlay — shown on EMERGENCY_PROPOSAL SSE event
+// Tab 5: Cyber-Physical Operations (CCTV + Fleet Status)
+// ──────────────────────────────────────────────────────────────
+
+// Simulated VLM bounding-box overlays.
+const MOCK_VLM_EVENTS = [
+  { id: 1, camera: 'CAM-ST4',  verdict: 'ANOMALY_CONFIRMED', confidence: 0.91,
+    description: 'Conveyor belt jam detected at Station 4. Products accumulated behind gate.',
+    boxes: [{ label: 'conveyor_jam', x: 0.35, y: 0.48, w: 0.30, h: 0.22, conf: 0.91 }],
+    ts: new Date(Date.now() - 12000).toISOString() },
+  { id: 2, camera: 'CAM-ST2',  verdict: 'NORMAL',            confidence: 0.88,
+    description: 'Station 2 operating normally. No visible anomalies.',
+    boxes: [],
+    ts: new Date(Date.now() - 48000).toISOString() },
+  { id: 3, camera: 'CAM-ST1',  verdict: 'ANOMALY_CONFIRMED', confidence: 0.78,
+    description: 'Faint smoke trail observed near Motor Drive Unit on left side of frame.',
+    boxes: [{ label: 'smoke', x: 0.10, y: 0.15, w: 0.22, h: 0.28, conf: 0.78 }],
+    ts: new Date(Date.now() - 95000).toISOString() },
+];
+
+// Simulated robot fleet registry.
+const MOCK_FLEET = [
+  { robot_id: 'AGV-001', role: 'AGV',            station: 'Station-1', status: 'ONLINE'   },
+  { robot_id: 'AGV-002', role: 'AGV',            station: 'Station-3', status: 'BUSY'     },
+  { robot_id: 'ARM-001', role: 'robotic_arm',    station: 'Station-2', status: 'ONLINE'   },
+  { robot_id: 'ARM-002', role: 'robotic_arm',    station: 'Station-4', status: 'ESTOP'    },
+  { robot_id: 'DRONE-001', role: 'inspection_drone', station: 'Station-2', status: 'CHARGING' },
+];
+
+const FLEET_STATUS_META = {
+  ONLINE:   { color: 'text-emerald-400', dot: 'bg-emerald-400',  label: 'Online'   },
+  OFFLINE:  { color: 'text-slate-500',   dot: 'bg-slate-600',    label: 'Offline'  },
+  ESTOP:    { color: 'text-red-400',     dot: 'bg-red-500 blink',label: 'E-STOP'   },
+  CHARGING: { color: 'text-yellow-400',  dot: 'bg-yellow-400',   label: 'Charging' },
+  BUSY:     { color: 'text-blue-400',    dot: 'bg-blue-400 blink',label: 'Busy'    },
+};
+
+const VERDICT_META = {
+  ANOMALY_CONFIRMED: { color: 'text-red-400',     bg: 'bg-red-900/30',     border: 'border-red-500/50',     icon: '⚠' },
+  NORMAL:            { color: 'text-emerald-400',  bg: 'bg-emerald-900/20', border: 'border-emerald-500/40', icon: '✓' },
+  UNCERTAIN:         { color: 'text-yellow-400',   bg: 'bg-yellow-900/20',  border: 'border-yellow-500/40',  icon: '?' },
+};
+
+// Mocked factory-floor SVG canvas with camera positions and bounding boxes.
+function CameraFeedCanvas({ event, width = 640, height = 360 }) {
+  const vm = VERDICT_META[event.verdict] || VERDICT_META.UNCERTAIN;
+  // Mock background: gradient simulating a blurred factory-floor photo.
+  const bgGrad = event.verdict === 'ANOMALY_CONFIRMED'
+    ? 'from-gray-900 via-red-950 to-gray-900'
+    : 'from-gray-900 via-slate-900 to-gray-900';
+
+  return (
+    <div className={`relative bg-gradient-to-br ${bgGrad} rounded-lg overflow-hidden`}
+         style={{ width: '100%', aspectRatio: '16/9', minHeight: 160 }}>
+      {/* Scanline overlay for CCTV aesthetic */}
+      <div className="absolute inset-0 pointer-events-none"
+           style={{ backgroundImage: 'repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.08) 3px,rgba(0,0,0,0.08) 4px)', zIndex: 2 }} />
+
+      {/* Camera label */}
+      <div className="absolute top-2 left-2 z-10 flex items-center gap-1.5">
+        <span className="w-2 h-2 rounded-full bg-red-500 blink"></span>
+        <span className="text-xs text-white font-mono bg-black/60 px-2 py-0.5 rounded">{event.camera}</span>
+      </div>
+      <div className="absolute top-2 right-2 z-10">
+        <span className="text-xs font-mono bg-black/60 text-slate-300 px-2 py-0.5 rounded">
+          {new Date(event.ts).toLocaleTimeString()}
+        </span>
+      </div>
+
+      {/* Bounding boxes */}
+      {event.boxes.map((box, i) => (
+        <div key={i}
+          className="absolute z-10 border-2 border-red-500 pointer-events-none"
+          style={{
+            left:   `${box.x * 100}%`,
+            top:    `${box.y * 100}%`,
+            width:  `${box.w * 100}%`,
+            height: `${box.h * 100}%`,
+            boxShadow: '0 0 12px 2px rgba(239,68,68,0.5)',
+          }}>
+          <span className="absolute -top-5 left-0 bg-red-600 text-white text-xs px-1.5 py-0.5 rounded font-mono whitespace-nowrap">
+            {box.label} {Math.round(box.conf * 100)}%
+          </span>
+        </div>
+      ))}
+
+      {/* Mock factory floor content — SVG silhouettes */}
+      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 640 360" preserveAspectRatio="xMidYMid meet" style={{ zIndex: 1 }}>
+        {/* Floor */}
+        <rect x="0" y="240" width="640" height="120" fill="#1c1c29" />
+        {/* Conveyor belt */}
+        <rect x="40" y="200" width="560" height="45" rx="4" fill="#2d3551" stroke="#4a5568" strokeWidth="1" />
+        <rect x="40" y="208" width="560" height="6" rx="2" fill="#3d4a68" />
+        {[80,160,240,320,400,480,560].map(x => (
+          <rect key={x} x={x} y="200" width="5" height="45" rx="1" fill="#4a5568" />
+        ))}
+        {/* Product units on belt */}
+        {[100,180,260,340,420,500].map((x, i) => (
+          <rect key={i} x={x} y="187" width="30" height="18" rx="2"
+                fill={event.verdict === 'ANOMALY_CONFIRMED' && x > 260 ? '#7f1d1d' : '#374151'}
+                stroke={event.verdict === 'ANOMALY_CONFIRMED' && x > 260 ? '#ef4444' : '#4b5563'} strokeWidth="1" />
+        ))}
+        {/* Station frames */}
+        {[80, 280, 480].map((x, i) => (
+          <g key={i}>
+            <rect x={x} y="100" width="80" height="100" rx="4" fill="#13161e" stroke="#2d3551" strokeWidth="1.5" />
+            <text x={x + 40} y="155" textAnchor="middle" fontSize="9" fill="#64748b">ST-{i+1}</text>
+          </g>
+        ))}
+        {/* Smoke particles (anomaly mode) */}
+        {event.verdict === 'ANOMALY_CONFIRMED' && event.boxes.some(b => b.label === 'smoke') && (
+          <g opacity="0.6">
+            {[80,95,110,125].map((x, i) => (
+              <ellipse key={i} cx={x} cy={120 - i*15} rx={8 + i*4} ry={5 + i*2} fill="#9ca3af" opacity={0.5 - i*0.1} />
+            ))}
+          </g>
+        )}
+        {/* VLM analysis overlay watermark */}
+        <text x="10" y="350" fontSize="9" fill="#334155">VisionInspectorAgent · VLM Analysis</text>
+      </svg>
+
+      {/* Verdict badge */}
+      <div className={`absolute bottom-2 left-2 z-10 flex items-center gap-1.5 ${vm.bg} border ${vm.border} rounded px-2 py-1`}>
+        <span className={`text-sm ${vm.color}`}>{vm.icon}</span>
+        <span className={`text-xs font-semibold ${vm.color}`}>{event.verdict}</span>
+        <span className="text-xs text-slate-400">{Math.round(event.confidence * 100)}%</span>
+      </div>
+    </div>
+  );
+}
+
+function CyberPhysicalTab() {
+  const [vlmEvents, setVlmEvents]   = useState(MOCK_VLM_EVENTS);
+  const [fleet, setFleet]           = useState(MOCK_FLEET);
+  const [dispatch, setDispatch]     = useState([]);
+  const [activeCamera, setActCamera] = useState(0);
+  const [lastDispatch, setLastDispatch] = useState(null);
+  const esRef = useRef(null);
+
+  // Subscribe to VLM_ANOMALY SSE events from the backend
+  useEffect(() => {
+    const token = localStorage.getItem('mva_token') || '';
+    const url   = `${API_BASE}/api/v1/cyber_physical/stream?token=${encodeURIComponent(token)}`;
+    const es    = new EventSource(url);
+    esRef.current = es;
+
+    es.addEventListener('VLM_ANOMALY', (e) => {
+      try {
+        const ev = JSON.parse(e.data);
+        setVlmEvents(prev => [ev, ...prev.slice(0, 9)]);
+        setActCamera(0);
+      } catch {}
+    });
+
+    es.addEventListener('ROBOT_CMD', (e) => {
+      try {
+        const cmd = JSON.parse(e.data);
+        setDispatch(prev => [cmd, ...prev.slice(0, 19)]);
+        setLastDispatch(new Date().toISOString());
+        // Update fleet status
+        if (cmd.command_type === 'ESTOP') {
+          setFleet(prev => prev.map(r =>
+            r.robot_id === cmd.robot_id ? { ...r, status: 'ESTOP' } : r
+          ));
+        } else if (cmd.command_type === 'CMD_VEL' || cmd.command_type === 'NAVIGATION_GOAL') {
+          setFleet(prev => prev.map(r =>
+            r.robot_id === cmd.robot_id ? { ...r, status: 'BUSY' } : r
+          ));
+        }
+      } catch {}
+    });
+
+    es.addEventListener('FLEET_UPDATE', (e) => {
+      try {
+        const update = JSON.parse(e.data);
+        setFleet(update.robots || []);
+      } catch {}
+    });
+
+    return () => es.close();
+  }, []);
+
+  const event = vlmEvents[activeCamera];
+
+  return (
+    <div className="flex-1 overflow-y-auto p-4 space-y-4">
+
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="text-lg">🤖</span>
+          <h2 className="text-sm font-semibold tracking-wider uppercase text-slate-300">Cyber-Physical Operations</h2>
+          <span className="text-xs bg-orange-900/30 border border-orange-500/40 text-orange-300 rounded px-2 py-0.5">
+            VisionInspectorAgent · ROS2 Bridge
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-orange-400 blink"></span>
+          <span className="text-xs text-orange-300">CYBER-PHYSICAL LIVE</span>
+        </div>
+      </div>
+
+      {/* Main grid: CCTV + Fleet */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+
+        {/* ── CCTV Panel (2/3 width on xl) ─────────────────────────────── */}
+        <div className="xl:col-span-2 space-y-3">
+          <div className="bg-surface-800 border border-surface-600 rounded-xl overflow-hidden">
+            <div className="flex items-center justify-between px-3 py-2 border-b border-surface-600">
+              <span className="text-xs text-slate-400 uppercase tracking-wider">Live Camera Feed — VLM Anomaly Detection</span>
+              <div className="flex gap-1">
+                {vlmEvents.slice(0, 5).map((ev, i) => {
+                  const vm = VERDICT_META[ev.verdict] || VERDICT_META.UNCERTAIN;
+                  return (
+                    <button key={ev.id || i} onClick={() => setActCamera(i)}
+                      className={`text-xs px-2 py-0.5 rounded border transition-colors ${
+                        i === activeCamera
+                          ? `${vm.bg} ${vm.border} ${vm.color} font-semibold`
+                          : 'border-surface-500 text-slate-500 hover:text-slate-300'
+                      }`}>
+                      {ev.camera}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Camera viewport */}
+            <div className="p-3">
+              {event && <CameraFeedCanvas event={event} />}
+              {!event && (
+                <div className="flex items-center justify-center h-40 text-slate-600">
+                  <span className="text-sm">No camera feed</span>
+                </div>
+              )}
+            </div>
+
+            {/* VLM Analysis report for active camera */}
+            {event && (
+              <div className="px-3 pb-3 space-y-2">
+                <div className={`rounded-lg border p-3 text-xs space-y-1 ${
+                  VERDICT_META[event.verdict]?.bg
+                } ${VERDICT_META[event.verdict]?.border}`}>
+                  <div className="flex items-center gap-2">
+                    <span className={`font-bold ${VERDICT_META[event.verdict]?.color}`}>
+                      {VERDICT_META[event.verdict]?.icon} {event.verdict}
+                    </span>
+                    <span className="text-slate-400">confidence: {Math.round(event.confidence * 100)}%</span>
+                    <span className="text-slate-500 ml-auto">{timeAgo(event.ts)}</span>
+                  </div>
+                  <p className="text-slate-300 leading-relaxed">{event.description}</p>
+                  {event.boxes.length > 0 && (
+                    <div className="flex gap-2 flex-wrap mt-1">
+                      {event.boxes.map((b, i) => (
+                        <span key={i} className="bg-red-900/40 border border-red-500/40 rounded px-1.5 py-0.5 text-red-300">
+                          {b.label} ({Math.round(b.conf * 100)}%)
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Dispatch Log */}
+          <div className="bg-surface-800 border border-surface-600 rounded-xl overflow-hidden">
+            <div className="flex items-center justify-between px-3 py-2 border-b border-surface-600">
+              <span className="text-xs text-slate-400 uppercase tracking-wider">ROS2 Command Dispatch Log</span>
+              {lastDispatch && <span className="text-xs text-slate-600">Last: {timeAgo(lastDispatch)}</span>}
+            </div>
+            <div className="p-3 max-h-52 overflow-y-auto space-y-1.5">
+              {dispatch.length === 0 && (
+                <div className="text-xs text-slate-600 text-center py-4">No commands dispatched yet</div>
+              )}
+              {dispatch.map((cmd, i) => (
+                <div key={i} className={`flex items-center gap-2 text-xs py-1.5 px-2 rounded border ${
+                  cmd.command_type === 'ESTOP'
+                    ? 'bg-red-900/20 border-red-500/30'
+                    : 'bg-surface-700 border-surface-500'
+                }`}>
+                  <span className={`font-mono font-bold ${
+                    cmd.command_type === 'ESTOP' ? 'text-red-400' :
+                    cmd.command_type === 'CMD_VEL' ? 'text-blue-400' : 'text-orange-400'
+                  }`}>{cmd.command_type || cmd.type}</span>
+                  <span className="text-violet-300">{cmd.robot_id}</span>
+                  <span className="text-slate-500 ml-auto font-mono text-xs">
+                    {(cmd.command_id || cmd.id || '').slice(0,12)}
+                  </span>
+                  <span className={`text-xs px-1.5 py-0.5 rounded ${
+                    cmd.dispatched
+                      ? 'bg-emerald-900/30 text-emerald-400 border border-emerald-500/30'
+                      : 'bg-slate-700 text-slate-400'
+                  }`}>{cmd.dispatched ? '✓ sent' : '⏳ queued'}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ── Fleet Status Panel (1/3 width on xl) ─────────────────────── */}
+        <div className="space-y-3">
+          <div className="bg-surface-800 border border-surface-600 rounded-xl overflow-hidden">
+            <div className="px-3 py-2 border-b border-surface-600">
+              <span className="text-xs text-slate-400 uppercase tracking-wider">Robot Fleet Status</span>
+            </div>
+
+            {/* Topological map — SVG grid */}
+            <div className="px-3 pt-3">
+              <svg viewBox="0 0 300 160" className="w-full" style={{ height: 130 }}>
+                {/* Grid background */}
+                {[0,1,2,3].map(i => (
+                  <line key={i} x1={i*100} y1="0" x2={i*100} y2="160" stroke="#1a1f2c" strokeWidth="1" />
+                ))}
+                {[0,1,2].map(i => (
+                  <line key={i} x1="0" y1={i*80} x2="300" y2={i*80} stroke="#1a1f2c" strokeWidth="1" />
+                ))}
+                {/* Pathways */}
+                <line x1="40" y1="80" x2="260" y2="80" stroke="#2d3551" strokeWidth="6" strokeLinecap="round" />
+                {/* Station nodes */}
+                {[
+                  { x: 50,  y: 80, label: 'ST-1' },
+                  { x: 125, y: 50, label: 'ST-2' },
+                  { x: 175, y: 80, label: 'ST-3' },
+                  { x: 250, y: 60, label: 'ST-4' },
+                ].map((s, i) => (
+                  <g key={i}>
+                    <circle cx={s.x} cy={s.y} r="10" fill="#13161e" stroke="#374151" strokeWidth="1.5" />
+                    <text x={s.x} y={s.y + 3} textAnchor="middle" fontSize="7" fill="#64748b">{s.label}</text>
+                  </g>
+                ))}
+                {/* Robot positions */}
+                {fleet.map((r, i) => {
+                  const stNum = parseInt(r.station.split('-')[1]) || 1;
+                  const positions = [{x:50,y:60},{x:125,y:30},{x:175,y:60},{x:250,y:40},{x:125,y:100}];
+                  const pos = positions[i % positions.length];
+                  const sm = FLEET_STATUS_META[r.status] || FLEET_STATUS_META.OFFLINE;
+                  const roleEmoji = r.role === 'AGV' ? '🚘' : r.role === 'robotic_arm' ? '🦾' : '🛸';
+                  return (
+                    <g key={r.robot_id}>
+                      <circle cx={pos.x} cy={pos.y} r="8"
+                        fill={r.status === 'ESTOP' ? '#7f1d1d' : r.status === 'BUSY' ? '#1e3a5f' : '#1a2e1a'}
+                        stroke={r.status === 'ESTOP' ? '#ef4444' : r.status === 'ONLINE' ? '#22c55e' : '#6b7280'}
+                        strokeWidth="1.5"
+                      />
+                      <text x={pos.x} y={pos.y + 3} textAnchor="middle" fontSize="8">{roleEmoji}</text>
+                      <text x={pos.x} y={pos.y + 18} textAnchor="middle" fontSize="6" fill="#94a3b8">{r.robot_id.split('-')[0]}{r.robot_id.split('-')[1]}</text>
+                    </g>
+                  );
+                })}
+              </svg>
+            </div>
+
+            {/* Fleet list */}
+            <div className="p-3 space-y-1.5">
+              {fleet.map(robot => {
+                const sm = FLEET_STATUS_META[robot.status] || FLEET_STATUS_META.OFFLINE;
+                return (
+                  <div key={robot.robot_id}
+                    className="flex items-center gap-2 bg-surface-700 border border-surface-500 rounded-lg px-3 py-1.5">
+                    <span className="text-base">
+                      {robot.role === 'AGV' ? '🚘' : robot.role === 'robotic_arm' ? '🦾' : '🛸'}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs font-mono text-slate-200">{robot.robot_id}</span>
+                        <span className="text-xs text-slate-500">{robot.station}</span>
+                      </div>
+                      <div className="text-xs text-slate-600">{robot.role.replace('_', ' ')}</div>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <div className={`w-2 h-2 rounded-full ${sm.dot}`}></div>
+                      <span className={`text-xs font-semibold ${sm.color}`}>{sm.label}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Interface spec card */}
+          <div className="bg-surface-800 border border-surface-600 rounded-xl p-4 space-y-2">
+            <div className="text-xs text-slate-400 uppercase tracking-wider">ROS2 Bridge Interface</div>
+            <div className="text-xs text-slate-500 space-y-1">
+              <p>MQTT: <code className="text-slate-300">{"mva/robots/<id>/cmd"}</code></p>
+              <p>WS: <code className="text-slate-300">rosbridge_suite :9090</code></p>
+              <p>Cmd types: <code className="text-slate-300">CMD_VEL · ESTOP · JOINT_TARGET · GRIPPER · NAV_GOAL</code></p>
+            </div>
+            <div className="bg-surface-900 rounded p-2 text-xs text-slate-400 font-mono overflow-x-auto">{`{
+  "type": "CMD_VEL",
+  "robot_id": "AGV-001",
+  "payload": { "linear_x": 0.3 },
+  "signature": "<Ed25519-sig>"
+}`}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
 // ──────────────────────────────────────────────────────────────
 function EmergencyAlertOverlay({ alerts, onDismiss }) {
   const [activeIdx, setActiveIdx]     = useState(0);
@@ -1621,10 +2024,11 @@ function App() {
       )}
       <TopNav user={user} onLogout={handleLogout} activeTab={activeTab} setActiveTab={setActiveTab} />
       <main className="flex-1 overflow-hidden flex flex-col">
-        {activeTab === 'stream' && <ThoughtStreamTab />}
-        {activeTab === 'action' && <ActionCenterTab />}
-        {activeTab === 'health' && <SystemHealthTab />}
-        {activeTab === 'twin'   && <DigitalTwinTab />}
+        {activeTab === 'stream'         && <ThoughtStreamTab />}
+        {activeTab === 'action'          && <ActionCenterTab />}
+        {activeTab === 'health'          && <SystemHealthTab />}
+        {activeTab === 'twin'            && <DigitalTwinTab />}
+        {activeTab === 'cyber_physical'  && <CyberPhysicalTab />}
       </main>
     </div>
   );

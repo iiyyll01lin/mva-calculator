@@ -1,36 +1,42 @@
 """
 backend/agents/debate_room.py
 ────────────────────────────────────────────────────────────────────────────────
-Multi-Agent Debate & Consensus Engine — Enterprise MVA Platform v2.0.0
+Multi-Agent Debate & Consensus Engine — Enterprise MVA Platform v3.0.0
 
 Architecture
 ────────────
-                     ┌────────────────────────────────────┐
-  User Query ──────► │        run_debate_session()         │
-                     │                                    │
-                     │  Turn 1:                           │
-                     │    CostOptimizationAgent  ─► Plan A│
-                     │                                    │
-                     │  Turn 2:                           │
-                     │    QualityAndTimeAgent    ─► Plan B│
-                     │    (critiques Plan A)              │
-                     │                                    │
-                     │  Optional extra turns              │
-                     │    (CostAgent rebuts Plan B)       │
-                     │                                    │
-                     │  Final turn:                       │
-                     │    ConsensusJudgeAgent    ─► Synth │
-                     └────────────────────────────────────┘
+                     ┌────────────────────────────────────────┐
+  User Query ──────► │         run_debate_session()            │
+                     │                                        │
+                     │  Turn 1:                               │
+                     │    CostOptimizationAgent  ─► Plan A    │
+                     │                                        │
+                     │  Turn 2:                               │
+                     │    QualityAndTimeAgent    ─► Plan B    │
+                     │    ├─ requests VisionProof (async)     │
+                     │    └─ embeds VLM evidence in critique  │
+                     │                                        │
+                     │  Optional extra turns                  │
+                     │    (CostAgent rebuts Plan B)           │
+                     │                                        │
+                     │  Final turn:                           │
+                     │    ConsensusJudgeAgent    ─► Synthesis │
+                     │    (with visual evidence if present)   │
+                     └────────────────────────────────────────┘
 
 Design principles
 ─────────────────
 • Debate turns are sequential — prevents race conditions on shared context.
-• Tool calls *within* a single agent turn may be parallelised via asyncio.gather.
+• Vision processing (VLM calls) runs concurrently with temporal context
+  retrieval inside run_quality_agent() via asyncio.gather — it does NOT
+  block the overall debate sequencing or the ConsensusJudge turn.
 • All turns are instrumented with span_type="debate" so Mission Control
   renders them as a distinct "internal argument" thread in the dashboard.
 • Pydantic v2 models enforce strict output schemas at every turn boundary.
 • The LLM client abstraction routes cost/quality agents to the local tier
   and ConsensusJudge to the cloud tier (see llm_client.AGENT_MODEL_MAP).
+• VLM analyses and dispatched ROS2 commands are Ed25519-signed and logged
+  in the TamperEvidentAuditLog (cryptographic provenance).
 """
 
 from __future__ import annotations
@@ -51,6 +57,7 @@ from memory.alignment_store import build_system_prompt
 
 # TemporalAnalyst is imported lazily inside coroutines to avoid circular imports
 # (agents/temporal_analyst.py → tools/temporal_rag.py → data_ops/agentic_etl.py)
+# VisionInspectorAgent is also imported lazily (heavy vision dependencies).
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +71,18 @@ MAX_TURNS_CEILING: int = 10
 DEBATE_AGENT_COST    = "CostOptimizationAgent"
 DEBATE_AGENT_QUALITY = "QualityAndTimeAgent"
 DEBATE_AGENT_JUDGE   = "ConsensusJudgeAgent"
+
+#: Timeout for the async VLM visual-proof call so it never blocks a debate turn.
+VISION_PROOF_TIMEOUT_S: float = float(
+    __import__("os").environ.get("DEBATE_VISION_TIMEOUT_S", "30.0")
+)
+
+# Sentinel placeholder image (1×1 transparent PNG, base64) used when no real
+# camera frame is available — signals the VLM to use IoT-only analysis.
+_PLACEHOLDER_FRAME_B64: str = (
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhf"
+    "DwAChwGA60e6kgAAAABJRU5ErkJggg=="
+)
 
 
 # ────────────────────────────────────────────────────────────────────────────
@@ -135,6 +154,16 @@ class ConsensusResult(BaseModel):
     debate_turns:         int   = Field(default=0,
                                         description="Total debate turns completed.")
     session_id:           str   = Field(default="")
+
+    # ── Cyber-Physical extensions (v3.0) ────────────────────────────────────
+    vision_evidence:      Optional[Dict[str, Any]] = Field(
+        default=None,
+        description="VisionAnalysisResult dict when the Quality Agent requested visual proof.",
+    )
+    physical_commands_dispatched: List[str] = Field(
+        default_factory=list,
+        description="command_id list of RobotCommands dispatched after HITL approval.",
+    )
 
     model_config = {"extra": "ignore"}
 
@@ -266,6 +295,56 @@ def _parse_or_raise(raw: str, schema: type[BaseModel], agent_name: str) -> BaseM
 # Adversarial Agent: CostOptimizationAgent
 # ────────────────────────────────────────────────────────────────────────────
 
+# ────────────────────────────────────────────────────────────────────────────
+# Helper: async visual proof request  (non-blocking — runs via asyncio.gather)
+# ────────────────────────────────────────────────────────────────────────────
+
+async def _request_visual_proof(
+    query:       str,
+    session_id:  str,
+    image_b64:   Optional[str] = None,
+) -> Optional[Dict[str, Any]]:
+    """
+    Request visual proof from the VisionInspectorAgent.
+
+    Designed to be called concurrently with _fetch_temporal_context inside
+    ``asyncio.gather`` so it does NOT add serial latency to the debate.
+
+    Returns the VisionAnalysisResult as a plain dict (None on any error).
+    Uses a placeholder 1×1 PNG when no real camera frame is supplied, which
+    signals the VLM to rely on the IoT context string instead.
+    """
+    try:
+        from agents.vision_inspector import analyse_frame, VisualVerdict
+
+        frame = image_b64 or _PLACEHOLDER_FRAME_B64
+        result = await asyncio.wait_for(
+            analyse_frame(
+                image_b64   = frame,
+                session_id  = session_id,
+                frame_id    = f"debate-{session_id[:8]}",
+                iot_context = query,
+            ),
+            timeout=VISION_PROOF_TIMEOUT_S,
+        )
+        logger.info(
+            "VisionProof for session=%s: verdict=%s confidence=%.2f",
+            session_id, result.verdict.value, result.confidence,
+        )
+        return result.model_dump()
+    except asyncio.TimeoutError:
+        logger.warning(
+            "VisionProof timed out after %.0fs for session=%s — skipping.",
+            VISION_PROOF_TIMEOUT_S, session_id,
+        )
+    except Exception as exc:
+        logger.warning(
+            "VisionProof failed for session=%s: %s — skipping.",
+            session_id, exc,
+        )
+    return None
+
+
 async def _fetch_temporal_context(
     query:      str,
     session_id: str,
@@ -364,17 +443,53 @@ async def run_quality_agent(
     plan_a:     DebatePlan,
     session_id: str,
     turn:       int = 2,
-) -> CritiquePlan:
+    image_b64:  Optional[str] = None,
+) -> tuple[CritiquePlan, Optional[Dict[str, Any]]]:
     """
     Critique Plan A and propose Plan B (quality/throughput-maximising counter-plan).
 
-    Fetches historical context from TemporalAnalystAgent so it can cite
-    evidence of past defect spikes as argument against the CostAgent's proposal.
+    v3.0: Now requests "Visual Proof" from the VisionInspectorAgent concurrently
+    with the TemporalAnalyst context fetch.  The VLM result is embedded into the
+    QualityAgent's argument so it can cite physical observations (e.g. a confirmed
+    conveyor jam at Station 4) when arguing against the CostAgent's plan.
 
-    Instrumented with ``span_type="debate"``.
+    The visual proof call runs via asyncio.gather alongside the temporal context
+    fetch and NEVER adds serial latency to the debate.
+
+    Args:
+        query:      Optimization query (also passed as IoT context to the VLM).
+        plan_a:     CostAgent's Plan A to critique.
+        session_id: Telemetry trace ID.
+        turn:       Current debate turn number.
+        image_b64:  Optional base64 camera frame.  If None, a 1x1 placeholder
+                    is used and the VLM relies on the IoT text context.
+
+    Returns:
+        Tuple of (CritiquePlan, Optional[VisionAnalysisResult dict]).
     """
-    # Fetch historical context — QualityAgent uses it to argue against risky changes
-    hist_context = await _fetch_temporal_context(query, session_id)
+    # ── Fetch temporal context AND visual proof concurrently ─────────────────────
+    # asyncio.gather runs both coroutines in parallel: the debate loop does NOT
+    # wait serially for the VLM response before proceeding with the text critique.
+    hist_context, vision_evidence = await asyncio.gather(
+        _fetch_temporal_context(query, session_id),
+        _request_visual_proof(query, session_id, image_b64),
+        return_exceptions=False,
+    )
+
+    # Build the visual proof block to inject into the QualityAgent prompt
+    vision_block = ""
+    if vision_evidence and isinstance(vision_evidence, dict):
+        verdict      = vision_evidence.get("verdict", "UNCERTAIN")
+        description  = vision_evidence.get("anomaly_description", "")
+        confidence   = vision_evidence.get("confidence", 0.0)
+        actions      = vision_evidence.get("recommended_actions", [])
+        vision_block = (
+            f"\n\n[VISUAL PROOF START]\n"
+            f"VisionInspectorAgent verdict: {verdict} (confidence={confidence:.0%})\n"
+            f"Camera observation: {description}\n"
+            f"Recommended physical actions: {'; '.join(actions)}\n"
+            f"[VISUAL PROOF END]\n"
+        )
 
     async with agent_span(
         span_name  = f"debate/quality_agent/turn_{turn}",
@@ -385,13 +500,18 @@ async def run_quality_agent(
         span.metadata["debate_turn"]          = turn
         span.metadata["debate_role"]          = "critic"
         span.metadata["has_temporal_context"] = bool(hist_context)
+        span.metadata["has_vision_proof"]     = bool(vision_block)
+        span.metadata["vision_verdict"]       = (
+            vision_evidence.get("verdict") if isinstance(vision_evidence, dict) else None
+        )
         span.metadata["debate_event"] = (
             f"[Turn {turn}] QualityAndTimeAgent is critiquing Plan A"
+            + (" (with visual proof)" if vision_block else "")
             + (" (with historical context)" if hist_context else "") + "…"
         )
 
         plan_a_json   = plan_a.model_dump_json(indent=2)
-        context_block = f"Original query:\n{query}{hist_context}"
+        context_block = f"Original query:\n{query}{hist_context}{vision_block}"
         messages = [
             ChatMessage(role="system",    content=build_system_prompt(DEBATE_AGENT_QUALITY, _QUALITY_BASE_PROMPT)),
             ChatMessage(role="user",      content=context_block),
@@ -414,13 +534,15 @@ async def run_quality_agent(
 
         critique = _parse_or_raise(result.content, CritiquePlan, DEBATE_AGENT_QUALITY)
         logger.info(
-            "QualityAgent Plan B: %d operators, %.2f UPH, $%.4f/unit (session=%s)",
+            "QualityAgent Plan B: %d operators, %.2f UPH, $%.4f/unit "
+            "vision=%s (session=%s)",
             critique.counter_plan.num_operators,
             critique.counter_plan.throughput_uph,
             critique.counter_plan.cost_per_unit_usd,
+            vision_evidence.get("verdict") if isinstance(vision_evidence, dict) else "n/a",
             session_id,
         )
-        return critique
+        return critique, vision_evidence
 
 
 # ────────────────────────────────────────────────────────────────────────────
@@ -428,18 +550,21 @@ async def run_quality_agent(
 # ────────────────────────────────────────────────────────────────────────────
 
 async def run_consensus_judge(
-    query:      str,
-    plan_a:     DebatePlan,
-    critique:   CritiquePlan,
-    session_id: str,
-    turn:       int = 3,
+    query:           str,
+    plan_a:          DebatePlan,
+    critique:        CritiquePlan,
+    session_id:      str,
+    turn:            int = 3,
+    vision_evidence: Optional[Dict[str, Any]] = None,
 ) -> ConsensusResult:
     """
     Evaluate Plan A and Plan B; synthesize the globally optimal consensus plan.
 
-    Routes to the cloud-tier model (configured in ``llm_client.AGENT_MODEL_MAP``)
-    for the highest available reasoning quality.
+    v3.0: Accepts optional ``vision_evidence`` from the Quality Agent's visual
+    proof request so the Judge can weigh physical observations (e.g. confirmed
+    conveyor jam, smoke detection) when resolving trade-offs.
 
+    Routes to the cloud-tier model for the highest available reasoning quality.
     Instrumented with ``span_type="debate"``.
     """
     async with agent_span(
@@ -448,19 +573,36 @@ async def run_consensus_judge(
         agent_name = DEBATE_AGENT_JUDGE,
         trace_id   = session_id,
     ) as span:
-        span.metadata["debate_turn"]  = turn
-        span.metadata["debate_role"]  = "judge"
+        span.metadata["debate_turn"]        = turn
+        span.metadata["debate_role"]        = "judge"
+        span.metadata["has_vision_evidence"] = bool(vision_evidence)
         span.metadata["debate_event"] = (
-            f"[Turn {turn}] ConsensusJudge is synthesizing the final optimal plan…"
+            f"[Turn {turn}] ConsensusJudge is synthesizing the final optimal plan"
+            + (" (with visual evidence)" if vision_evidence else "") + "…"
         )
 
-        plan_b   = critique.counter_plan
+        plan_b = critique.counter_plan
+
+        # Build optional visual evidence block for the judge
+        vision_block = ""
+        if vision_evidence and isinstance(vision_evidence, dict):
+            verdict     = vision_evidence.get("verdict", "UNCERTAIN")
+            description = vision_evidence.get("anomaly_description", "")
+            confidence  = vision_evidence.get("confidence", 0.0)
+            vision_block = (
+                f"\n\n[VISUAL EVIDENCE FROM VISION INSPECTOR]\n"
+                f"Verdict: {verdict} (confidence={confidence:.0%})\n"
+                f"Camera observation: {description}\n"
+                f"[END VISUAL EVIDENCE]\n"
+            )
+
         context  = (
             f"Original query:\n{query}\n\n"
             f"Plan A (Cost-Optimized):\n{plan_a.model_dump_json(indent=2)}\n\n"
             f"Critique by QualityAgent:\n"
             f"  Weaknesses: {json.dumps(critique.weaknesses_found)}\n\n"
             f"Plan B (Quality-Optimized):\n{plan_b.model_dump_json(indent=2)}"
+            f"{vision_block}"
         )
         messages = [
             ChatMessage(role="system", content=build_system_prompt(DEBATE_AGENT_JUDGE, _JUDGE_BASE_PROMPT)),
@@ -482,17 +624,22 @@ async def run_consensus_judge(
 
         # Use _parse_or_raise for consistent fence-stripping + validation
         raw_obj = _parse_or_raise(result.content, ConsensusResult, DEBATE_AGENT_JUDGE)
-        # Stamp session metadata that can't come from the LLM
-        consensus = raw_obj.model_copy(update={
+        # Stamp session metadata that can't come from the LLM, plus visual evidence
+        update_fields: Dict[str, Any] = {
             "session_id":   session_id,
             "debate_turns": turn,
-        })
+        }
+        if vision_evidence and isinstance(vision_evidence, dict):
+            update_fields["vision_evidence"] = vision_evidence
+        consensus = raw_obj.model_copy(update=update_fields)
         logger.info(
-            "Consensus plan: %d operators, %.2f UPH, $%.4f/unit, confidence=%.2f (session=%s)",
+            "Consensus plan: %d operators, %.2f UPH, $%.4f/unit, confidence=%.2f "
+            "vision=%s (session=%s)",
             consensus.num_operators,
             consensus.throughput_uph,
             consensus.cost_per_unit_usd,
             consensus.confidence_score,
+            vision_evidence.get("verdict") if isinstance(vision_evidence, dict) else "n/a",
             session_id,
         )
         return consensus
@@ -506,14 +653,20 @@ async def run_debate_session(
     query:      str,
     session_id: str,
     max_turns:  int = DEFAULT_MAX_TURNS,
+    image_b64:  Optional[str] = None,
 ) -> ConsensusResult:
     """
     Orchestrate a full multi-agent debate session for a complex optimisation query.
 
+    v3.0: Accepts an optional ``image_b64`` camera frame that is forwarded to
+    the QualityAgent for visual proof.  When provided, the VisionInspectorAgent
+    runs concurrently (non-blocking) with the temporal context fetch so there
+    is zero additional serial latency on the critical debate path.
+
     Turn structure (default ``max_turns=3``):
       Turn 1 — CostOptimizationAgent  → Plan A
-      Turn 2 — QualityAndTimeAgent    → Critique A + Plan B
-      Turn 3 — ConsensusJudgeAgent    → Synthesis
+      Turn 2 — QualityAndTimeAgent    → Critique A + Plan B  [+ VisionProof]
+      Turn 3 — ConsensusJudgeAgent    → Synthesis  [+ visual evidence]
 
     When ``max_turns > 3``, an additional rebuttal round is inserted:
       Turn 3 — CostOptimizationAgent  → Rebuttal of Plan B
@@ -531,6 +684,7 @@ async def run_debate_session(
         query:      Natural-language manufacturing optimisation query.
         session_id: Telemetry trace ID (pass the parent AgentState session_id).
         max_turns:  Hard cap on debate rounds. Must be ≥ 3; capped at 10.
+        image_b64:  Optional base64 camera frame for VisionInspectorAgent.
 
     Returns:
         :class:`ConsensusResult` — the final synthesized execution plan.
@@ -552,9 +706,11 @@ async def run_debate_session(
         trace_id   = session_id,
     ) as root_span:
         root_span.prompt = query
-        root_span.metadata["max_turns"]    = max_turns
+        root_span.metadata["max_turns"]        = max_turns
+        root_span.metadata["has_image_frame"]  = bool(image_b64)
         root_span.metadata["debate_event"] = (
-            "Debate session initiated — adversarial agents assembling…"
+            "Debate session initiated — adversarial agents assembling"
+            + (" (multi-modal mode)" if image_b64 else "") + "…"
         )
 
         db_session = DebateSession(session_id=session_id, query=query)
@@ -564,12 +720,13 @@ async def run_debate_session(
         db_session.plans.append(plan_a)
         db_session.turns = 1
 
-        # ── Turn 2: QualityAndTimeAgent critiques Plan A + proposes Plan B ──
-        critique = await run_quality_agent(
+        # ── Turn 2: QualityAndTimeAgent critiques Plan A + requests VisionProof
+        critique, vision_evidence = await run_quality_agent(
             query      = query,
             plan_a     = plan_a,
             session_id = session_id,
             turn       = 2,
+            image_b64  = image_b64,
         )
         db_session.critiques.append(critique)
         db_session.plans.append(critique.counter_plan)
@@ -595,13 +752,14 @@ async def run_debate_session(
             current_turn += 1
             db_session.turns = current_turn - 1
 
-        # ── Final turn: ConsensusJudgeAgent synthesizes ─────────────────────
+        # ── Final turn: ConsensusJudgeAgent synthesizes (with visual evidence)
         consensus = await run_consensus_judge(
-            query      = query,
-            plan_a     = active_plan_a,
-            critique   = critique,
-            session_id = session_id,
-            turn       = current_turn,
+            query            = query,
+            plan_a           = active_plan_a,
+            critique         = critique,
+            session_id       = session_id,
+            turn             = current_turn,
+            vision_evidence  = vision_evidence,
         )
         consensus = consensus.model_copy(update={
             "debate_turns": current_turn,
