@@ -208,6 +208,80 @@ function LoginPage({ onLogin }) {
 // ──────────────────────────────────────────────────────────────
 // Top Nav
 // ──────────────────────────────────────────────────────────────
+// Verification Shield — cryptographic audit chain integrity badge
+// ──────────────────────────────────────────────────────────────
+function VerificationShield() {
+  const [state, setState] = React.useState('idle'); // idle | loading | secure | compromised | error
+  const [result, setResult] = React.useState(null);
+  const [popover, setPopover] = React.useState(false);
+
+  async function verify() {
+    setState('loading');
+    setPopover(false);
+    try {
+      const data = await apiFetch('/api/v1/audit/verify_chain');
+      setResult(data);
+      setState(data.status === 'SECURE' ? 'secure' : 'compromised');
+    } catch (e) {
+      setState('error');
+      setResult({ error: String(e) });
+    }
+    setPopover(true);
+    // Auto-dismiss after 8 s
+    setTimeout(() => setPopover(false), 8000);
+  }
+
+  const badge = {
+    idle:        { icon: '🛡', label: 'Verify Chain',          cls: 'text-slate-400 hover:text-emerald-300 hover:bg-emerald-900/20' },
+    loading:     { icon: '⟳', label: 'Verifying…',            cls: 'text-slate-400 animate-spin cursor-wait' },
+    secure:      { icon: '🔐', label: 'Chain Verified',        cls: 'text-emerald-400 hover:text-emerald-300 hover:bg-emerald-900/20' },
+    compromised: { icon: '⚠', label: 'Tamper Detected!',      cls: 'text-red-400 hover:text-red-300 hover:bg-red-900/20' },
+    error:       { icon: '✕', label: 'Verify Failed',         cls: 'text-yellow-400 hover:text-yellow-300 hover:bg-yellow-900/20' },
+  }[state];
+
+  return (
+    <div className="relative">
+      <button
+        onClick={verify}
+        disabled={state === 'loading'}
+        className={`text-xs transition-colors px-2 py-1 rounded flex items-center gap-1 ${badge.cls}`}
+        title="Verify cryptographic audit chain integrity"
+      >
+        <span>{badge.icon}</span>
+        <span className="hidden sm:inline">{badge.label}</span>
+      </button>
+      {popover && result && (
+        <div
+          className="absolute right-0 top-8 w-72 bg-surface-700 border border-surface-500 rounded-lg shadow-xl p-3 z-50 text-xs"
+          onClick={() => setPopover(false)}
+        >
+          {state === 'error' ? (
+            <p className="text-yellow-400">Error: {result.error}</p>
+          ) : (
+            <>
+              <p className={`font-bold mb-1 ${state === 'secure' ? 'text-emerald-400' : 'text-red-400'}`}>
+                {state === 'secure' ? '🔐 Chain Cryptographically Verified' : '⚠ Chain COMPROMISED'}
+              </p>
+              <p className="text-slate-400">Blocks: {result.total_blocks ?? 0}</p>
+              <p className="text-slate-400">Verified sigs: {result.verified_signatures ?? 0}</p>
+              {result.tampered_blocks && result.tampered_blocks.length > 0 && (
+                <div className="mt-1">
+                  <p className="text-red-400 font-semibold">Tampered blocks ({result.tampered_blocks.length}):</p>
+                  {result.tampered_blocks.slice(0, 3).map((b, i) => (
+                    <p key={i} className="text-red-300 truncate">#{b.seq ?? b.lineno}: {b.reason}</p>
+                  ))}
+                </div>
+              )}
+              <p className="text-slate-600 mt-1">Click to dismiss</p>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
 function TopNav({ user, onLogout, activeTab, setActiveTab }) {
   const tabs = [
     { id: 'stream',   label: 'Thought Stream',  icon: '⟁' },
@@ -240,6 +314,7 @@ function TopNav({ user, onLogout, activeTab, setActiveTab }) {
       <div className="flex items-center gap-3">
         <span className="text-xs text-slate-500">{user?.role ?? ''}</span>
         <span className="text-xs text-slate-300">{user?.user_id ?? user?.sub ?? '—'}</span>
+        <VerificationShield />
         <button onClick={onLogout} className="text-xs text-red-400 hover:text-red-300 transition-colors px-2 py-1 rounded hover:bg-red-900/20">
           ⏻ Logout
         </button>

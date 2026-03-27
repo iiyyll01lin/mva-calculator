@@ -8,3 +8,5 @@ test-results/
 __pycache__/
 *.pyc
 .DS_Store
+# Runtime-generated audit chain (process-local, not for VCS)
+ddm-l6/backend/audit_chain.jsonl

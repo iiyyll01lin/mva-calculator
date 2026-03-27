@@ -39,6 +39,7 @@ from __future__ import annotations
 
 import asyncio
 import base64
+import hashlib
 import json
 import logging
 import os
@@ -48,6 +49,22 @@ from contextlib import asynccontextmanager
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from typing import Any, AsyncGenerator, Dict, List, Optional
+
+# Deferred import to avoid circular deps at module load; resolved lazily
+_provenance: Any = None
+
+
+def _get_provenance():
+    global _provenance
+    if _provenance is None:
+        from security.provenance import sign_payload, verify_payload, hash_payload, GENESIS_HASH  # noqa: E402
+        _provenance = {
+            "sign_payload": sign_payload,
+            "verify_payload": verify_payload,
+            "hash_payload": hash_payload,
+            "GENESIS_HASH": GENESIS_HASH,
+        }
+    return _provenance
 
 logger = logging.getLogger(__name__)
 
@@ -726,6 +743,15 @@ class EmergencyProposal:
     created_at:           str               = field(
         default_factory=lambda: datetime.now(timezone.utc).isoformat()
     )
+    # Digital signature over the canonical JSON of the other fields.
+    # Populated by broadcast_emergency_proposal() before fan-out.
+    cryptographic_signature: Optional[str]  = None
+
+    def _signable_dict(self) -> Dict[str, Any]:
+        """Return the payload that was/will be signed (excludes the sig field itself)."""
+        d = self.to_dict()
+        d.pop("cryptographic_signature", None)
+        return d
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -789,7 +815,31 @@ async def broadcast_emergency_proposal(proposal: EmergencyProposal) -> None:
     client cannot stall the Watchdog.  The proposal is also appended to the
     in-memory ring buffer (using the watchdog session_id as trace_id) so it
     appears in the telemetry replay feed.
+
+    The proposal is digitally signed with the process-level Ed25519 key before
+    being broadcast, and then logged to the tamper-evident audit chain.
     """
+    # ── Sign the proposal before broadcast ───────────────────────────────────
+    try:
+        prov = _get_provenance()
+        proposal.cryptographic_signature = prov["sign_payload"](proposal._signable_dict())
+        logger.debug(
+            "EmergencyProposal %s signed (sig_prefix=%s)",
+            proposal.proposal_id[:8],
+            (proposal.cryptographic_signature or "")[:16],
+        )
+    except Exception as _sign_exc:
+        logger.warning("Failed to sign EmergencyProposal: %s", _sign_exc)
+
+    # ── Log to tamper-evident chain ───────────────────────────────────────────
+    asyncio.create_task(
+        TamperEvidentAuditLog.record(
+            event_type = "EMERGENCY_PROPOSAL_BROADCAST",
+            entity_id  = proposal.proposal_id,
+            payload    = proposal.to_dict(),
+        )
+    )
+
     lock = _get_emergency_lock()
     async with lock:
         queues = list(_emergency_queues)
@@ -852,3 +902,251 @@ def estimate_tokens(text: str) -> int:
     if not text:
         return 1
     return max(1, len(text) // 4)
+
+
+# ────────────────────────────────────────────────────────────────────────────
+# Tamper-Evident Audit Log  (blockchain-style hash chaining)
+# ────────────────────────────────────────────────────────────────────────────
+
+AUDIT_CHAIN_LOG_FILE: str = os.environ.get("MVA_AUDIT_CHAIN_LOG", "audit_chain.jsonl")
+
+
+@dataclass
+class AuditChainEntry:
+    """
+    A single block in the append-only audit chain.
+
+    Each block records a previous_hash that chains it to its predecessor,
+    producing a Merkle-style linked list that makes silent tampering detectable.
+    """
+    block_id:      str
+    seq:           int               # monotonically-increasing block index
+    event_type:    str
+    entity_id:     str
+    payload:       Dict[str, Any]
+    timestamp:     str               # ISO-8601 UTC
+    previous_hash: str               # SHA-256 of the previous block's canonical JSON
+    block_hash:    str = ""          # SHA-256 of this block (excl. block_hash itself)
+    signature:     str = ""          # Ed25519 sig over canonical JSON (excl. signature)
+
+    def _hashable_dict(self) -> Dict[str, Any]:
+        """Canonical dict used when computing block_hash (excludes block_hash itself)."""
+        d = asdict(self)
+        d.pop("block_hash", None)
+        d.pop("signature", None)
+        return d
+
+    def _signable_dict(self) -> Dict[str, Any]:
+        """Canonical dict used when signing (excludes both block_hash and signature)."""
+        return self._hashable_dict()
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_dict(), sort_keys=True, separators=(",", ":"), default=str)
+
+
+class TamperEvidentAuditLog:
+    """
+    Async-safe, append-only audit log with blockchain-style SHA-256 hash
+    chaining and Ed25519 digital signatures.
+
+    Each new block includes the SHA-256 hash of the previous block, making
+    any retroactive modification instantly detectable by
+    :meth:`verify_chain`.
+
+    Usage::
+
+        await TamperEvidentAuditLog.record(
+            event_type = "EMERGENCY_PROPOSAL_BROADCAST",
+            entity_id  = proposal.proposal_id,
+            payload    = proposal.to_dict(),
+        )
+    """
+
+    _lock: Optional[asyncio.Lock] = None
+    _seq:  int = 0
+    _last_hash: str = ""
+
+    @classmethod
+    def _get_lock(cls) -> asyncio.Lock:
+        if cls._lock is None:
+            cls._lock = asyncio.Lock()
+        return cls._lock
+
+    @classmethod
+    def _genesis_hash(cls) -> str:
+        try:
+            return _get_provenance()["GENESIS_HASH"]
+        except Exception:
+            return "0" * 64
+
+    @classmethod
+    async def record(
+        cls,
+        event_type: str,
+        entity_id:  str,
+        payload:    Dict[str, Any],
+    ) -> "AuditChainEntry":
+        """
+        Append a new block to the audit chain.
+
+        The block is signed with the process Ed25519 key and appended to
+        ``MVA_AUDIT_CHAIN_LOG`` (default: ``audit_chain.jsonl``).
+
+        Returns
+        -------
+        AuditChainEntry
+            The committed chain block (useful for tests).
+        """
+        prov = _get_provenance()
+
+        async with cls._get_lock():
+            if not cls._last_hash:
+                cls._last_hash = cls._genesis_hash()
+
+            entry = AuditChainEntry(
+                block_id      = str(uuid.uuid4()),
+                seq           = cls._seq,
+                event_type    = event_type,
+                entity_id     = entity_id,
+                payload       = payload,
+                timestamp     = datetime.now(timezone.utc).isoformat(),
+                previous_hash = cls._last_hash,
+            )
+
+            # Compute block hash (SHA-256 of block minus block_hash & signature)
+            entry.block_hash = prov["hash_payload"](entry._hashable_dict())
+            # Sign the block
+            entry.signature  = prov["sign_payload"](entry._signable_dict())
+
+            cls._last_hash = entry.block_hash
+            cls._seq += 1
+
+        logger.debug(
+            "TamperEvidentAuditLog: block seq=%d type=%s entity=%s hash_prefix=%s",
+            entry.seq, entry.event_type, entry.entity_id, entry.block_hash[:12],
+        )
+
+        # Append to JSONL file (fire-and-forget)
+        if AUDIT_CHAIN_LOG_FILE:
+            line = entry.to_json() + "\n"
+            loop = asyncio.get_event_loop()
+            try:
+                await loop.run_in_executor(
+                    None, _sync_jsonl_append, AUDIT_CHAIN_LOG_FILE, line
+                )
+            except OSError as exc:
+                logger.debug("TamperEvidentAuditLog JSONL write failed: %s", exc)
+
+        return entry
+
+    @classmethod
+    async def verify_chain(
+        cls, log_file: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Read the JSONL audit chain from disk and verify the hash linkage and
+        Ed25519 signatures of every block.
+
+        Returns
+        -------
+        dict
+            ``{"status": "SECURE"|"COMPROMISED",
+               "total_blocks": int,
+               "tampered_blocks": [...],
+               "verified_signatures": int}``
+        """
+        prov         = _get_provenance()
+        path         = log_file or AUDIT_CHAIN_LOG_FILE
+        tampered     : List[Dict[str, Any]] = []
+        prev_hash   = cls._genesis_hash()
+        total        = 0
+        verified_sigs = 0
+
+        # Read all blocks from disk (non-blocking via executor)
+        loop = asyncio.get_event_loop()
+        try:
+            raw_lines: List[str] = await loop.run_in_executor(
+                None, _read_lines_safe, path
+            )
+        except Exception as exc:
+            logger.warning("TamperEvidentAuditLog.verify_chain: cannot read %s: %s", path, exc)
+            raw_lines = []
+
+        for lineno, line in enumerate(raw_lines, start=1):
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                data = json.loads(line)
+            except json.JSONDecodeError:
+                tampered.append({"lineno": lineno, "reason": "invalid JSON"})
+                continue
+
+            total += 1
+            block_id = data.get("block_id", f"line-{lineno}")
+
+            # Re-create entry for hash verification
+            entry = AuditChainEntry(
+                block_id      = data.get("block_id", ""),
+                seq           = data.get("seq", 0),
+                event_type    = data.get("event_type", ""),
+                entity_id     = data.get("entity_id", ""),
+                payload       = data.get("payload", {}),
+                timestamp     = data.get("timestamp", ""),
+                previous_hash = data.get("previous_hash", ""),
+                block_hash    = data.get("block_hash", ""),
+                signature     = data.get("signature", ""),
+            )
+
+            reason = None
+
+            # 1. Verify previous_hash linkage
+            expected_prev = prev_hash
+            if entry.previous_hash != expected_prev:
+                reason = (
+                    f"previous_hash mismatch: expected {expected_prev[:12]}… "
+                    f"got {entry.previous_hash[:12]}…"
+                )
+
+            # 2. Verify block_hash integrity
+            computed_hash = prov["hash_payload"](entry._hashable_dict())
+            if computed_hash != entry.block_hash:
+                reason = reason or (
+                    f"block_hash mismatch: expected {computed_hash[:12]}… "
+                    f"got {entry.block_hash[:12]}…"
+                )
+
+            # 3. Verify Ed25519 signature
+            if entry.signature and prov["verify_payload"](entry._signable_dict(), entry.signature):
+                verified_sigs += 1
+            else:
+                reason = reason or "signature invalid or missing"
+
+            if reason:
+                tampered.append({
+                    "block_id": block_id,
+                    "seq":      entry.seq,
+                    "lineno":   lineno,
+                    "reason":   reason,
+                })
+
+            prev_hash = entry.block_hash or prev_hash
+
+        return {
+            "status":             "SECURE" if not tampered else "COMPROMISED",
+            "total_blocks":       total,
+            "tampered_blocks":    tampered,
+            "verified_signatures": verified_sigs,
+        }
+
+
+def _read_lines_safe(path: str) -> List[str]:
+    """Synchronous helper — read lines from a file; return [] if not found."""
+    try:
+        with open(path, "r", encoding="utf-8") as fh:
+            return fh.readlines()
+    except FileNotFoundError:
+        return []

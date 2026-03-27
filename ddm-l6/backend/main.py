@@ -4298,6 +4298,31 @@ async def stream_emergency_proposals(token: Optional[str] = None):
 
 
 # ============================================
+# Cryptographic Audit Chain Endpoint
+# ============================================
+
+@app.get("/api/v1/audit/verify_chain")
+async def verify_audit_chain(current_user: dict = Depends(verify_token)):
+    """
+    Verify the integrity of the tamper-evident audit chain.
+
+    Re-reads every block from the JSONL file on disk, recomputes SHA-256 hash
+    linkages, and re-verifies Ed25519 signatures.
+
+    Returns
+    -------
+    JSON
+        ``{"status": "SECURE"|"COMPROMISED",
+           "total_blocks": int,
+           "tampered_blocks": [...],
+           "verified_signatures": int}``
+    """
+    from telemetry import TamperEvidentAuditLog
+    result = await TamperEvidentAuditLog.verify_chain()
+    return result
+
+
+# ============================================
 # Run Server
 # ============================================
 
